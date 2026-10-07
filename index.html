@@ -16,59 +16,134 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
-<main>
-  <section class="hero panel" aria-label="Hero stats">
-    <div class="av"><span id="av"></span><b class="lvbadge">Lv <span id="lvl">1</span></b></div>
-    <div class="stats">
-      <div class="rank" id="rank">Peasant</div>
-      <div class="row"><label>HP</label><div class="bar hp" id="hpbar"><i id="hpfill"></i><em id="hptxt"></em></div></div>
-      <div class="row"><label>XP</label><div class="bar xp" id="bar"><i id="fill"></i><em id="xptxt"></em></div></div>
+<body class="wait">
+<div class="gate" id="gate">
+  <div class="panel gatebox">
+    <div class="gicon" id="gicon"></div>
+    <h1>Daily Quests</h1>
+    <p>Sign in to begin your adventure. Your progress is saved to your account.</p>
+    <input id="em" type="email" placeholder="Email" autocomplete="email" aria-label="Email">
+    <input id="pw" type="password" placeholder="Password (6+ characters)" autocomplete="current-password" aria-label="Password">
+    <div class="acts">
+      <button class="btn" id="gin" type="button">Sign in</button>
+      <button class="ghost" id="gup" type="button">Create account</button>
     </div>
-    <div class="chips">
-      <div class="chip off" id="streak"><span id="fl"></span> <b id="sn">0</b></div>
-      <div class="chip" id="mult">x1.0 XP</div>
-      <div class="chip"><span id="gc"></span> <b id="gd">0</b></div>
+    <div class="sub" id="gmsg"></div>
+  </div>
+</div>
+
+<main>
+  <header class="hud">
+    <section class="hero panel" aria-label="Hero stats">
+      <div class="av"><span id="av"></span><b class="lvbadge">Lv <span id="lvl">1</span></b></div>
+      <div class="stats">
+        <div class="rank" id="rank">Peasant</div>
+        <div class="row"><label>HP</label><div class="bar hp" id="hpbar"><i id="hpfill"></i><em id="hptxt"></em></div></div>
+        <div class="row"><label>XP</label><div class="bar xp" id="bar"><i id="fill"></i><em id="xptxt"></em></div></div>
+      </div>
+      <div class="chips">
+        <div class="chip off" id="streak" title="Perfect-day streak"><div class="ch"><span id="fl"></span><small>Streak</small></div><b id="sn">0</b></div>
+        <div class="chip" id="mult" title="XP multiplier"><div class="ch"><span id="mi"></span><small>XP</small></div><b id="mv">x1.0</b></div>
+        <div class="chip" title="Gold"><div class="ch"><span id="gc"></span><small>Gold</small></div><b id="gd">0</b></div>
+      </div>
+    </section>
+  </header>
+
+  <section class="tab on" id="tab-quests">
+    <div class="timer" id="timer"></div>
+    <div class="board">
+      <div class="today"><h2>Quest board</h2><span id="count">0 / 0</span></div>
+      <div class="bar xp dbar" id="dbar" role="progressbar" aria-label="Quests done today"><i id="dfill"></i></div>
+      <div class="qtabs" role="tablist" aria-label="Quest schedule">
+        <button type="button" class="qtab on" data-g="today" role="tab" aria-selected="true">Today</button>
+        <button type="button" class="qtab" data-g="all" role="tab" aria-selected="false">Daily</button>
+        <button type="button" class="qtab" data-g="wk" role="tab" aria-selected="false">Mon-Fri</button>
+        <button type="button" class="qtab" data-g="we" role="tab" aria-selected="false">Sat-Sun</button>
+      </div>
+      <ul id="list"></ul>
+    </div>
+    <div id="winbox"></div>
+    <form id="add">
+      <label class="posthead" for="newname">Post a new quest</label>
+      <input id="newname" placeholder="e.g. Drink 2L water" maxlength="80" aria-label="Quest name" required>
+      <span class="posthead">Difficulty</span>
+      <input type="hidden" id="diff" value="20">
+      <div class="diffs" role="group" aria-label="Difficulty">
+        <button type="button" class="dbtn" data-v="10" aria-pressed="false"><span class="st">★</span><b>Easy</b><small class="dx">+10 XP</small><small class="dh">-1 HP</small></button>
+        <button type="button" class="dbtn on" data-v="20" aria-pressed="true"><span class="st">★★</span><b>Medium</b><small class="dx">+20 XP</small><small class="dh">-3 HP</small></button>
+        <button type="button" class="dbtn" data-v="40" aria-pressed="false"><span class="st">★★★</span><b>Hard</b><small class="dx">+40 XP</small><small class="dh">-5 HP</small></button>
+      </div>
+      <span class="posthead">Repeats</span>
+      <input type="hidden" id="days" value="all">
+      <div class="diffs" role="group" aria-label="Repeats">
+        <button type="button" class="sbtn on" data-g="all" aria-pressed="true">Every day</button>
+        <button type="button" class="sbtn" data-g="wk" aria-pressed="false">Weekdays</button>
+        <button type="button" class="sbtn" data-g="we" aria-pressed="false">Weekends</button>
+      </div>
+      <button class="btn" type="submit">Pin quest</button>
+    </form>
+  </section>
+
+  <section class="tab" id="tab-hero">
+    <h3>Character</h3>
+    <div class="stats4" id="sheet"></div>
+    <div class="sub">Every level: +3 max HP, +2% XP, +2% gold, -1% damage taken.</div>
+    <button class="ghost wide" id="editchar" type="button">Edit character</button>
+    <h3>Forge</h3>
+    <div class="panel" id="forge"></div>
+    <h3>Honors</h3>
+    <div class="badges" id="badges"></div>
+  </section>
+
+  <section class="tab" id="tab-realm">
+    <div class="arena" id="arena" aria-hidden="true">
+      <div class="stars"></div><div class="orb"></div><div class="castle"></div>
+      <div class="atag" id="atag"></div>
+      <div class="abinfo"><b id="abname"></b><div class="bar hp"><i id="abfill"></i><em id="abtxt"></em></div></div>
+      <div class="ground"></div>
+      <div class="sprite" id="ahero"></div>
+      <div class="sprite boss" id="aboss"></div>
+    </div>
+    <div class="panel dev" id="dev" hidden>
+      <div class="devrow">
+        <button class="ghost" id="dprev" type="button" aria-label="Previous avatar">&lt;</button>
+        <div class="devmid"><span id="dface"></span><b id="dname">My hero</b></div>
+        <button class="ghost" id="dnext" type="button" aria-label="Next avatar">&gt;</button>
+      </div>
+      <div class="sub">Dev: preview every rank and class. Arrow keys work too. Your save is not changed.</div>
+      <button class="ghost" id="dreset" type="button">Back to my hero</button>
+    </div>
+    <h3>Weekly boss</h3>
+    <div class="panel boss" id="bossbox"></div>
+    <h3>Chronicle</h3>
+    <div class="log panel" id="log"></div>
+    <h3>Account</h3>
+    <div class="panel" id="acct"></div>
+    <div class="foot">
+      <button class="ghost" id="theme">Day / Night</button>
+      <button class="ghost" id="reset">Reset all progress</button>
     </div>
   </section>
 
-  <div class="timer" id="timer"></div>
-
-  <div class="today"><h2>Quest board</h2><span id="count">0 / 0</span></div>
-  <ul id="list"></ul>
-  <div id="winbox"></div>
-
-  <form id="add">
-    <input id="newname" placeholder="New daily quest, e.g. Drink 2L water" maxlength="80" aria-label="Quest name" required>
-    <select id="diff" aria-label="Difficulty">
-      <option value="10">Easy +10 XP / -5 HP</option>
-      <option value="20" selected>Medium +20 XP / -10 HP</option>
-      <option value="40">Hard +40 XP / -20 HP</option>
-    </select>
-    <button class="btn" type="submit">Accept quest</button>
-  </form>
-
-  <h3>Weekly boss</h3>
-  <div class="panel boss" id="bossbox"></div>
-
-  <h3>Forge</h3>
-  <div class="panel" id="forge"></div>
-
-  <h3>Chronicle</h3>
-  <div class="log panel" id="log"></div>
-
-  <h3>Honors</h3>
-  <div class="badges" id="badges"></div>
-
-  <h3>Account</h3>
-  <div class="panel" id="acct"></div>
-
-  <div class="foot">
-    <button class="ghost" id="theme">Day / Night</button>
-    <button class="ghost" id="reset">Reset all progress</button>
-  </div>
+  <nav class="nav" aria-label="Main">
+    <button class="navbtn on" data-tab="quests" type="button"><span class="ni"></span>Quests</button>
+    <button class="navbtn" data-tab="hero" type="button"><span class="ni"></span>Hero<span class="dot" id="dot-hero" hidden>!</span></button>
+    <button class="navbtn" data-tab="realm" type="button"><span class="ni"></span>Realm</button>
+  </nav>
 </main>
 
+<div class="creator" id="creator" role="dialog" aria-modal="true" aria-labelledby="ctitle" hidden>
+  <div class="cwrap">
+    <h2 id="ctitle">Create your hero</h2>
+    <div class="panel cprevbox"><div id="cprev" aria-hidden="true"></div></div>
+    <div id="copts"></div>
+    <div class="acts cacts">
+      <button class="ghost" id="crand" type="button">Random</button>
+      <button class="ghost" id="ccancel" type="button">Cancel</button>
+      <button class="btn" id="cdone" type="button">Done</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true">
   <div class="card" id="mcard">
