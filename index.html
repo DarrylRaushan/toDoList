@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daily Quests</title>
+<meta name="theme-color" content="#1e1b26">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Quests">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <section class="hero panel" aria-label="Hero stats">
+    <div class="av"><span id="av"></span><b class="lvbadge">Lv <span id="lvl">1</span></b></div>
+    <div class="stats">
+      <div class="rank" id="rank">Peasant</div>
+      <div class="row"><label>HP</label><div class="bar hp" id="hpbar"><i id="hpfill"></i><em id="hptxt"></em></div></div>
+      <div class="row"><label>XP</label><div class="bar xp" id="bar"><i id="fill"></i><em id="xptxt"></em></div></div>
+    </div>
+    <div class="chips">
+      <div class="chip off" id="streak"><span id="fl"></span> <b id="sn">0</b></div>
+      <div class="chip" id="mult">x1.0 XP</div>
+      <div class="chip"><span id="gc"></span> <b id="gd">0</b></div>
+    </div>
+  </section>
+
+  <div class="timer" id="timer"></div>
+
+  <div class="today"><h2>Quest board</h2><span id="count">0 / 0</span></div>
+  <ul id="list"></ul>
+  <div id="winbox"></div>
+
+  <form id="add">
+    <input id="newname" placeholder="New daily quest, e.g. Drink 2L water" maxlength="80" aria-label="Quest name" required>
+    <select id="diff" aria-label="Difficulty">
+      <option value="10">Easy +10 XP / -5 HP</option>
+      <option value="20" selected>Medium +20 XP / -10 HP</option>
+      <option value="40">Hard +40 XP / -20 HP</option>
+    </select>
+    <button class="btn" type="submit">Accept quest</button>
+  </form>
+
+  <h3>Weekly boss</h3>
+  <div class="panel boss" id="bossbox"></div>
+
+  <h3>Forge</h3>
+  <div class="panel" id="forge"></div>
+
+  <h3>Chronicle</h3>
+  <div class="log panel" id="log"></div>
+
+  <h3>Honors</h3>
+  <div class="badges" id="badges"></div>
+
+  <h3>Account</h3>
+  <div class="panel" id="acct"></div>
+
+  <div class="foot">
+    <button class="ghost" id="theme">Day / Night</button>
+    <button class="ghost" id="reset">Reset all progress</button>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="card" id="mcard">
+    <div class="me" id="me"></div>
+    <h2 id="mt"></h2>
+    <p id="mm"></p>
+    <button class="btn" id="mok">Continue</button>
+  </div>
+</div>
+<div id="fx" aria-hidden="true"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
