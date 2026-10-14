@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=17">
 </head>
 <body class="wait">
 <div class="gate" id="gate">
@@ -85,11 +85,30 @@
   </section>
 
   <section class="tab" id="tab-hero">
-    <h3>Character</h3>
-    <div class="stats4" id="sheet"></div>
-    <div class="sub">Every level: +3 max HP, +2% XP, +2% gold, -1% damage taken.</div>
+    <div class="panel showcase" aria-label="Equipment">
+      <div class="stage">
+        <div class="scol" id="scol-l"></div>
+        <div class="figure" id="figure" role="img" aria-label="Your hero"></div>
+        <div class="scol" id="scol-r"></div>
+        <div class="fpet" id="fpet" hidden></div>
+      </div>
+      <div class="figname" id="figname"></div>
+      <div class="slotrow" id="slotrow"></div>
+      <div class="stats4" id="sheet"></div>
+      <div class="sub" id="gearbonus"></div>
+    </div>
+    <div class="panel picker" id="picker"></div>
+    <div class="panel dev" id="devpet" hidden>
+      <div class="devrow">
+        <button class="ghost" id="dpprev" type="button" aria-label="Previous companion">&lt;</button>
+        <div class="devmid"><span id="dpface"></span><b id="dpname">My companion</b></div>
+        <button class="ghost" id="dpnext" type="button" aria-label="Next companion">&gt;</button>
+      </div>
+      <div class="sub">Dev: preview companions next to your hero. Your save is not changed.</div>
+      <button class="ghost" id="dpreset" type="button">Back to my companion</button>
+    </div>
     <button class="ghost wide" id="editchar" type="button">Edit character</button>
-    <h3>Forge</h3>
+    <h3>Class &amp; chests</h3>
     <div class="panel" id="forge"></div>
     <h3>Honors</h3>
     <div class="badges" id="badges"></div>
@@ -102,6 +121,7 @@
       <div class="abinfo"><b id="abname"></b><div class="bar hp"><i id="abfill"></i><em id="abtxt"></em></div></div>
       <div class="ground"></div>
       <div class="sprite" id="ahero"></div>
+      <div class="sprite pet" id="apet" hidden></div>
       <div class="sprite boss" id="aboss"></div>
     </div>
     <div class="panel dev" id="dev" hidden>
@@ -110,7 +130,7 @@
         <div class="devmid"><span id="dface"></span><b id="dname">My hero</b></div>
         <button class="ghost" id="dnext" type="button" aria-label="Next avatar">&gt;</button>
       </div>
-      <div class="sub">Dev: preview every rank and class. Arrow keys work too. Your save is not changed.</div>
+      <div class="sub">Dev: preview gear sets. Arrow keys work too. Your save is not changed.</div>
       <button class="ghost" id="dreset" type="button">Back to my hero</button>
     </div>
     <h3>Weekly boss</h3>
@@ -157,7 +177,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
-<script src="script.js"></script>
+<script src="firebase-config.js?v=6"></script>
+<script src="script.js?v=16"></script>
 </body>
 </html>

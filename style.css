@@ -383,3 +383,133 @@ body.creating{overflow:hidden}
 .board .q.rest{opacity:.62;box-shadow:3px 3px 0 rgba(0,0,0,.5),inset 6px 0 0 #7a6a4a}
 .board .q.rest .chk{background:#7a6a4a;cursor:not-allowed}
 .board .q.rest .tag{border-color:#7a6a4a;color:#7a6a4a}
+
+/* dev tool: tap the profile avatar -> "Modify look" menu */
+.av.devclick{cursor:pointer}
+.av.devclick:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.devmenu{position:fixed;z-index:30;display:grid;gap:6px;min-width:140px;background:var(--panel);border:4px solid var(--ink);padding:8px;box-shadow:4px 4px 0 var(--ink)}
+.devmenu small{font:400 8px var(--head);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.devmenu .ghost{color:var(--text);text-align:left;padding:10px 12px}
+
+/* ---- hero tab: equipment showcase ---- */
+.showcase{margin-top:20px;padding:14px 12px 12px;background:radial-gradient(ellipse at 50% 40%,rgba(255,255,255,.13),transparent 62%),var(--panel2)}
+.stage{display:grid;grid-template-columns:minmax(66px,84px) minmax(0,1fr) minmax(66px,84px);gap:10px;align-items:center}
+.scol{display:grid;gap:14px}
+.figure{position:relative;display:grid;place-items:center;padding:8px 0 18px}
+.figure::before{content:'';position:absolute;left:10%;right:10%;bottom:6px;height:14px;background:var(--panel);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.figure .px{position:relative;z-index:1;width:100%;max-width:190px;height:auto;animation:bob 1.4s steps(2) infinite}
+.figname{text-align:center;margin-top:8px;font:400 11px var(--head);color:var(--gold);text-shadow:2px 2px 0 var(--ink)}
+
+.eslot{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;min-height:98px;padding:6px 3px;background:var(--panel);border:3px solid var(--rar,#6b6478);color:var(--text);cursor:pointer;box-shadow:3px 3px 0 var(--ink),inset 0 0 0 2px var(--ink)}
+.eslot::before,.irow .ei::before{content:'';position:absolute;inset:0;z-index:0;background:radial-gradient(circle at 50% 42%,var(--rar),transparent 72%);opacity:.3;pointer-events:none}
+.eslot>*{position:relative;z-index:1}
+.eslot .ek{font:400 8px var(--head);color:var(--muted)}
+.eslot .ei{display:grid;place-items:center}
+.eslot .ei .px,.irow .ei .px{width:32px;height:32px}
+.eslot small{font:400 18px/1 var(--body);text-align:center;overflow-wrap:anywhere}
+.eslot.base .ei{opacity:.45;filter:grayscale(1)}
+.eslot.on{outline:4px solid var(--gold);outline-offset:2px}
+.eslot:active{transform:translate(2px,2px)}
+.eslot .up{position:absolute;top:-10px;right:-6px;z-index:2;background:var(--hp);color:#fff;font:400 9px var(--head);font-style:normal;padding:3px 5px;border:3px solid var(--ink)}
+
+.picker{margin-top:14px;padding:12px}
+.pkhead{display:flex;justify-content:space-between;align-items:center;font:400 12px var(--head);color:var(--gold)}
+.pkhead span{font:400 21px var(--body);color:var(--text)}
+.picker>.sub{margin:4px 0 6px}
+.irow{display:flex;align-items:center;gap:10px;padding:8px;margin-top:8px;background:var(--panel2);border:3px solid var(--ink);border-left:8px solid var(--rar)}
+.irow.on{box-shadow:inset 0 0 0 3px var(--gold)}
+.irow.lock{opacity:.6}
+.irow .ei{position:relative;flex:none;width:44px;height:44px;display:grid;place-items:center;border:3px solid var(--rar);background:var(--panel)}
+.irow .ei .px{position:relative}
+.irow .itx{flex:1;min-width:0}
+.irow .itx b{display:block;font:400 9px/1.5 var(--head);overflow-wrap:anywhere}
+.irow .itx small{display:block;margin-top:3px;color:var(--muted);font-size:19px;line-height:1.05}
+.irow .btn{flex:none;min-width:84px;min-height:40px;padding:6px 8px;font-size:8px}
+.irow .btn.cur:disabled{opacity:1;background:var(--xp);color:#fff;cursor:default}
+
+.styles{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+
+/* ---- loot inventory ---- */
+.eslot small{font-size:16px}
+.iact{flex:none;display:grid;gap:6px}
+.iact .ghost{min-height:34px;padding:4px 6px;font-size:8px}
+.ghost:disabled{opacity:.45;cursor:not-allowed}
+.chestrow .ghost{margin-left:auto;min-height:42px}
+.chestrow .ghost+.btn{margin-left:0}
+
+/* stats live inside the avatar panel */
+.showcase .stats4{margin-top:14px}
+.showcase .sub{text-align:center;font-size:19px;margin-top:10px}
+
+/* hero idle is drawn in script.js (blink + weapon glint), so the canvas itself stays still. Boss keeps bobbing; the attack lunge still plays. */
+.figure .px{animation:none}
+#ahero:not(.atk){animation:none}
+
+
+/* ---- class preview + chest stage ---- */
+.lockrow{display:flex;justify-content:center;gap:14px;margin:14px 0 4px}
+.lockc{width:48px;height:48px;display:grid;place-items:center;background:var(--panel2);border:3px solid var(--ink);box-shadow:inset 3px 3px 0 rgba(0,0,0,.25)}
+.lockc .px{width:26px;height:26px;filter:brightness(0) opacity(.5)}
+.cbar{height:22px;margin-top:10px}
+.cbar em{font-size:17px}
+
+.chestwrap{position:relative;display:flex;flex-direction:column;align-items:center;padding:16px 8px 14px;margin-top:6px;background:radial-gradient(ellipse at 50% 55%,rgba(255,255,255,.1),transparent 65%),var(--panel2);border:3px solid var(--ink);box-shadow:inset 3px 3px 0 rgba(0,0,0,.22)}
+.chestfig{display:grid;place-items:center;width:100px;height:100px;padding:0;background:none;border:0;cursor:pointer;filter:grayscale(.85) brightness(.75)}
+.chestfig .px{width:100px;height:100px}
+.chestfig.ready{filter:drop-shadow(0 0 8px var(--gold));animation:cbob 1.2s steps(2) infinite}
+.chestfig.shake{filter:drop-shadow(0 0 10px var(--gold));animation:cshake .5s steps(8)}
+.chestfig.burst{filter:drop-shadow(0 0 14px #fff1a8)}
+.chestcount{font:400 12px var(--head);color:var(--gold);margin-top:8px}
+.chestwrap .sub{text-align:center;margin:8px 0 0;font-size:19px}
+.spark{position:absolute;left:50%;top:62px;width:8px;height:8px;margin:-4px;pointer-events:none;animation:spark .7s steps(8) forwards}
+.buyrow{display:flex;gap:10px;align-items:center;margin-top:12px}
+.gbar{height:34px}
+.gbar em{font-size:19px}
+.bar.gold i{background:var(--gold)}
+.gbar.full{animation:blink 1s steps(2) infinite}
+@keyframes cbob{50%{transform:translateY(-4px)}}
+@keyframes cshake{12%{transform:translate(-5px,0)}37%{transform:translate(5px,0)}62%{transform:translate(-4px,0)}87%{transform:translate(4px,0)}}
+@keyframes spark{from{opacity:1;transform:translate(0,0)}to{opacity:0;transform:translate(var(--dx),var(--dy))}}
+
+
+/* ---- locked class preview: labels, padlocks, tap for bonus ---- */
+.lockrow{gap:8px;margin:14px 0 0}
+.lockitem{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:64px;padding:0;background:none;border:0;color:var(--muted);cursor:pointer}
+.lockitem small{font:400 8px var(--head)}
+.lockitem:active .lockc{transform:translate(2px,2px)}
+.lockitem.on small{color:var(--gold)}
+.lockitem.on .lockc{border-color:var(--gold)}
+.lockc{position:relative}
+.lockc .px{filter:grayscale(1) brightness(.95) opacity(.75)}
+.lockpad{position:absolute;right:-8px;bottom:-8px;width:24px;height:24px;display:grid;place-items:center;background:var(--panel);border:3px solid var(--ink)}
+.lockc .lockpad .px{width:14px;height:14px;filter:none}
+.lockinfo{text-align:center;font-size:20px;color:var(--text);margin-top:12px;min-height:22px}
+
+
+/* ---- 5 classes: keep the rows from overflowing on phones ---- */
+.lockrow{gap:4px}
+.lockitem{min-width:0;flex:1;max-width:72px}
+.clsgrid .btn:last-child:nth-child(odd){grid-column:1/-1}
+
+/* ---- off-hand + companion slots ---- */
+.slotrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.eslot.wide{flex-direction:row;align-items:center;justify-content:flex-start;gap:10px;min-height:64px;padding:8px 10px;text-align:left}
+.eslot.wide .ei{flex:none}
+.eslot.wide .etx{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
+.eslot.wide small{text-align:left}
+
+/* companion standing next to the hero in the Realm arena */
+.sprite.pet{left:calc(10% + 78px);bottom:30px}
+.sprite.pet .px{width:44px;height:44px}
+.sprite.hop{animation:hop .5s steps(6)}
+@keyframes hop{30%{transform:translateY(-20px)}60%{transform:translateY(-20px)}100%{transform:none}}
+
+/* dev: companion previewer */
+#dpface{display:grid;place-items:center;min-width:56px;min-height:56px}
+#dpface .px{width:56px;height:56px}
+
+/* companion standing beside the hero on the Hero tab (outside #figure so the idle effects never touch it) */
+.stage{position:relative}
+.fpet{position:absolute;left:calc(50% + 28px);bottom:18px;z-index:3;pointer-events:none;animation:bob 1.2s steps(2) infinite}
+.fpet .px{width:40px;height:40px}
+.fpet[hidden]{display:none}
