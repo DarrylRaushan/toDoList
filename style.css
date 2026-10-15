@@ -192,8 +192,8 @@ main{padding-top:0;padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
 .sprite.atk{animation:lunge .5s steps(6)}
 .sprite.hit{animation:flash .45s steps(4) .25s}
 .sprite.dead{animation:none;filter:grayscale(1) brightness(.6);transform:rotate(90deg) translateX(8px)}
-.atag{position:absolute;top:8px;left:8px;font:400 10px var(--head);background:var(--ink);color:#fff;padding:5px 6px}
-.abinfo{position:absolute;top:8px;right:8px;width:50%;max-width:230px;text-align:right}
+.atag{position:absolute;z-index:3;top:8px;left:8px;font:400 10px var(--head);background:var(--ink);color:#fff;padding:5px 6px}
+.abinfo{position:absolute;z-index:3;top:8px;right:8px;width:50%;max-width:230px;text-align:right}
 .abinfo b{display:block;font:400 10px var(--head);margin-bottom:4px;background:var(--ink);padding:5px 6px;color:#fff}
 .abinfo .bar{height:20px}
 .abinfo .bar em{font-size:17px}
@@ -304,7 +304,7 @@ body.creating{overflow:hidden}
 .board .today span{background:var(--paper);color:var(--paperink);border:3px solid #1a0f06;padding:2px 8px;font-size:20px}
 .board .dbar{margin:0 0 10px;height:14px}
 
-.board ul{gap:22px;padding:24px 14px 18px;min-height:130px;border:4px solid #1a0f06;
+.board .cork{padding:24px 14px 18px;border:4px solid #1a0f06;
   background-color:#b38a55;
   background-image:radial-gradient(#8f6a3a 1.5px,transparent 2px),radial-gradient(#cfa970 1.5px,transparent 2px),radial-gradient(#7a5630 1px,transparent 1.5px);
   background-size:11px 11px,17px 17px,7px 9px;background-position:0 0,5px 6px,3px 2px;
@@ -333,22 +333,40 @@ body.creating{overflow:hidden}
 .board .q .del{color:#7a6a4a}
 .board .empty{padding:24px 14px 18px;font-size:23px;color:#5a4628}
 
-/* the scroll for posting a new quest */
-#add{position:relative;margin:34px 0 0;padding:20px 16px 18px;gap:14px;flex-direction:column;flex-wrap:nowrap;background:var(--paper);color:var(--paperink);border:4px solid var(--dark);box-shadow:4px 4px 0 rgba(0,0,0,.5),inset 0 0 0 3px rgba(0,0,0,.07)}
-#add::before,#add::after{content:'';position:absolute;left:-10px;right:-10px;height:16px;background:var(--wood);border:4px solid var(--dark);box-shadow:0 3px 0 rgba(0,0,0,.35)}
-#add::before{top:-16px}
-#add::after{bottom:-16px}
-.posthead{font:400 11px var(--head);color:#8a5a12;letter-spacing:.5px}
-#add #newname{flex:none;width:100%;background:rgba(255,255,255,.4);border:3px solid var(--dark);color:var(--paperink)}
+/* ---- post-a-quest: one more note pinned at the bottom of the board's cork (collapsed to a single row until tapped) ---- */
+#add{position:relative;display:block;margin:20px 0 4px;padding:0;color:var(--paperink);background:var(--paper);border:3px solid var(--dark);box-shadow:3px 3px 0 rgba(0,0,0,.5)}
+#add::before{content:'';position:absolute;top:-9px;left:50%;margin-left:-6px;width:12px;height:12px;background:#3a8fe0;border:3px solid var(--dark);box-shadow:2px 2px 0 rgba(0,0,0,.45),inset 2px 2px 0 rgba(255,255,255,.45)}
+#add::after{content:'';position:absolute;top:-3px;right:-3px;width:14px;height:14px;background:linear-gradient(225deg,#a97f4a 0 50%,#c4ac6c 50% 100%)}
+.newq-toggle{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:16px 12px 12px 14px;background:none;border:0;color:var(--paperink);font:400 11px/1.3 var(--head);text-align:left;cursor:pointer}
+.newq-toggle:active{transform:translate(2px,2px)}
+.newq-toggle .plus{flex:none;margin-left:auto;display:grid;place-items:center;width:28px;height:28px;background:#2e1c0e;border:3px solid #1a0f06;color:var(--gold);font:400 14px/1 var(--head);font-style:normal;box-shadow:inset 3px 3px 0 rgba(255,255,255,.08)}
+.newq-toggle .plus::before{content:'+'}
+#add.open .newq-toggle .plus::before{content:'-'}
+.newq-body{display:grid;gap:12px;margin:0 12px;padding:14px 0 14px;border-top:3px dotted rgba(58,42,24,.35)}
+.newq-body[hidden]{display:none}
+/* section headings are ruled off like a form */
+.posthead{display:flex;align-items:center;gap:10px;font:400 10px var(--head);color:#8a5a12;letter-spacing:.5px}
+.posthead::after{content:'';flex:1;border-top:3px dotted rgba(58,42,24,.35)}
+#add #newname{flex:none;width:100%;min-height:50px;padding:10px 12px;font-size:23px;background:rgba(255,255,255,.4);border:3px solid var(--dark);color:var(--paperink);box-shadow:inset 3px 3px 0 rgba(0,0,0,.12)}
 #add #newname::placeholder{color:#8a7a58;opacity:1}
 .diffs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.dbtn{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;padding:8px 2px;background:rgba(255,255,255,.3);border:3px solid var(--dark);color:var(--paperink);font:400 9px var(--head);cursor:pointer}
+/* difficulty: small notes; the chosen one gets pinned */
+.dbtn{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:88px;padding:10px 2px 8px;background:#f2e6bf;border:3px solid var(--dark);color:var(--paperink);font:400 9px var(--head);cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.4)}
 .dbtn .st{font:400 15px/1 var(--body);color:#8a5a12;letter-spacing:1px}
 .dbtn small{font:400 19px/1 var(--body)}
-.dbtn:active{transform:translate(2px,2px)}
-.dbtn.on{background:var(--gold);color:var(--goldtxt);box-shadow:inset 3px 3px 0 rgba(255,255,255,.35),inset -3px -3px 0 rgba(0,0,0,.2)}
-.dbtn.on .st{color:var(--goldtxt)}
-#add .btn{width:100%;flex:none}
+.dbtn .dx{color:#2f7d3e}
+.dbtn .dh{color:#a8283a}
+.dbtn:active{transform:translate(2px,2px);box-shadow:none}
+.dbtn.on{background:var(--gold);color:var(--goldtxt);box-shadow:2px 2px 0 rgba(0,0,0,.4),inset 3px 3px 0 rgba(255,255,255,.35),inset -3px -3px 0 rgba(0,0,0,.2)}
+.dbtn.on .st,.dbtn.on small{color:var(--goldtxt)}
+.dbtn.on::before{content:'';position:absolute;top:-8px;left:50%;margin-left:-5px;width:10px;height:10px;background:#d63a47;border:3px solid var(--dark);box-shadow:2px 2px 0 rgba(0,0,0,.45),inset 2px 2px 0 rgba(255,255,255,.45)}
+/* repeats: wooden tabs, the same as the Today / Daily tabs on the board */
+.sbtn{display:flex;align-items:center;justify-content:center;min-width:0;min-height:40px;padding:4px 2px 2px;background:#2e1c0e;color:#d9c38c;border:3px solid #1a0f06;font:400 19px/1 var(--body);text-align:center;cursor:pointer;box-shadow:inset 3px 3px 0 rgba(255,255,255,.08)}
+.sbtn:active{transform:translate(2px,2px)}
+.sbtn.on{background:var(--gold);color:var(--goldtxt);box-shadow:inset 3px 3px 0 rgba(255,255,255,.35),inset -3px -3px 0 rgba(0,0,0,.2)}
+/* submit: gold button with a little pin */
+#add .btn{display:flex;align-items:center;justify-content:center;gap:12px;flex:none;width:100%;min-height:56px;margin-top:4px;padding:10px 12px;font-size:12px}
+#add .btn .pin{flex:none;width:12px;height:12px;background:#d63a47;border:3px solid var(--dark);box-shadow:2px 2px 0 rgba(0,0,0,.45),inset 2px 2px 0 rgba(255,255,255,.45)}
 
 /* ---- compact quest notes ---- */
 .board{padding:10px}
@@ -356,7 +374,8 @@ body.creating{overflow:hidden}
 .board .today h2{font-size:12px}
 .board .today span{font-size:19px;padding:1px 7px}
 .board .dbar{height:12px;margin-bottom:8px}
-.board ul{gap:16px;padding:18px 10px 12px;min-height:96px}
+.board .cork{padding:18px 10px 12px}
+.board ul{gap:16px;min-height:96px}
 .board li:nth-child(odd){margin-right:4px}
 .board li:nth-child(even){margin-left:4px}
 
@@ -376,10 +395,6 @@ body.creating{overflow:hidden}
 .qtab{min-width:0;min-height:34px;padding:4px 2px 2px;background:#2e1c0e;color:#d9c38c;border:3px solid #1a0f06;font:400 19px/1 var(--body);cursor:pointer;box-shadow:inset 3px 3px 0 rgba(255,255,255,.08)}
 .qtab.on{background:var(--gold);color:var(--goldtxt);box-shadow:inset 3px 3px 0 rgba(255,255,255,.35),inset -3px -3px 0 rgba(0,0,0,.2)}
 .qtab:active{transform:translate(2px,2px)}
-#add .posthead{margin-bottom:-6px}
-.sbtn{display:flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:6px 2px;background:rgba(255,255,255,.3);border:3px solid var(--dark);color:var(--paperink);font:400 8px var(--head);cursor:pointer}
-.sbtn:active{transform:translate(2px,2px)}
-.sbtn.on{background:var(--gold);color:var(--goldtxt);box-shadow:inset 3px 3px 0 rgba(255,255,255,.35),inset -3px -3px 0 rgba(0,0,0,.2)}
 .board .q.rest{opacity:.62;box-shadow:3px 3px 0 rgba(0,0,0,.5),inset 6px 0 0 #7a6a4a}
 .board .q.rest .chk{background:#7a6a4a;cursor:not-allowed}
 .board .q.rest .tag{border-color:#7a6a4a;color:#7a6a4a}
@@ -396,7 +411,8 @@ body.creating{overflow:hidden}
 .stage{display:grid;grid-template-columns:minmax(66px,84px) minmax(0,1fr) minmax(66px,84px);gap:10px;align-items:center}
 .scol{display:grid;gap:14px}
 .figure{position:relative;display:grid;place-items:center;padding:8px 0 18px}
-.figure::before{content:'';position:absolute;left:10%;right:10%;bottom:6px;height:14px;background:var(--panel);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.figure::before{content:'';position:absolute;left:12%;right:12%;bottom:12px;height:24px;border-radius:50%;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,.6),rgba(0,0,0,.3) 50%,transparent 72%)}   /* contact shadow */
+.figure::after{content:'';position:absolute;left:0;right:0;bottom:8px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,.28);box-shadow:0 0 14px rgba(255,255,255,.25),inset 0 0 14px rgba(255,255,255,.12);pointer-events:none}   /* floor ring */
 .figure .px{position:relative;z-index:1;width:100%;max-width:190px;height:auto;animation:bob 1.4s steps(2) infinite}
 .figname{text-align:center;margin-top:8px;font:400 11px var(--head);color:var(--gold);text-shadow:2px 2px 0 var(--ink)}
 
@@ -499,8 +515,10 @@ body.creating{overflow:hidden}
 .eslot.wide small{text-align:left}
 
 /* companion standing next to the hero in the Realm arena */
-.sprite.pet{left:calc(10% + 78px);bottom:30px}
-.sprite.pet .px{width:44px;height:44px}
+.sprite.pet{--aw:calc(var(--pz,34) * .4737px);left:max(2px,calc(10% + 9px - .94 * var(--aw)));bottom:34px;z-index:1}
+.sprite.pet .px{width:var(--aw);height:var(--aw)}
+.sprite.pet.big{left:calc(10% + 45px - var(--aw) * .7);bottom:40px}
+#ahero{z-index:2}
 .sprite.hop{animation:hop .5s steps(6)}
 @keyframes hop{30%{transform:translateY(-20px)}60%{transform:translateY(-20px)}100%{transform:none}}
 
@@ -509,7 +527,311 @@ body.creating{overflow:hidden}
 #dpface .px{width:56px;height:56px}
 
 /* companion standing beside the hero on the Hero tab (outside #figure so the idle effects never touch it) */
-.stage{position:relative}
-.fpet{position:absolute;left:calc(50% + 28px);bottom:18px;z-index:3;pointer-events:none;animation:bob 1.2s steps(2) infinite}
-.fpet .px{width:40px;height:40px}
+.stage{position:relative;isolation:isolate;overflow:hidden;padding:12px 8px 8px;border:3px solid var(--ink);
+  grid-template-columns:var(--cw) minmax(0,1fr) var(--cw);
+  box-shadow:inset 3px 3px 0 rgba(255,255,255,.12),inset -3px -3px 0 rgba(0,0,0,.25);
+  background:var(--deco),var(--bgsky);
+  --cw:clamp(62px,18vw,76px);--tx:0;--pw:min(calc(var(--pz,34) * 1px),60vw,260px);   /* --pz = companion size from its level, set in script.js */   /* --tx (-1..1) = pointer parallax, set in script.js */
+  --bgsky:linear-gradient(180deg,var(--sky1) 0,var(--sky2) 62%,var(--sky3) 100%);--deco:linear-gradient(transparent,transparent);
+  --flr:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.4));--ln:rgba(255,255,255,.18);--gl:rgba(255,255,255,.28)}
+/* 3D scene: perspective floor grid + soft light behind the hero (colours come from the selected background) */
+.stage::before{content:'';position:absolute;left:-25%;right:-25%;bottom:0;height:70%;z-index:-1;pointer-events:none;
+  background:repeating-linear-gradient(90deg,var(--ln) 0 2px,transparent 2px 30px),repeating-linear-gradient(0deg,var(--ln) 0 2px,transparent 2px 24px),var(--flr);
+  transform:perspective(220px) rotateX(62deg);transform-origin:50% 100%;
+  -webkit-mask-image:linear-gradient(to top,#000 35%,transparent);mask-image:linear-gradient(to top,#000 35%,transparent);
+  translate:calc(var(--tx) * 5px) 0;transition:translate .2s linear}
+.stage::after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 60%,var(--gl),transparent 58%)}
+.stage .eslot{background:color-mix(in srgb,var(--panel) 62%,transparent)}   /* see-through, so a companion is never fully hidden */
+.figure{z-index:1;translate:calc(var(--tx) * 8px) 0;transition:translate .2s linear}
+.scol{position:relative;z-index:2}
+.stage:has(.fpet:not([hidden])) .figure{transform:translateX(6%)}
+/* companion: SMALL ones float beside the hero (inside the middle column, clear of the gear slots), BIG ones stand behind it (class .big is set in script.js) */
+.fpet{position:absolute;z-index:1;pointer-events:none;animation:bob 1.2s steps(2) infinite;transition:translate .2s linear}
 .fpet[hidden]{display:none}
+.fpet::after{content:'';position:absolute;left:12%;right:12%;height:12px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.45),transparent 70%)}
+.fpet:not(.big){left:calc(18px + var(--cw));bottom:40px;z-index:0;translate:calc(var(--tx) * 12px) 0}
+.fpet .px{width:var(--pw);height:var(--pw)}
+.fpet:not(.big)::after{bottom:-16px}
+.stage:has(.fpet.big:not([hidden])){padding-top:calc(12px + max(0px, var(--pw) - 196px))}   /* sky grows so a big companion can rise above the hero's head */
+.fpet.big{left:calc(50% - var(--pw) * .8);bottom:40px;z-index:0;filter:drop-shadow(0 0 12px var(--gl));translate:calc(var(--tx) * 3px) 0}   /* big and to the left, hero in front, most of it in view */
+.fpet.big::after{left:6%;right:6%;bottom:-6px;height:14px}
+
+/* ---- selectable backgrounds (data-bg on .stage, cycled with the arrows under the hero) ---- */
+.stage[data-bg="grass"],.av[data-bg="grass"]{--bgsky:linear-gradient(180deg,#5fb3ee 0,#a8dcf5 55%,#d9f0c0 100%);
+  --deco:radial-gradient(ellipse 30px 9px at 22% 20%,rgba(255,255,255,.9) 90%,transparent),radial-gradient(ellipse 38px 10px at 72% 13%,rgba(255,255,255,.85) 90%,transparent),radial-gradient(ellipse 24px 7px at 88% 32%,rgba(255,255,255,.75) 90%,transparent),radial-gradient(ellipse 48% 16% at 16% 74%,#6fb85a 97%,transparent 100%),radial-gradient(ellipse 56% 18% at 80% 76%,#5ea84e 97%,transparent 100%);
+  --flr:linear-gradient(180deg,#9ad974,#3f8a3a);--ln:rgba(20,80,20,.22);--gl:rgba(255,255,200,.35)}
+.stage[data-bg="dungeon"],.av[data-bg="dungeon"]{--bgsky:linear-gradient(180deg,#12101a 0,#262233 62%,#3a3447 100%);
+  --deco:radial-gradient(circle 34px at 27% 36%,rgba(255,150,50,.65),transparent 70%),radial-gradient(circle 34px at 73% 36%,rgba(255,150,50,.65),transparent 70%),repeating-linear-gradient(0deg,rgba(0,0,0,.4) 0 2px,transparent 2px 24px),repeating-linear-gradient(90deg,rgba(0,0,0,.3) 0 2px,transparent 2px 44px);
+  --flr:linear-gradient(180deg,#4a4458,#1c1826);--ln:rgba(0,0,0,.55);--gl:rgba(255,170,90,.2)}
+.stage[data-bg="desert"],.av[data-bg="desert"]{--bgsky:linear-gradient(180deg,#f2a65a 0,#f7cf8a 55%,#fbe6b0 100%);
+  --deco:radial-gradient(circle 15px at 74% 24%,#fff3c0 94%,transparent),radial-gradient(ellipse 52% 14% at 22% 74%,#e5b26a 97%,transparent 100%),radial-gradient(ellipse 46% 12% at 86% 72%,#d9a05a 97%,transparent 100%);
+  --flr:linear-gradient(180deg,#ebc684,#b98a48);--ln:rgba(120,70,20,.22);--gl:rgba(255,240,190,.4)}
+.stage[data-bg="snow"],.av[data-bg="snow"]{--bgsky:linear-gradient(180deg,#8fb6e0 0,#cfe3f5 60%,#f2f8ff 100%);
+  --deco:radial-gradient(circle 2px at 12% 18%,#fff 90%,transparent),radial-gradient(circle 2px at 30% 10%,#fff 90%,transparent),radial-gradient(circle 2px at 48% 26%,#fff 90%,transparent),radial-gradient(circle 2px at 64% 12%,#fff 90%,transparent),radial-gradient(circle 2px at 80% 22%,#fff 90%,transparent),radial-gradient(circle 2px at 92% 10%,#fff 90%,transparent),radial-gradient(circle 2px at 22% 38%,#fff 90%,transparent),radial-gradient(circle 2px at 70% 40%,#fff 90%,transparent),radial-gradient(ellipse 50% 15% at 18% 74%,#e4eefa 97%,transparent 100%),radial-gradient(ellipse 52% 17% at 82% 76%,#d4e3f4 97%,transparent 100%);
+  --flr:linear-gradient(180deg,#ffffff,#c4d6ea);--ln:rgba(90,130,180,.25);--gl:rgba(255,255,255,.5)}
+.stage[data-bg="volcano"],.av[data-bg="volcano"]{--bgsky:linear-gradient(180deg,#160708 0,#4a1410 55%,#b8421c 100%);
+  --deco:radial-gradient(ellipse 36% 24% at 50% 80%,#2a0e0c 97%,transparent 100%),radial-gradient(circle 16px at 50% 56%,rgba(255,120,40,.6),transparent 70%),radial-gradient(circle 2px at 20% 30%,#ffb04a 90%,transparent),radial-gradient(circle 2px at 78% 22%,#ffb04a 90%,transparent),radial-gradient(circle 2px at 62% 40%,#ff8a2a 90%,transparent),radial-gradient(circle 2px at 36% 18%,#ff8a2a 90%,transparent);
+  --flr:linear-gradient(180deg,#5a1a10,#1a0806);--ln:rgba(255,120,40,.5);--gl:rgba(255,130,50,.3)}
+.stage[data-bg="night"],.av[data-bg="night"]{--bgsky:linear-gradient(180deg,#07081c 0,#1a1a4a 60%,#3a2a6a 100%);
+  --deco:radial-gradient(circle 11px at 78% 22%,#f4efd0 92%,transparent),radial-gradient(circle 2px at 10% 14%,#fff 90%,transparent),radial-gradient(circle 2px at 24% 30%,#fff 90%,transparent),radial-gradient(circle 2px at 38% 12%,#fff 90%,transparent),radial-gradient(circle 2px at 52% 34%,#fff 90%,transparent),radial-gradient(circle 2px at 62% 10%,#fff 90%,transparent),radial-gradient(circle 2px at 90% 40%,#fff 90%,transparent),radial-gradient(circle 2px at 16% 48%,#fff 90%,transparent);
+  --flr:linear-gradient(180deg,rgba(40,30,80,.2),rgba(0,0,0,.55));--ln:rgba(160,140,255,.3);--gl:rgba(150,150,255,.28)}
+.bgrow{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px}
+.bgrow b{min-width:120px;text-align:center;font:400 10px var(--head);color:var(--text)}
+.bgrow .ghost{min-height:36px;min-width:44px;padding:4px 10px;font-size:12px}
+
+
+
+/* ---- companion placement ----
+   --W = stage width, --hw = hero width on screen, --S = companion size.
+   Small companions (Lv 1-7) stand left of the hero, head touching the hero's edge.
+   Big companions (Lv 8+) tower behind the hero, much larger than it: the hero stands in front, the head looms out past the hero's shoulder. */
+.stage{--W:min(calc(100vw - 32px),528px);--hw:min(190px,calc(var(--W) - 2 * var(--cw) - 42px));--S:var(--pw)}
+.stage:has(.fpet.big:not([hidden])){--S:min(max(calc(var(--pw) * 1.3),calc(var(--hw) * 2.1)),calc(var(--W) * 1.1))}
+.stage .fpet{left:calc(50% - .26 * var(--hw) - .94 * var(--S) + .035 * var(--S));bottom:30px;z-index:0;filter:none}
+.stage .fpet.big{left:calc(50% - .5 * var(--S) + .08 * var(--hw) + .035 * var(--S));bottom:30px;z-index:0;filter:drop-shadow(0 0 14px var(--gl))}
+.stage .fpet .px{width:var(--S);height:var(--S)}
+.stage .figure{transform:none;z-index:2}
+.stage:has(.fpet:not([hidden])) .figure{transform:translateX(calc(var(--hw) * .14))}
+.stage:has(.fpet.big:not([hidden])) .figure{transform:translateX(calc(var(--hw) * .05))}
+.stage:has(.fpet.big:not([hidden])){padding-top:calc(12px + max(0px,calc(var(--S) - 1.3 * var(--hw) - 6px)))}
+
+/* Realm arena: big companions are far bigger than the hero and stand behind it, head looming past it */
+.sprite.pet.big{--aw:189px;left:calc(10% + 47.7px - .465 * var(--aw));bottom:34px;z-index:1}
+
+/* gear boxes can be hidden to see the hero and companion better */
+.stage .scol{transition:opacity .2s}
+.stage.nogear .scol{opacity:0;pointer-events:none}
+.gearbtn{position:absolute;top:6px;left:50%;transform:translateX(-50%);z-index:6;min-height:30px;padding:4px 10px;font-size:8px;color:var(--text);background:color-mix(in srgb,var(--panel) 80%,transparent)}
+
+/* ---- solid companions (Cinder Pup): no bobbing, feet on the same ground line as the hero, contact shadow right under the paws ---- */
+.stage .fpet.solid{animation:none;bottom:26px}
+.stage .fpet.solid::after{left:6%;right:6%;bottom:-5px;height:10px}
+.sprite.pet.solid{bottom:32px}
+.sprite.pet.solid:not(.hop){animation:none}
+.sprite.pet.solid::after{content:'';position:absolute;left:4%;right:4%;bottom:-3px;height:7px;border-radius:50%;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,.5),transparent 72%)}
+
+/* ---- small companions (Cinder Pup) stand in FRONT of the hero, just left of centre at its feet ---- */
+.stage .fpet.solid{left:calc(50% - .5 * var(--S) - .24 * var(--hw));bottom:18px;z-index:3}
+.stage:has(.fpet.solid:not([hidden])) .figure{transform:none}   /* the hero no longer needs to step aside */
+.sprite.pet.solid{left:calc(10% + 45px - .5 * var(--aw) - 18px);bottom:24px;z-index:3}
+
+/* ---- companions flagged "still" (Wendigo) do not bob up and down ---- */
+.stage .fpet.still{animation:none}
+.sprite.pet.still:not(.hop){animation:none}
+
+
+
+
+/* ---- honors: medal plaques ----
+   each badge is a plaque with a coloured ribbon and a round medal (streak = orange, level = purple, other = green).
+   Earned ones glow and sparkle; locked ones are dim with a padlock and, for streak/level goals, a progress bar. */
+.badges{grid-template-columns:repeat(2,1fr);gap:16px}
+.b{--bc:var(--xp);position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px 8px 12px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 0,color-mix(in srgb,var(--bc) 26%,transparent),transparent 72%),var(--panel)}
+.b.k-s{--bc:#e8803a}
+.b.k-l{--bc:#a56be0}
+.b.k-x{--bc:#58b368}
+.b::before{content:'';position:absolute;top:0;left:0;right:0;height:9px;background:var(--bc);border-bottom:3px solid var(--ink)}
+.b .e{position:relative;width:68px;height:68px;margin:0 0 4px;border:4px solid var(--bc);
+  background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.28),transparent 65%),var(--panel2);
+  box-shadow:0 0 0 3px var(--ink),inset 3px 3px 0 rgba(255,255,255,.12),inset -3px -3px 0 rgba(0,0,0,.25)}
+.b .e .px{width:40px;height:40px}
+.b b{display:block;font:400 9px/1.5 var(--head);color:var(--text);min-height:27px;display:grid;place-items:center}
+.b .bd{font-size:19px;line-height:1.05;color:var(--muted)}
+
+.b.got .e{box-shadow:0 0 0 3px var(--ink),0 0 14px color-mix(in srgb,var(--bc) 75%,transparent),inset 3px 3px 0 rgba(255,255,255,.18),inset -3px -3px 0 rgba(0,0,0,.25)}
+.b.got .e::after{content:'';position:absolute;top:-10px;right:-10px;width:4px;height:4px;background:#fff;
+  box-shadow:4px 0 #fff,-4px 0 #fff,0 4px #fff,0 -4px #fff;animation:blink 1.6s steps(2) infinite}
+.b.got b{color:var(--gold)}
+
+.b.lock{opacity:1}
+.b.lock::before{background:#4a4458}
+.b.lock .e{border-color:#6b6478;border-style:dashed;box-shadow:0 0 0 3px var(--ink)}
+.b.lock .e .px{filter:grayscale(1) brightness(.75);opacity:.5}
+.b.lock b{color:var(--muted)}
+.bl{position:absolute;right:-12px;bottom:-12px;width:26px;height:26px;display:grid;place-items:center;background:var(--panel);border:3px solid var(--ink)}
+.b.lock .e .bl .px{width:14px;height:14px;filter:none;opacity:1}
+.bp{position:relative;width:100%;height:20px;margin-top:4px;background:var(--ink);border:3px solid var(--ink);overflow:hidden}
+.bp i{display:block;height:100%;background:var(--bc)}
+.bp em{position:absolute;inset:0;display:grid;place-items:center;font:400 17px var(--body);font-style:normal;color:#fff;text-shadow:1px 1px 0 #000}
+
+/* ---- hero tab: compact inventory picker (grid of item tiles + one detail card) ---- */
+.pkempty{display:flex;align-items:center;gap:10px;margin-top:8px;padding:8px 10px;background:var(--panel2);border:3px dashed var(--ink);color:var(--muted);font-size:20px;line-height:1.05}
+.pkempty .ei{flex:none;display:grid;place-items:center;width:34px;height:34px;opacity:.45;filter:grayscale(1)}
+.pkempty .ei .px{width:24px;height:24px}
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px;margin-top:10px}
+.itile{position:relative;display:grid;place-items:center;aspect-ratio:1;min-height:54px;padding:0;background:var(--panel2);border:3px solid var(--rar,#6b6478);cursor:pointer;box-shadow:3px 3px 0 var(--ink),inset 0 0 0 2px var(--ink)}
+.itile::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,var(--rar),transparent 72%);opacity:.3;pointer-events:none}
+.itile .ei{position:relative;display:grid;place-items:center}
+.itile .ei .px{width:32px;height:32px}
+.itile:active{transform:translate(2px,2px)}
+.itile.sel{outline:4px solid var(--gold);outline-offset:2px}
+.itile .wn{position:absolute;top:-8px;right:-6px;z-index:2;background:var(--xp);color:#fff;font:400 9px var(--head);font-style:normal;padding:3px 4px;border:3px solid var(--ink)}
+.idet{margin-top:12px;padding:10px 10px 10px 12px;background:var(--panel2);border:3px solid var(--ink);border-left:8px solid var(--rar)}
+.idet b{display:block;font:400 10px/1.5 var(--head);overflow-wrap:anywhere}
+.idet small{display:block;margin-top:4px;color:var(--muted);font-size:19px;line-height:1.05}
+.idet small.dim{opacity:.8}
+.iact2{display:flex;gap:8px;margin-top:10px}
+.iact2 .btn{flex:1;min-height:42px;padding:8px 10px;font-size:9px}
+.iact2 .ghost{min-height:42px;padding:6px 10px;font-size:8px}
+
+/* ---- hero caption + scene picker ----
+   the caption is smaller; the background picker no longer sits on the Hero tab, it lives at the bottom of the Realm tab (with Day / Night) */
+.figname{display:grid;gap:6px;margin-top:10px;font:inherit;opacity:1}
+.figname span{display:block;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;font-family:var(--head);line-height:1.3;text-shadow:2px 2px 0 var(--ink)}
+.fn-name{color:var(--gold);font-size:16px}
+.fn-rank{color:var(--text);font-size:12px}
+.foot .bgrow{width:100%;margin:0}
+.foot .bgrow b{min-width:0;font-size:9px}
+.foot .bgrow .ghost{min-height:40px;min-width:40px}
+
+/* ---- character creator: hero name box ---- */
+.copt input{display:block;width:100%;min-height:50px;background:var(--panel2);border:4px solid var(--ink);padding:10px 12px;font-size:22px;color:var(--text);text-align:left}
+.copt input::placeholder{color:var(--muted);opacity:.8}
+
+/* ---- reset confirmation: stacked buttons, the red one swaps places between the two steps ---- */
+.stack{display:grid;gap:14px}
+.stack .btn{width:100%;min-height:54px}
+.btn.danger{background:var(--hp);color:#fff;text-shadow:1px 1px 0 #000}
+
+/* ---- top bar: name big, rank small ---- */
+.rank{display:grid;gap:5px;margin:0 0 2px;letter-spacing:0}
+.rank span{display:block;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk-name{font-size:17px}
+.rk-sub{font-size:11px;color:var(--muted);text-shadow:none}
+
+/* ---- character creator v2: icon tabs, big preview, category list + option panel ---- */
+.creator{overflow:hidden}
+.cwrap{height:100%;display:flex;flex-direction:column;gap:10px;max-width:560px;margin:0 auto;padding:12px 12px 12px}
+.cwrap h2{flex:none;margin:2px 0 0;font-size:13px}
+.ctabs{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.ctab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:56px;padding:6px 2px;background:var(--panel2);border:3px solid var(--ink);color:var(--muted);cursor:pointer;font:400 8px var(--head);box-shadow:inset 3px 3px 0 rgba(255,255,255,.06)}
+.ctab small{font:inherit}
+.ctab .px{width:24px;height:24px;filter:grayscale(1);opacity:.7}
+.ctab.on{background:var(--gold);color:var(--goldtxt);box-shadow:inset 3px 3px 0 rgba(255,255,255,.35),inset -3px -3px 0 rgba(0,0,0,.2)}
+.ctab.on .px{filter:none;opacity:1}
+.ctab:active{transform:translate(2px,2px)}
+.cprevbox{position:relative;flex:none;overflow:hidden;padding:10px 0 18px;
+  background:radial-gradient(ellipse at 50% 35%,rgba(150,120,220,.35),transparent 70%),linear-gradient(#1c1830,#0d0a16)}
+.cprevbox::after{content:'';position:absolute;left:30%;right:30%;bottom:8px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.28);box-shadow:0 0 14px rgba(255,255,255,.2),inset 0 0 12px rgba(255,255,255,.1);pointer-events:none}
+#cprev{position:relative;z-index:1}
+#cprev .px{width:auto;height:clamp(150px,26dvh,240px)}
+#copts{flex:1;min-height:0;display:grid;grid-template-columns:minmax(104px,36%) minmax(0,1fr);gap:10px}
+.ccats,.cpanel{min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.ccats{display:flex;flex-direction:column;gap:8px;padding:0 4px 4px 0}
+.ccat{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none;min-height:52px;padding:6px 8px;text-align:left;background:var(--panel2);border:3px solid var(--ink);color:var(--text);cursor:pointer;box-shadow:3px 3px 0 var(--ink),inset 3px 3px 0 rgba(255,255,255,.06)}
+.ccat .ctx{min-width:0;display:grid;gap:4px}
+.ccat b{font:400 9px/1.3 var(--head);overflow-wrap:anywhere}
+.ccat small{font:400 19px/1 var(--body);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ccat .cdot{flex:none;width:18px;height:18px;border:3px solid var(--ink);box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+.ccat:active{transform:translate(2px,2px)}
+.ccat.on{background:var(--panel);border-color:var(--gold);box-shadow:inset 5px 0 0 var(--gold),3px 3px 0 var(--ink)}
+.ccat.on b{color:var(--gold)}
+.cpanel{padding:12px;background:var(--panel);border:4px solid var(--ink);box-shadow:4px 4px 0 var(--ink),inset 4px 4px 0 rgba(255,255,255,.1),inset -4px -4px 0 rgba(0,0,0,.2)}
+.cpanel h4{font:400 11px var(--head);color:var(--gold);margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px}
+.cpanel .copt{margin:0}
+.cpanel .sub{margin-top:10px;font-size:19px}
+.cpanel .copts.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr))}
+.cpanel .o.sw{width:100%;aspect-ratio:1;min-width:0;height:auto}
+.cacts{flex:none;margin-top:0}
+@media (max-width:380px){#copts{grid-template-columns:minmax(92px,34%) minmax(0,1fr)}.ccat b{font-size:8px}}
+
+/* ---- body sliders ---- */
+.sl{display:grid;gap:6px;margin-bottom:14px}
+.sl label{font:400 9px var(--head);color:var(--text)}
+.slrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px}
+.slrow .rs{min-height:0;min-width:0;width:30px;height:30px;padding:0;display:grid;place-items:center;font:400 16px/1 var(--body);color:var(--muted)}
+.slrow output{min-width:40px;text-align:right;font:400 20px/1 var(--body);color:var(--gold)}
+.rng{-webkit-appearance:none;appearance:none;display:block;width:100%;min-height:0;height:30px;margin:0;padding:0;background:transparent;cursor:pointer;touch-action:pan-y}
+.rng:focus-visible{outline:4px dashed var(--gold);outline-offset:2px}
+.rng::-webkit-slider-runnable-track{height:10px;background:var(--ink);border:3px solid var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.12)}
+.rng::-moz-range-track{height:10px;background:var(--ink);border:3px solid var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.12)}
+.rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:26px;margin-top:-11px;background:var(--gold);border:3px solid var(--ink);border-radius:0;box-shadow:inset 2px 2px 0 rgba(255,255,255,.4),inset -2px -2px 0 rgba(0,0,0,.25)}
+.rng::-moz-range-thumb{width:10px;height:20px;background:var(--gold);border:3px solid var(--ink);border-radius:0}
+.cpanel .wide{margin-top:4px}
+@media (max-width:370px){.sbtn{font-size:16px}}
+
+/* ---- HUD v4: living avatar frame, shiny bars, reactive chips ---- */
+/* frame colour follows your level: wood -> iron -> mythril -> gold -> legendary; the scene behind the hero is the one picked in the Realm tab */
+.av{--fr:#b07a3a;--frg:rgba(176,122,58,0);--bgsky:linear-gradient(180deg,var(--sky1) 0,var(--sky2) 62%,var(--sky3) 100%);--deco:linear-gradient(transparent,transparent);
+  border-color:var(--fr);background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.18),transparent 65%),var(--deco),var(--bgsky);
+  box-shadow:0 0 0 4px var(--ink),0 0 8px 1px var(--frg);animation:frglow 2.6s ease-in-out infinite}
+.av[data-tier="1"]{--fr:#b4bccb;--frg:rgba(180,190,210,.45)}
+.av[data-tier="2"]{--fr:#4aa8d8;--frg:rgba(74,168,216,.55)}
+.av[data-tier="3"]{--fr:#e8b93c;--frg:rgba(232,185,60,.6)}
+.av[data-tier="4"]{--fr:#ff7ae0;--frg:rgba(255,122,224,.65);animation:frglow 2.6s ease-in-out infinite,frhue 6s linear infinite}
+.lvbadge{background:var(--fr,var(--gold));z-index:3}
+@keyframes frglow{0%,100%{box-shadow:0 0 0 4px var(--ink),0 0 5px 0 var(--frg)}50%{box-shadow:0 0 0 4px var(--ink),0 0 18px 4px var(--frg)}}
+@keyframes frhue{0%,100%{border-color:#ff7ae0}33%{border-color:#7aa8ff}66%{border-color:#7affc8}}
+
+/* HP / XP bars: icon in front of the label, a light sweep across the fill, flash on gain, sparkles near full */
+.stats .row label{display:flex;align-items:center;gap:4px;width:54px}
+.row label .px{flex:none;width:16px;height:16px}
+.hud .bar i{position:relative;overflow:hidden}
+.hud .bar.xp i::after{content:'';position:absolute;top:0;bottom:0;left:-45%;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.4),transparent);animation:shine 4s ease-in-out 1.6s infinite}
+@keyframes shine{0%,60%{left:-45%}100%{left:140%}}
+.bar.flash i{animation:barflash .7s ease-out}
+@keyframes barflash{0%{filter:brightness(2.2) saturate(1.4)}100%{filter:none}}
+.bar.near i::before{content:'';position:absolute;right:3px;top:3px;z-index:1;width:3px;height:3px;background:#fff;box-shadow:-14px 10px 0 #fff,-30px 4px 0 #ffe9a8,-46px 12px 0 #fff;animation:twk .9s steps(2) infinite}
+@keyframes twk{50%{opacity:.15}}
+/* low HP: the screen edges glow red */
+body.lowhp::after{content:'';position:fixed;inset:0;z-index:5;pointer-events:none;box-shadow:inset 0 0 80px 8px rgba(214,58,71,.32);animation:vig 1.6s ease-in-out infinite}
+body.critical::after{box-shadow:inset 0 0 110px 22px rgba(214,58,71,.5);animation-duration:.9s}
+@keyframes vig{50%{opacity:.45}}
+
+/* chips: the flame grows and flickers with your streak, numbers pop when they change, the coin flips when gold comes in */
+#fl,#gc{display:inline-block}
+#fl .px{transform-origin:50% 100%}
+#streak:not(.off){box-shadow:inset 3px 3px 0 rgba(0,0,0,.22),0 0 8px rgba(255,140,40,.4)}
+#streak:not(.off) #fl .px{animation:flick .6s steps(2) infinite}
+#streak.s2 #fl .px{width:24px;height:24px}
+#streak.s3 #fl .px{width:28px;height:28px}
+#streak.s4 #fl .px{width:32px;height:32px}
+#streak.s3{box-shadow:inset 3px 3px 0 rgba(0,0,0,.22),0 0 12px rgba(255,140,40,.6)}
+#streak.s4{border-color:#ff7a2a;animation:cglow 1.2s ease-in-out infinite}
+@keyframes flick{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.1,1.16) rotate(3deg)}}
+@keyframes cglow{0%,100%{box-shadow:inset 3px 3px 0 rgba(0,0,0,.22),0 0 10px rgba(255,140,40,.5)}50%{box-shadow:inset 3px 3px 0 rgba(0,0,0,.22),0 0 20px 3px rgba(255,170,60,.8)}}
+.chip b.bump{animation:bump .4s steps(4)}
+@keyframes bump{40%{transform:scale(1.3);color:var(--gold)}}
+#gc.flip .px{animation:coinflip .6s steps(6)}
+@keyframes coinflip{to{transform:rotateY(360deg)}}
+
+/* ---- banner name plate: name on a pixel ribbon, rank / class as a title ---- */
+.rank{display:grid;gap:7px;margin:0 0 2px;letter-spacing:0;text-shadow:none}
+.rk-banner{display:flex;align-items:center;gap:4px;min-width:0}
+.rk-rib{position:relative;isolation:isolate;flex:1;min-width:0;margin:0 12px}
+.rk-rib .rk-name{padding:6px 10px 5px;background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 50%),#b02a3c;border:3px solid var(--ink);box-shadow:inset 0 -4px 0 rgba(0,0,0,.25);color:#fff4d0;text-shadow:2px 2px 0 var(--ink);font-size:15px;text-align:center}
+.rk-rib::before,.rk-rib::after{content:'';position:absolute;z-index:-1;top:7px;bottom:-5px;width:16px;background:#7a1c2a;border:3px solid var(--ink)}
+.rk-rib::before{left:-12px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,6px 50%)}
+.rk-rib::after{right:-12px;clip-path:polygon(0 0,100% 0,calc(100% - 6px) 50%,100% 100%,0 100%)}
+.rank .rk-sub{display:flex;align-items:center;justify-content:center;gap:8px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);text-shadow:2px 2px 0 var(--ink)}
+.rk-sub::before,.rk-sub::after{content:'';flex:1;min-width:6px;height:3px;background:repeating-linear-gradient(90deg,var(--gold) 0 6px,transparent 6px 9px);opacity:.6}
+
+/* ---- subclasses (Forge) ---- */
+.subbox{margin-top:14px;padding-top:14px;border-top:3px dotted var(--ink)}
+.subgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.subopt{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:124px;padding:10px 6px;text-align:center}
+.subopt .px{width:32px;height:32px}
+.subopt b{font:400 10px/1.4 var(--head)}
+.subopt small{font:400 18px/1.05 var(--body)}
+
+/* ---- pixel-art bosses (Direwolf Pack): bigger, planted on the ground, no bobbing (the hit flash still plays) ---- */
+.sprite.boss.art .px{width:160px;height:160px}
+.sprite.boss.art:not(.hit){animation:none}
+
+/* ---- Realm arena: a twilit fantasy wood (pines, a pale moon, fireflies, mossy floor) ---- */
+:root{--w1:#0b1a2e;--w2:#1a3b45;--w3:#3b6b4a;--tb:#12332f;--tf:#0b2220;--g1:#3a6a38;--g2:#2f5a2e;--fly:#e4ff8a}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--w1:#8fd0e8;--w2:#c9eec0;--w3:#f0f2b0;--tb:#4d8a5a;--tf:#2f6b43;--g1:#5a9a48;--g2:#4c8a3e}}
+:root[data-theme="dark"]{--w1:#0b1a2e;--w2:#1a3b45;--w3:#3b6b4a;--tb:#12332f;--tf:#0b2220;--g1:#3a6a38;--g2:#2f5a2e}
+:root[data-theme="light"]{--w1:#8fd0e8;--w2:#c9eec0;--w3:#f0f2b0;--tb:#4d8a5a;--tf:#2f6b43;--g1:#5a9a48;--g2:#4c8a3e}
+.arena{background:linear-gradient(var(--w1),var(--w2) 62%,var(--w3))}
+.arena::before{content:'';position:absolute;left:0;right:0;bottom:34px;height:150px;background:var(--tb);opacity:.9;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 110'%3E%3Cpath d='M30 0L46 38L38 38L53 72L44 72L60 110L0 110L7 72L16 72L14 38L22 38Z'/%3E%3Cpath transform='translate(62 26) scale(.75 .76)' d='M30 0L46 38L38 38L53 72L44 72L60 110L0 110L7 72L16 72L14 38L22 38Z'/%3E%3C/svg%3E") repeat-x 40px 100%/170px 150px;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 110'%3E%3Cpath d='M30 0L46 38L38 38L53 72L44 72L60 110L0 110L7 72L16 72L14 38L22 38Z'/%3E%3Cpath transform='translate(62 26) scale(.75 .76)' d='M30 0L46 38L38 38L53 72L44 72L60 110L0 110L7 72L16 72L14 38L22 38Z'/%3E%3C/svg%3E") repeat-x 40px 100%/170px 150px}
+.castle{left:0;right:0;width:auto;transform:none;bottom:34px;height:110px;background:var(--tf);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 110'%3E%3Cpath d='M30 0L46 38L38 38L53 72L44 72L60 110L0 110L7 72L16 72L14 38L22 38Z'/%3E%3Cpath transform='translate(62 26) scale(.75 .76)' d='M30 0L46 38L38 38L53 72L44 72L60 110L0 110L7 72L16 72L14 38L22 38Z'/%3E%3C/svg%3E") repeat-x 0 100%/120px 110px;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 110'%3E%3Cpath d='M30 0L46 38L38 38L53 72L44 72L60 110L0 110L7 72L16 72L14 38L22 38Z'/%3E%3Cpath transform='translate(62 26) scale(.75 .76)' d='M30 0L46 38L38 38L53 72L44 72L60 110L0 110L7 72L16 72L14 38L22 38Z'/%3E%3C/svg%3E") repeat-x 0 100%/120px 110px}
+.castle::after{display:none}
+.stars{background:var(--fly);box-shadow:40px 38px var(--fly),90px 56px #bfe86a,140px 30px var(--fly),190px 66px #bfe86a,240px 44px var(--fly),60px 82px #bfe86a,170px 90px var(--fly),280px 70px #bfe86a,310px 104px var(--fly),120px 110px #bfe86a;filter:drop-shadow(0 0 3px var(--fly))}
+.ground{background:linear-gradient(#27501f 0 6px,transparent 6px),repeating-linear-gradient(90deg,var(--g1) 0 16px,var(--g2) 16px 32px)}
+/* the wolf pack: wide, planted on the grass, shown at 3x */
+.sprite.boss.art{bottom:4px;right:2%}
+.sprite.boss.art .px{width:180px;height:120px}

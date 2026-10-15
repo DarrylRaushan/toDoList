@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=17">
+<link rel="stylesheet" href="style.css?v=27">
 </head>
 <body class="wait">
 <div class="gate" id="gate">
@@ -60,11 +60,12 @@
         <button type="button" class="qtab" data-g="wk" role="tab" aria-selected="false">Mon-Fri</button>
         <button type="button" class="qtab" data-g="we" role="tab" aria-selected="false">Sat-Sun</button>
       </div>
-      <ul id="list"></ul>
-    </div>
-    <div id="winbox"></div>
-    <form id="add">
-      <label class="posthead" for="newname">Post a new quest</label>
+      <div class="cork">
+        <ul id="list"></ul>
+        <form id="add">
+      <button type="button" class="newq-toggle" id="addtoggle" aria-expanded="false" aria-controls="addbody"><span>Post a new quest</span><i class="plus" aria-hidden="true"></i></button>
+      <div class="newq-body" id="addbody" hidden>
+      <label class="posthead" for="newname">Quest name</label>
       <input id="newname" placeholder="e.g. Drink 2L water" maxlength="80" aria-label="Quest name" required>
       <span class="posthead">Difficulty</span>
       <input type="hidden" id="diff" value="20">
@@ -80,8 +81,13 @@
         <button type="button" class="sbtn" data-g="wk" aria-pressed="false">Weekdays</button>
         <button type="button" class="sbtn" data-g="we" aria-pressed="false">Weekends</button>
       </div>
-      <button class="btn" type="submit">Pin quest</button>
+      <button class="btn" type="submit"><i class="pin" aria-hidden="true"></i>Pin quest</button>
+      </div>
     </form>
+      </div>
+    </div>
+    <div id="winbox"></div>
+    
   </section>
 
   <section class="tab" id="tab-hero">
@@ -155,6 +161,7 @@
 <div class="creator" id="creator" role="dialog" aria-modal="true" aria-labelledby="ctitle" hidden>
   <div class="cwrap">
     <h2 id="ctitle">Create your hero</h2>
+    <div class="ctabs" id="ctabs" role="tablist" aria-label="Customise your hero"></div>
     <div class="panel cprevbox"><div id="cprev" aria-hidden="true"></div></div>
     <div id="copts"></div>
     <div class="acts cacts">
@@ -178,6 +185,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=6"></script>
-<script src="script.js?v=16"></script>
+<script src="script.js?v=31"></script>
+<script src="wendigo-idle.js?v=1"></script>
 </body>
 </html>
