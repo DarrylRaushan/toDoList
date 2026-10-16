@@ -982,11 +982,23 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 /* the board hangs from the hero card on two iron chains */
 .hud{padding-bottom:0}
 .board{margin-top:44px}
-.board::before,.board::after{content:'';position:absolute;top:-56px;width:14px;height:52px;pointer-events:none;
-  background:linear-gradient(#aab3c2,#aab3c2) 2px calc(100% - 1px)/10px 5px no-repeat,linear-gradient(#1a0f06,#1a0f06) 0 100%/14px 8px no-repeat,
-  repeating-linear-gradient(#cfd6e2 0 3px,#8f9aab 3px 5px,#2a2f38 5px 7px) 4px 0/6px calc(100% - 7px) no-repeat}
-.board::before{left:26px}
-.board::after{right:26px}
+.board::before,.board::after,.arenaframe::before,.arenaframe::after{content:'';position:absolute;top:-56px;width:21px;height:60px;box-sizing:border-box;border:solid transparent;border-width:0 0 12px;pointer-events:none;image-rendering:pixelated;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%207%204%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20x=%220%22%20y=%220%22%20width=%227%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%220%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%224%22%20height=%221%22%20fill=%22%23e6ebf3%22/%3E%3Crect%20x=%225%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%2398a3b6%22/%3E%3Crect%20x=%226%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%220%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%221%22%20y=%222%22%20width=%222%22%20height=%221%22%20fill=%22%23e6ebf3%22/%3E%3Crect%20x=%223%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%224%22%20y=%222%22%20width=%222%22%20height=%221%22%20fill=%22%2398a3b6%22/%3E%3Crect%20x=%226%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%220%22%20y=%223%22%20width=%227%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%207%208%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20x=%222%22%20y=%220%22%20width=%223%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%222%22%20y=%221%22%20width=%222%22%20height=%221%22%20fill=%22%23e6ebf3%22/%3E%3Crect%20x=%224%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%2398a3b6%22/%3E%3Crect%20x=%225%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%221%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%222%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%23e6ebf3%22/%3E%3Crect%20x=%223%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%232c313b%22/%3E%3Crect%20x=%224%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%2398a3b6%22/%3E%3Crect%20x=%225%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%221%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%222%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%23e6ebf3%22/%3E%3Crect%20x=%223%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%232c313b%22/%3E%3Crect%20x=%224%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%2398a3b6%22/%3E%3Crect%20x=%225%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%221%22%20y=%224%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%222%22%20y=%224%22%20width=%223%22%20height=%221%22%20fill=%22%2398a3b6%22/%3E%3Crect%20x=%225%22%20y=%224%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%222%22%20y=%225%22%20width=%223%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%222%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%223%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23e6ebf3%22/%3E%3Crect%20x=%224%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%222%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3Crect%20x=%223%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%2398a3b6%22/%3E%3Crect%20x=%224%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%231a0f06%22/%3E%3C/svg%3E");   /* bolted bracket on the board + repeating iron links (21x24 each, 3px pixels) hanging from behind the hero card */
+  background-repeat:no-repeat,repeat-y;
+  background-size:21px 12px,21px 24px;
+  background-position:0 100%,0 12px;
+  background-origin:border-box,padding-box;
+  background-clip:border-box,padding-box;
+  filter:drop-shadow(3px 4px 0 rgba(0,0,0,.45)) drop-shadow(0 0 5px rgba(255,140,40,.4));   /* dark pixel shadow + warm firelight glow */
+  transform-origin:50% 0;animation:chainswing 6s ease-in-out infinite alternate,chainglow 2.6s ease-in-out infinite alternate;will-change:transform}
+/* one shared sway: the whole board shifts a couple of pixels, and the chains skew the opposite way so their tops stay pinned to the hero card while the bottoms follow the board */
+.board,.arenaframe{animation:boardswing 6s ease-in-out infinite alternate;will-change:transform}
+@keyframes boardswing{from{transform:translateX(-3px)}to{transform:translateX(3px)}}
+@keyframes chainswing{from{transform:translateX(3px) skewX(-2.9deg)}to{transform:translateX(-3px) skewX(2.9deg)}}
+@keyframes chainglow{from{filter:drop-shadow(3px 4px 0 rgba(0,0,0,.45)) drop-shadow(0 0 3px rgba(255,140,40,.25))}to{filter:drop-shadow(3px 4px 0 rgba(0,0,0,.45)) drop-shadow(0 0 8px rgba(255,160,50,.65))}}
+@media (prefers-reduced-motion:reduce){.board,.board::before,.board::after,.arenaframe,.arenaframe::before,.arenaframe::after{animation:none}}
+.board::before,.arenaframe::before{left:23px}
+.board::after,.arenaframe::after{right:23px}
 .board .timer{margin:0 0 10px}
 
 /* ---- quest cards: guild commissions. Difficulty is a guild rank on a coloured band, the checkbox is a wax seal, rewards are icon chips.
@@ -1607,3 +1619,191 @@ body.out #embers,body.wait #embers,body.creating #embers{display:none}
 #embers>b:nth-of-type(25){left:45.3%;width:4px;height:4px;background:#ffd75a;--dx:37px;animation-duration:16s;animation-delay:-14.0s}
 #embers>b:nth-of-type(26){left:8.6%;width:3px;height:3px;background:#ff8a2a;--dx:-15px;animation-duration:15s;animation-delay:-9.4s}
 @media (prefers-reduced-motion:reduce){#tavern *,#tavern *::before,#tavern *::after,.tv-hearth::after{animation:none!important}#embers{display:none!important}}
+
+/* ---- boss arena: hangs from the hero card on the same two iron chains as the quest board, inside a riveted iron war-frame with a blood-red trim and a slow red glow ---- */
+.arenaframe{position:relative;margin-top:44px;padding:12px;border:4px solid var(--ink);
+  background:
+    linear-gradient(#aab3c2,#aab3c2) left 5px top 5px/7px 7px no-repeat,
+    linear-gradient(#aab3c2,#aab3c2) right 5px top 5px/7px 7px no-repeat,
+    linear-gradient(#aab3c2,#aab3c2) left 5px bottom 5px/7px 7px no-repeat,
+    linear-gradient(#aab3c2,#aab3c2) right 5px bottom 5px/7px 7px no-repeat,
+    linear-gradient(#aab3c2,#aab3c2) left 50% top 5px/7px 7px no-repeat,
+    linear-gradient(#aab3c2,#aab3c2) left 50% bottom 5px/7px 7px no-repeat,
+    repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 2px,transparent 2px 9px),
+    repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 2px,transparent 2px 7px),
+    linear-gradient(180deg,#5a5666,#2c2832 55%,#3e3a48);
+  box-shadow:4px 4px 0 var(--ink),inset 3px 3px 0 rgba(255,255,255,.14),inset -3px -3px 0 rgba(0,0,0,.45),0 0 22px rgba(201,48,44,.35);
+  animation:boardswing 6s ease-in-out infinite alternate,bossglow 2.4s ease-in-out infinite alternate}
+.arenaframe .arena{margin-top:0;box-shadow:0 0 0 3px #8a1a10,0 0 0 6px var(--ink),inset 0 0 24px rgba(0,0,0,.45)}
+@keyframes bossglow{from{box-shadow:4px 4px 0 var(--ink),inset 3px 3px 0 rgba(255,255,255,.14),inset -3px -3px 0 rgba(0,0,0,.45),0 0 10px rgba(201,48,44,.2)}to{box-shadow:4px 4px 0 var(--ink),inset 3px 3px 0 rgba(255,255,255,.14),inset -3px -3px 0 rgba(0,0,0,.45),0 0 28px 2px rgba(201,48,44,.55)}}
+@media (prefers-reduced-motion:reduce){.arenaframe{animation:none}}
+
+/* ---- boss fight: a blood-red night, embers, mist and lightning; your HP vs the boss's; VS badge; damage trail on the boss bar; rage under 30%; hit shake, flash and slashes; victory banner.
+   The arena has its own dark palette so it looks the same in the light theme. ---- */
+.arenaframe .arena{--w1:#120816;--w2:#3a1226;--w3:#8a3328;--tb:#1d0f22;--tf:#120a18;--g1:#3a3328;--g2:#2e2920}
+.arenaframe .ground{background:linear-gradient(#6a2a18 0 6px,transparent 6px),repeating-linear-gradient(90deg,var(--g1) 0 16px,var(--g2) 16px 32px)}
+.arenaframe .ground::before{content:'';position:absolute;left:30%;right:0;top:0;height:100%;background:radial-gradient(ellipse 60% 90% at 70% 0,rgba(255,70,30,.45),transparent 70%);animation:moonpulse 2.2s ease-in-out infinite alternate}   /* hot cracks under the boss */
+.arenaframe .orb{background:#d8382e;box-shadow:0 0 0 4px rgba(255,90,60,.25),0 0 26px 8px rgba(255,60,40,.5);animation:moonpulse 4s ease-in-out infinite alternate}   /* blood moon */
+.arenaframe .stars{background:#ffb04a;filter:drop-shadow(0 0 3px #ff7a1a);animation:emberblink 2.4s ease-in-out infinite;
+  box-shadow:40px 38px #ff7a1a,90px 56px #ffc02a,140px 30px #ff7a1a,190px 66px #ffc02a,240px 44px #ff7a1a,60px 82px #ffc02a,170px 90px #ff7a1a,280px 70px #ffc02a,310px 104px #ff7a1a,120px 110px #ffc02a}   /* embers */
+@keyframes emberblink{50%{opacity:.4;transform:translateY(-8px)}}
+@keyframes moonpulse{from{opacity:.7}to{opacity:1}}
+.mist{position:absolute;z-index:0;left:-20%;right:-20%;bottom:30px;height:60px;pointer-events:none;
+  background:radial-gradient(ellipse 120px 26px at 20% 60%,rgba(255,200,180,.16),transparent 70%),radial-gradient(ellipse 160px 30px at 55% 50%,rgba(255,200,180,.12),transparent 70%),radial-gradient(ellipse 110px 22px at 85% 65%,rgba(255,200,180,.15),transparent 70%);
+  animation:mistdrift 14s ease-in-out infinite alternate}
+@keyframes mistdrift{from{transform:translateX(-8%)}to{transform:translateX(8%)}}
+.arena::after{content:'';position:absolute;inset:0;z-index:5;pointer-events:none;box-shadow:inset 0 0 50px 10px rgba(120,0,10,.55)}   /* dark red vignette */
+.arena.rage::after{animation:ragepulse .9s ease-in-out infinite alternate}
+@keyframes ragepulse{from{box-shadow:inset 0 0 50px 10px rgba(120,0,10,.55)}to{box-shadow:inset 0 0 70px 24px rgba(220,20,20,.75)}}
+.afx{position:absolute;inset:0;z-index:4;pointer-events:none;background:#fff;opacity:0;animation:lightning 9s linear infinite}
+@keyframes lightning{0%,93%,96%,100%{opacity:0}94%{opacity:.35}95%{opacity:.05}97%{opacity:.2}}
+.arena.hit .afx{background:#ffd8c0;animation:hitflash .3s steps(3)}
+@keyframes hitflash{0%{opacity:.55}100%{opacity:0}}
+.arena.shk{animation:arenashake .4s steps(6)}
+@keyframes arenashake{20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(3px,-1px)}}
+
+/* name plates and bars */
+.atag,.ahp,.abinfo,.vsb{z-index:6}
+.ahp{position:absolute;top:33px;left:8px;width:36%;max-width:130px}
+.ahp .bar{height:18px;box-shadow:0 0 0 2px #0d0a09}
+.ahp .bar em{font-size:14px}
+.abinfo{width:54%;max-width:250px}
+.abinfo b{white-space:nowrap;overflow:hidden;font-size:9px;color:#ffe0c0;background:linear-gradient(#6a1414,#2e0808);border:2px solid #0d0a09}
+.abinfo b::before{content:'BOSS';display:inline-block;margin-right:6px;padding:2px 4px;background:#c9302c;color:#fff;font-size:8px;text-shadow:1px 1px 0 #000}
+.arenaframe:has(.arena.rage) .abinfo b::after{content:'ENRAGED';display:block;width:max-content;margin:3px 0 0 auto;padding:2px 4px;background:#ffc02a;color:#2a0a00;font-size:8px;animation:blink .5s steps(2) infinite}
+.arenaframe .abinfo .bar{height:22px;box-shadow:0 0 0 2px #8a1a10}
+.abinfo .bar i{position:relative;z-index:1}
+.abinfo .bar #abghost{position:absolute;left:0;top:0;z-index:0;background:rgba(255,235,210,.85);transition:width 1s .45s steps(10)}
+.arenaframe:has(.arena.rage) .abinfo .bar #abfill{background:#ff4a2a}
+.vsb{position:absolute;left:50%;top:70px;transform:translateX(-50%);padding:3px 6px 2px;font:400 12px var(--head);color:#ffd75a;text-shadow:2px 2px 0 #000,0 0 8px #ff3a1a;background:rgba(0,0,0,.55);border:2px solid #8a1a10;animation:vspulse 1.4s steps(2) infinite}
+@keyframes vspulse{50%{color:#fff;box-shadow:0 0 10px rgba(255,60,30,.7)}}
+.arenaframe:has(.arena.won) .vsb{display:none}
+
+/* the boss: red aura, slow breathing, pale and grey when beaten */
+.sprite.boss::before{content:'';position:absolute;z-index:-1;left:-10%;right:-10%;top:5%;bottom:-8%;background:radial-gradient(ellipse at 50% 60%,rgba(255,50,30,.4),transparent 70%);animation:moonpulse 1.6s ease-in-out infinite alternate}
+.arena.rage .sprite.boss::before{background:radial-gradient(ellipse at 50% 60%,rgba(255,40,20,.7),transparent 72%)}
+.sprite.boss .px{transform-origin:50% 100%;animation:breathe 2.4s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.025,1.04)}}
+.sprite.boss.dead::before,.sprite.boss.dead .px{display:none;animation:none}
+.sprite.boss.dead .px{display:block}
+
+/* blows */
+.arenaframe .dmg{z-index:7;right:16%;top:auto;bottom:150px;font:400 22px var(--head);color:#fff;text-shadow:3px 3px 0 #c9302c,-1px -1px 0 #000,0 0 12px #ff6a3a;animation:dmgpop 1s steps(10) forwards}
+@keyframes dmgpop{0%{opacity:1;transform:scale(.4) translateY(10px)}20%{opacity:1;transform:scale(1.4) translateY(0)}100%{opacity:0;transform:scale(1) translateY(-48px)}}
+.slash{--r:-38deg;position:absolute;z-index:7;right:15%;bottom:60px;width:96px;height:5px;background:#fff;box-shadow:0 0 6px #fff,0 0 14px #ff6a3a;transform-origin:100% 50%;pointer-events:none;transform:rotate(var(--r)) scaleX(0);animation:slashfx .35s steps(5) forwards}
+.slash.s2{--r:-12deg;bottom:76px;right:17%;width:80px;animation-delay:.08s}
+@keyframes slashfx{0%{opacity:1;transform:rotate(var(--r)) scaleX(0)}60%{opacity:1;transform:rotate(var(--r)) scaleX(1)}100%{opacity:0;transform:rotate(var(--r)) scaleX(1)}}
+
+/* victory banner, shown once the weekly boss is down */
+.victory{position:absolute;z-index:8;left:0;right:0;top:70px;display:none;justify-content:center;padding:7px 0 5px;font:400 18px var(--head);letter-spacing:3px;color:#ffd75a;text-shadow:3px 3px 0 #000,0 0 14px #ff9a2a;background:linear-gradient(90deg,transparent,rgba(0,0,0,.72) 15%,rgba(0,0,0,.72) 85%,transparent);pointer-events:none}
+.arena.won .victory{display:flex;animation:vicin .6s steps(6)}
+@keyframes vicin{from{opacity:0;transform:scale(1.5)}to{opacity:1;transform:none}}
+
+/* frame title plate */
+.aftitle{position:absolute;z-index:3;top:-14px;left:50%;transform:translateX(-50%);padding:5px 12px 4px;font:400 10px var(--head);letter-spacing:2px;white-space:nowrap;color:#ffd0b0;text-shadow:2px 2px 0 #000;background:linear-gradient(#7a1c1c,#3a0a0a);border:3px solid var(--ink);box-shadow:0 0 0 2px #aab3c2,0 0 12px rgba(201,48,44,.6)}
+
+/* ---- boss fight, roomier: the name plates and HP bars live in their own strip above the scene instead of on top of it, and the scene is taller ---- */
+.arenaframe{padding-top:22px}
+.fhud{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:center;margin:0 0 12px;padding:10px;background:linear-gradient(#1a0a0e,#0e0508);border:3px solid var(--ink);box-shadow:inset 0 0 0 2px #5a1410}
+.fhud .fl{display:grid;gap:6px;min-width:0}
+.fhud .atag,.fhud .ahp,.fhud .abinfo,.fhud .vsb{position:static;top:auto;left:auto;right:auto;transform:none;width:auto;max-width:none;margin:0}
+.fhud .atag{padding:0;background:none;font-size:9px;line-height:1.4;color:#f0e2c0}
+.fhud .abinfo b{white-space:normal;line-height:1.4;padding:4px 6px;margin-bottom:5px}
+.fhud .abinfo b::before{display:block;width:max-content;margin:0 0 3px auto}
+.fhud .abinfo{text-align:right}
+.fhud .ahp .bar{height:20px}
+.arenaframe .arena{height:clamp(260px,42dvh,360px)}
+.victory{top:16%}
+@media (max-width:460px){.sprite.boss.art .px{width:150px!important;height:88px!important}}
+
+/* boss name: no red plate behind it */
+.fhud .abinfo b{background:none;border:0;padding:0;color:#f0e2c0}
+
+/* ---- weekly boss card: riveted iron plate with a blood-red glow (same look as the arena frame). Inside: a living scene (embers, fog, lightning, breathing pack), a name banner, a skull-marked HP bar and reward tiles ---- */
+h3:has(+#bossbox){display:flex;align-items:center;gap:10px;color:#ff6a50;text-shadow:2px 2px 0 var(--ink),0 0 10px rgba(255,70,40,.45)}
+h3:has(+#bossbox)::before{flex:none;margin-right:0;background:#c9302c;box-shadow:2px 2px 0 var(--ink),0 0 8px rgba(255,60,40,.7)}
+h3:has(+#bossbox)::after{content:'';flex:1;height:3px;background:repeating-linear-gradient(90deg,rgba(201,48,44,.7) 0 6px,transparent 6px 9px)}
+.panel.boss.bx{position:relative;padding:14px;gap:14px;align-items:stretch;
+  background:
+    linear-gradient(#aab3c2,#aab3c2) left 5px top 5px/5px 5px no-repeat,
+    linear-gradient(#aab3c2,#aab3c2) right 5px top 5px/5px 5px no-repeat,
+    linear-gradient(#aab3c2,#aab3c2) left 5px bottom 5px/5px 5px no-repeat,
+    linear-gradient(#aab3c2,#aab3c2) right 5px bottom 5px/5px 5px no-repeat,
+    repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 2px,transparent 2px 9px),
+    repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 2px,transparent 2px 7px),
+    linear-gradient(180deg,#4a4658,#2c2832 60%,#3a3644);
+  box-shadow:4px 4px 0 var(--ink),inset 3px 3px 0 rgba(255,255,255,.14),inset -3px -3px 0 rgba(0,0,0,.45),0 0 16px rgba(201,48,44,.35)}
+.bxp{position:relative;flex:none;width:156px;min-height:136px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;border:3px solid var(--ink);
+  background:radial-gradient(circle 12px at 74% 22%,#e0443a 94%,transparent),radial-gradient(circle 30px at 74% 22%,rgba(255,60,40,.35),transparent),radial-gradient(ellipse 90% 60% at 50% 100%,rgba(255,70,30,.4),transparent 70%),linear-gradient(#120816,#3a1226 62%,#8a3328);
+  box-shadow:0 0 0 2px #8a1a10,inset 0 0 22px rgba(0,0,0,.6)}
+.bxp::before{content:'';position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 60% 55% at 50% 78%,rgba(255,50,30,.45),transparent 70%)}
+.bxp::after{content:'';position:absolute;left:0;right:0;bottom:0;z-index:2;height:12px;border-top:3px solid var(--ink);background:repeating-linear-gradient(90deg,#3a3328 0 16px,#2e2920 16px 32px)}
+.bxp .px{position:relative;z-index:1}
+.bxp .px.art{width:150px;height:auto;margin-bottom:9px}
+.bxp .px.em{width:68px;height:68px;margin-bottom:14px}
+.bxf{position:absolute;z-index:2;left:-20%;right:-20%;bottom:10px;height:44px;pointer-events:none;
+  background:radial-gradient(ellipse 70px 16px at 20% 60%,rgba(255,200,180,.18),transparent 70%),radial-gradient(ellipse 90px 18px at 60% 50%,rgba(255,200,180,.14),transparent 70%),radial-gradient(ellipse 60px 14px at 90% 65%,rgba(255,200,180,.16),transparent 70%);animation:mistdrift 12s ease-in-out infinite alternate}
+.bxe{position:absolute;z-index:2;bottom:12px;left:var(--x);width:3px;height:3px;background:#ffb04a;box-shadow:0 0 5px 1px rgba(255,140,40,.8);opacity:0;animation:bxem 4s linear infinite;animation-delay:var(--d)}
+.bxe:nth-of-type(3n){background:#ffd75a}
+@keyframes bxem{0%{transform:translate(0,0);opacity:0}15%{opacity:1}100%{transform:translate(var(--dx),-120px);opacity:0}}
+.bxl{position:absolute;inset:0;z-index:3;background:#fff;opacity:0;pointer-events:none;animation:lightning 9s linear infinite}
+.bxp.rage{box-shadow:0 0 0 2px #ff4a2a,inset 0 0 28px rgba(220,20,20,.75)}
+.bxp.rage::before{background:radial-gradient(ellipse 70% 65% at 50% 78%,rgba(255,40,20,.7),transparent 72%)}
+.bxp.dead .px{filter:grayscale(1) brightness(.6);animation:none}
+.bxp.dead::before,.bxp.dead .bxf{display:none}
+.bxs{position:absolute;z-index:4;left:50%;top:42%;transform:translate(-50%,-50%) rotate(-12deg);padding:5px 7px 4px;font:400 9px/1 var(--head);font-style:normal;letter-spacing:1px;color:#fff1d8;text-shadow:2px 2px 0 #000;background:rgba(138,26,16,.9);border:3px solid #ffb4a0;white-space:nowrap}
+.bxi{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:9px}
+.bxn{position:relative;padding:8px 22px 7px;text-align:center;font:400 14px/1.35 var(--head);color:#ffe3cc;text-shadow:2px 2px 0 #000,0 0 10px rgba(255,80,40,.6);overflow-wrap:anywhere;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 50%),linear-gradient(#7a1c1c,#3a0a0a);border:3px solid var(--ink);box-shadow:inset 0 0 0 2px #8a1a10,0 3px 0 rgba(0,0,0,.4)}
+.bxn::before,.bxn::after{content:'';position:absolute;top:50%;width:6px;height:6px;margin-top:-3px;background:#aab3c2;border:2px solid var(--ink);transform:rotate(45deg)}
+.bxn::before{left:7px}.bxn::after{right:7px}
+.bxt{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.bxg{font:400 8px/1 var(--head);padding:4px 5px 3px;background:#c9302c;color:#fff;border:2px solid var(--ink);text-shadow:1px 1px 0 #000}
+.bxg.th{background:var(--rar,#58b368);color:#1b0a02;text-shadow:none}
+.bxg.rage{background:#ffc02a;color:#2a0a00;text-shadow:none}
+.bxsk{display:flex;gap:1px;margin-left:auto}
+.bxsk .px{width:14px;height:14px}
+.bxh{display:flex;align-items:center;gap:8px}
+.bxh>.px{flex:none;width:20px;height:20px}
+.bxbar{flex:1;min-width:0;height:26px;box-shadow:0 0 0 2px #8a1a10}
+.bxbar::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,transparent calc(25% - 1px),rgba(0,0,0,.7) calc(25% - 1px) calc(25% + 1px),transparent calc(25% + 1px) calc(50% - 1px),rgba(0,0,0,.7) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px) calc(75% - 1px),rgba(0,0,0,.7) calc(75% - 1px) calc(75% + 1px),transparent calc(75% + 1px))}
+.bxbar em{font-size:21px}
+.bar.hp.rage i{background:#ff4a2a}
+.bxc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.bxk{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;padding:6px 3px 5px;background:linear-gradient(rgba(0,0,0,.32),rgba(0,0,0,.5));border:3px solid var(--ink);box-shadow:inset 0 0 0 2px rgba(170,179,194,.18),inset 3px 3px 0 rgba(255,255,255,.05)}
+.bxk small{font:400 7px/1 var(--head);color:var(--muted);letter-spacing:.5px;white-space:nowrap}
+.bxk .v{display:flex;align-items:center;justify-content:center;gap:4px;max-width:100%;font:400 21px/1 var(--body);color:var(--text);white-space:nowrap}
+.bxk .v .px{flex:none;width:16px;height:16px}
+.bxk.got{opacity:.55}
+.bxk.got .v{text-decoration:line-through}
+.bxm{font-size:19px;line-height:1.05;color:var(--muted);text-align:center}
+@media (max-width:430px){.panel.boss.bx{flex-direction:column}.bxp{width:100%;min-height:150px}.bxp .px.art{width:200px}}
+
+/* ---- boss card: small idle motion instead of pulsing (all of it stops for reduced-motion users via the global rule) ---- */
+/* the pack shifts a pixel at a time, like the other pixel sprites */
+.bxp .px.art,.bxp .px.em{animation:bxidle 3.6s steps(1) infinite}
+@keyframes bxidle{0%,100%{transform:translate(0,0)}15%{transform:translate(0,-1px)}30%{transform:translate(1px,-1px)}45%{transform:translate(1px,0)}60%{transform:translate(0,0)}80%{transform:translate(-1px,0)}}
+/* twinkling stars in the night sky */
+.bxst{position:absolute;z-index:0;top:10px;left:12px;width:2px;height:2px;background:#fff;pointer-events:none;
+  box-shadow:34px 14px #fff,62px 4px #ffd0b0,88px 22px #fff,18px 30px #ffd0b0,54px 34px #fff,112px 8px #fff,140px 26px #ffd0b0;animation:bxtw 3.2s steps(1) infinite}
+@keyframes bxtw{0%,100%{opacity:1}30%{opacity:.35}55%{opacity:.9}75%{opacity:.5}}
+/* the name plate catches the light now and then */
+.bxn{background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.22) 50%,transparent 58%) 160% 0/250% 100% no-repeat,linear-gradient(180deg,rgba(255,255,255,.12),transparent 50%),linear-gradient(#7a1c1c,#3a0a0a);animation:bxglint 5s ease-in-out infinite}
+@keyframes bxglint{0%,55%{background-position:160% 0,0 0,0 0}100%{background-position:-60% 0,0 0,0 0}}
+/* the sword rocks, the skulls bob one after another */
+.bxh>.px{transform-origin:50% 100%;animation:bxrock 3s steps(1) infinite}
+@keyframes bxrock{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}50%{transform:rotate(0)}75%{transform:rotate(10deg)}}
+.bxsk .px{animation:bxbob 2.4s steps(1) infinite}
+.bxsk .px:nth-child(2){animation-delay:.2s}.bxsk .px:nth-child(3){animation-delay:.4s}.bxsk .px:nth-child(4){animation-delay:.6s}.bxsk .px:nth-child(5){animation-delay:.8s}.bxsk .px:nth-child(6){animation-delay:1s}
+@keyframes bxbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+/* reward tiles: the coin flips, the chest hops, the hourglass turns over */
+.bxk:nth-child(1) .v .px{animation:coinflip 4s steps(6) infinite}
+.bxk:nth-child(2) .v .px{animation:bxhop 3.4s steps(1) infinite}
+.bxk:nth-child(3) .v .px{animation:bxturn 5s steps(1) infinite}
+@keyframes bxhop{0%,70%,100%{transform:translateY(0)}78%{transform:translateY(-3px)}86%{transform:translateY(0)}92%{transform:translateY(-1px)}}
+@keyframes bxturn{0%,78%{transform:rotate(0)}84%{transform:rotate(90deg)}90%,100%{transform:rotate(180deg)}}
+/* the dashed line after the header slowly marches */
+h3:has(+#bossbox)::after{background-size:9px 100%;animation:bxmarch 1.4s linear infinite}
+@keyframes bxmarch{to{background-position:9px 0}}
+.bxp.dead .bxst{animation:none}
+.bxk.got .px{animation:none!important}

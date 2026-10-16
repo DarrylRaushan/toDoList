@@ -1579,14 +1579,25 @@ function openChestFx(fg,st){
 function renderRPG(){
   const lv=levelOf(S.xp);renderArena();renderSheet();renderGear();
   /* boss */
-  const bb=$('bossbox');bb.innerHTML='';
+  const bb=$('bossbox');bb.innerHTML='';bb.className='panel boss bx';
   const b=S.boss;
-  if(b){
-    const B=bossOf(b),info=el('div','');info.style.flex='1';
-    const bar=el('div','bar hp'),fill=document.createElement('i'),em=el('em','',b.hp+' / '+b.max);
-    fill.style.width=(b.hp/b.max*100)+'%';bar.append(fill,em);
-    info.append(el('b','',b.hp?B[0]:B[0]+' (defeated)'),bar,el('div','sub',b.hp?'Every quest you finish deals damage. A new boss arrives on Monday.':'Reward claimed. A new boss arrives on Monday.'));
-    bb.append(px(B[1],24),info);
+  if(b){   /* weekly boss card: living portrait scene, name banner, skull-marked HP bar, reward tiles */
+    const B=bossOf(b),dead=b.hp<=0,pct=Math.max(0,Math.min(100,b.hp/b.max*100)),rage=!dead&&pct<=30,tr=b.tier||0;
+    const pf=el('div','bxp'+(dead?' dead':'')+(rage?' rage':'')),ak=B[1].slice(0,4)==='pet:'&&PETART[B[1].slice(4)]?B[1].slice(4):null;
+    let sp;if(ak){sp=PETART[ak]();sp.removeAttribute('style');sp.className='px art'}else{sp=px(B[1],24);sp.classList.add('em')}
+    pf.append(el('i','bxst'),el('i','bxf'),sp);
+    if(!dead)for(let q=0;q<9;q++){const m=el('b','bxe');m.style.setProperty('--x',(8+q*10.5)+'%');m.style.setProperty('--d',(-(q*.47)%4).toFixed(2)+'s');m.style.setProperty('--dx',((q%2?1:-1)*(5+q%3*5))+'px');pf.appendChild(m)}
+    pf.appendChild(el('i','bxl'));if(dead)pf.appendChild(el('i','bxs','DEFEATED'));
+    const info=el('div','bxi'),tg=el('div','bxt'),th=el('span','bxg th',['Minor','Dangerous','Elite','Deadly','Legendary','Mythic'][tr]||'Minor');
+    th.style.setProperty('--rar',RAR[Math.min(7,tr+1)]);tg.append(el('span','bxg','BOSS'),th);if(rage)tg.appendChild(el('span','bxg rage','ENRAGED'));
+    const sk=el('span','bxsk');sk.title='Threat level';for(let q=0;q<=tr;q++)sk.appendChild(px('\ud83d\udc80',16));tg.appendChild(sk);
+    const bar=el('div','bar hp bxbar'+(rage?' rage':'')),fill=document.createElement('i'),hr=el('div','bxh');
+    fill.style.width=pct+'%';bar.append(fill,el('em','',dead?'Defeated':b.hp+' / '+b.max));hr.append(px(dead?'\u2620\ufe0f':'\u2694\ufe0f',16),bar);
+    const rw=b.rw||{g:50,c:1},dn=(8-new Date().getDay())%7||7,cs=el('div','bxc');
+    const tile=(lab,e,val,ti,c)=>{const s=el('span','bxk'+(c?' '+c:'')),v=el('span','v');s.title=ti;v.append(px(e,16),document.createTextNode(val));s.append(el('small','',lab),v);return s};
+    cs.append(tile(dead?'CLAIMED':'REWARD','\ud83e\ude99','+'+rw.g+'g','Gold reward',dead?'got':''),tile(dead?'CLAIMED':'REWARD','\ud83d\udce6','+'+rw.c+(rw.c>1?' chests':' chest'),'Chest reward',dead?'got':''),tile('RESETS IN','\u23f3',dn+(dn===1?' day':' days'),'A new boss arrives on Monday'));
+    info.append(el('div','bxn',B[0]),tg,hr,cs,el('div','bxm',dead?'Reward claimed. Rest up for the next one.':'Every quest you finish deals damage.'));
+    bb.append(pf,info);
   }
   /* forge */
   const f=$('forge');if(CHEST_BUSY)return;f.innerHTML='';
@@ -1640,17 +1651,23 @@ function renderArena(){
   const lv=levelOf(S.xp),R=rk(lv);
   const ah=$('ahero'),hk=(PV?'pv'+PV.n:Object.values(eqLook()).join('.'))+(S.look?Object.values(S.look).join(','):'');if(ah.dataset.k!==hk){ah.dataset.k=hk;ah.replaceChildren(heroPx(lv))}
   $('atag').textContent='Lv '+lv+' '+(S.cls?clsName():R[0]);
+  {const mh=maxHp(lv),hp=Math.max(0,Math.round(S.hp)),hb=$('ahbar');$('ahfill').style.width=(hp/mh*100)+'%';$('ahtxt').textContent=hp+' / '+mh;hb.classList.toggle('low',hp/mh<.3)}   /* your own HP in the fight */
   const pt=worn('companion'),ap=$('apet'),pk=PVP||(pt?(PETS[pt.pet]?pt.pet:'wolfpup'):null),al=PVP?PVL:(pt?plv(pt):1);
   if(pk){ap.hidden=false;ap.title=(PVP?PETS[pk].n:pt.n)+' (Lv '+al+')';const vl=vlv(pk,al);ap.classList.toggle('solid',!!PETS[pk].sm);ap.classList.toggle('still',!!PETS[pk].still);ap.classList.toggle('big',vl>=BIG_LV);ap.style.setProperty('--pz',PETS[pk].px?PETS[pk].px/.4737:psize(vl));setSprite('apet',PETS[pk].e,pres(vl),vl);ap.classList.toggle('fire',!!PETS[pk].fire)}else ap.hidden=true;
   const b=S.boss;if(!b)return;
   const B=bossOf(b);setSprite('aboss',B[1],24);$('aboss').classList.toggle('art',B[1].slice(0,4)==='pet:');
-  $('abname').textContent=B[0];$('abfill').style.width=(b.hp/b.max*100)+'%';$('abtxt').textContent=b.hp+' / '+b.max;
+  $('abname').textContent=B[0];{const pc=(b.hp/b.max*100)+'%';$('abfill').style.width=pc;$('abghost').style.width=pc;const ar=$('arena');ar.classList.toggle('rage',b.hp>0&&b.hp/b.max<=.3);ar.classList.toggle('won',b.hp<=0)}$('abtxt').textContent=b.hp+' / '+b.max;   /* abghost = the pale trail that lags behind the real bar; rage = boss under 30%; won = defeated */
   $('aboss').classList.toggle('dead',b.hp<=0);
 }
 function attackFx(dmg){
   const h=$('ahero'),b=$('aboss');
   [[h,'atk'],[b,'hit'],[$('apet'),'hop']].forEach(([e,c])=>{e.classList.remove(c);void e.offsetWidth;e.classList.add(c);setTimeout(()=>e.classList.remove(c),800)});
-  const d=el('div','dmg','-'+dmg);$('arena').appendChild(d);setTimeout(()=>d.remove(),900);
+  setTimeout(()=>{   /* the blow lands when the hero's lunge reaches the boss */
+    const a=$('arena');
+    a.classList.remove('shk','hit');void a.offsetWidth;a.classList.add('shk','hit');setTimeout(()=>a.classList.remove('shk','hit'),450);
+    const sl=el('div','slash'),sl2=el('div','slash s2');a.append(sl,sl2);setTimeout(()=>{sl.remove();sl2.remove()},600);
+    const d=el('div','dmg','-'+dmg);a.appendChild(d);setTimeout(()=>d.remove(),1000);
+  },250);
 }
 function renderSheet(){
   const s=$('sheet');s.innerHTML='';
@@ -2105,7 +2122,7 @@ if(DEV){
   const sgo=n=>{si=PVS?(si+n+sLIST.length)%sLIST.length:(n>0?0:sLIST.length-1);PVS=sLIST[si];sdraw()};
   sPrev.onclick=()=>sgo(-1);sNext.onclick=()=>sgo(1);
   sReset.onclick=()=>{PVS=null;si=-1;sdraw()};
-  $('tab-realm').insertBefore(sp,$('arena'));
+  $('arena').closest('.arenaframe').after(sp);   /* after the frame, so the chains always hang from the hero card */
   const dtb=el('button','ghost','');dtb.type='button';dtb.id='devtoggle';
   const applyDev=()=>{
     if(!DEVON){PVS=null;si=-1;sName.textContent='My subclass';$('dreset').onclick();$('dpreset').onclick()}   /* drop any preview so you see your real hero and companion */

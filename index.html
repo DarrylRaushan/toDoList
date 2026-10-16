@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=51">
+<link rel="stylesheet" href="style.css?v=64">
 </head>
 <body class="wait">
 <div id="tavern" aria-hidden="true">
@@ -136,14 +136,23 @@
   </section>
 
   <section class="tab" id="tab-realm">
+    <div class="arenaframe">
+    <div class="aftitle" aria-hidden="true">BOSS FIGHT</div>
+    <div class="fhud" aria-hidden="true">
+      <div class="fl"><div class="atag" id="atag"></div>
+      <div class="ahp"><div class="bar hp" id="ahbar"><i id="ahfill"></i><em id="ahtxt"></em></div></div></div>
+      <div class="vsb">VS</div>
+      <div class="abinfo"><b id="abname"></b><div class="bar hp"><i id="abghost"></i><i id="abfill"></i><em id="abtxt"></em></div></div>
+    </div>
     <div class="arena" id="arena" aria-hidden="true">
-      <div class="stars"></div><div class="orb"></div><div class="castle"></div>
-      <div class="atag" id="atag"></div>
-      <div class="abinfo"><b id="abname"></b><div class="bar hp"><i id="abfill"></i><em id="abtxt"></em></div></div>
+      <div class="stars"></div><div class="orb"></div><div class="castle"></div><div class="mist"></div>
       <div class="ground"></div>
       <div class="sprite" id="ahero"></div>
       <div class="sprite pet" id="apet" hidden></div>
       <div class="sprite boss" id="aboss"></div>
+      <div class="afx"></div>
+      <div class="victory">VICTORY</div>
+    </div>
     </div>
     <div class="panel dev" id="dev" hidden>
       <div class="devrow">
@@ -200,7 +209,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=6"></script>
-<script src="script.js?v=43"></script>
+<script src="script.js?v=47"></script>
 <script src="wendigo-idle.js?v=1"></script>
 </body>
 </html>
