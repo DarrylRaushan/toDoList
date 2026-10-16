@@ -17,7 +17,7 @@ const BADGES=[
   {id:'l100',e:'💫',n:'Eternal',d:'Reach level 100'}
 ];
 const need=l=>Math.round(50*l*(l-1)*(1+.04*Math.max(0,l-2)));   /* total XP for level l: each level takes longer than the last */
-let TR=0,QT='today',ADDOPEN=false,addTouched=false;   /* ADDOPEN = the new-quest note on the board is expanded */   /* QT = selected tab on the quest board */
+let TR=0,QT='any',ADDOPEN=false,addTouched=false;   /* ADDOPEN = the new-quest note on the board is expanded */   /* QT = selected tab on the quest board */
 /* ---- balance: small HP pool, penalties and XP both grow with level ---- */
 const hpBase=l=>12+3*(l-1);                          /* max HP before trinkets: 12 at Lv 1 */
 const subHp=(id,l)=>id==='guardian'?Math.round(hpBase(l)*.2):0;   /* Guardian: +20% base HP */
@@ -35,8 +35,16 @@ const pad=n=>String(n).padStart(2,'0');
 const dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const today=()=>dkey(new Date());
 const dow=k=>new Date(k+'T12:00:00').getDay();     /* 0 Sun .. 6 Sat */
-/* quest schedule: t.days = 'all' (every day, default) | 'wk' (Mon-Fri) | 'we' (Sat-Sun) */
-const active=(t,k)=>{k=k||today();const g=t.days||'all',w=dow(k);return g==='all'||(g==='wk'?w>=1&&w<=5:w===0||w===6)};
+/* quest schedule: t.days = 'all' (every day, default) | 'wk' (Mon-Fri) | 'we' (Sat-Sun) | an array of weekday numbers (0 Sun .. 6 Sat) for your own days, e.g. [3,5] = Wed + Fri */
+const DAYSETS={all:[0,1,2,3,4,5,6],wk:[1,2,3,4,5],we:[0,6]};
+const DNAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],DORDER=[1,2,3,4,5,6,0];   /* the week is shown Mon..Sun */
+const dayList=t=>Array.isArray(t.days)&&t.days.length?t.days:(DAYSETS[t.days]||DAYSETS.all);
+const dayKey=ds=>{const s=ds.slice().sort((a,b)=>a-b).join();return Object.keys(DAYSETS).find(k=>DAYSETS[k].join()===s)||null};   /* preset name, or null for a custom set */
+const saveDays=ds=>dayKey(ds)||ds.slice().sort((a,b)=>a-b);
+const dayLabel=t=>{const k=dayKey(dayList(t));return k==='all'?'Daily':k==='wk'?'Mo-Fr':k==='we'?'Sa-Su':DORDER.filter(d=>dayList(t).includes(d)).map(d=>DNAMES[d].slice(0,2)).join(' ')};   /* short text for a resting quest's header */
+const dayGroup=t=>dayKey(dayList(t))||'cu';
+const tabOf=t=>dayKey(dayList(t))==='all'?'all':'cu';   /* which tab a quest lives in: Daily (every day) or Custom (any other days) */
+const active=(t,k)=>{k=k||today();return dayList(t).includes(dow(k))};
 const addDays=(k,n)=>{const d=new Date(k+'T12:00:00');d.setDate(d.getDate()+n);return dkey(d)};
 const $=id=>document.getElementById(id);
 /* draws an emoji tiny, then scales it up unsmoothed so it looks like pixel art */
@@ -242,14 +250,36 @@ function wolfpupCanvas(ph){
       }
     });
   };
-  flame(5,37,13,3.2,.6);                 /* tail tip */
-  flame(16,25,8,2.4,-.3);flame(20,24,11,2.8,.2);flame(24,24,8,2.3,.7);   /* mane along the back */
+  /* behind the body (their bases hide under the fur): flames spouting off the spine only, from the shoulders to just past the rump. Nothing on the head or the rest of the tail. */
+  flame(22,23,11,2.7,.3);flame(20,24,13,3,.2);flame(18,25,9,2.4,-.1);flame(16,25,8,2.3,-.3);flame(14,26,6,2,-.5);   /* along the back, tallest in the middle, shrinking toward the rump */
+  flame(13,25,5,1.8,-.6);flame(11,27,5,1.6,-.7);flame(9,30,4,1.4,-.8);flame(7,34,3,1.2,-.8);                              /* a tiny bit past the rump, onto the base of the tail */
   WOLFPUP.r.forEach((segs,y)=>segs.forEach(([x0,rle])=>{
     let x=x0;
     rle.split(' ').forEach(t=>{const n=t.length>1?+t.slice(1):1;X.fillStyle=P[t[0]];for(let i=0;i<n;i++)X.fillRect(x++,y,1,1)});
   }));
+  /* in front of the body: glowing magma cracks in the fur (only on fur pixels, never on the outline) */
+  const fur=(px,py)=>{const d=X.getImageData(px,py,1,1).data;return d[3]>0&&d[0]+d[1]+d[2]>130&&d[0]<120};
+  /* each crack is a connected, jagged line of pixels that starts at the spine (where the flames come out) and runs down the fur; hottest at the root, cooling to dark red at the tip, with a heat pulse that travels along it and a faint warm glow in the fur around it */
+  const CRACKS=[
+    [[19,24],[19,25],[19,26],[20,27],[20,28],[19,29],[19,30],[18,31],[18,32],[18,33]],             /* haunch */
+    [[23,25],[24,26],[24,27],[25,28],[26,28],[26,29]],                                               /* flank */
+    [[29,25],[29,26],[30,27],[30,28],[29,29],[29,30],[30,31],[30,32],[31,28],[32,29]]                /* shoulder (the last two pixels are a short fork off [30,28]) */
+  ];
+  const heat=[P.q,P.m,P.n,P.o],cp=[],isc={};
+  CRACKS.forEach((path,ci)=>path.forEach(([cx,cy],i)=>{if(fur(cx,cy)){cp.push([cx,cy,i,path.length,ci]);isc[cx+','+cy]=1}}));
+  const halo={};
+  cp.forEach(([cx,cy])=>[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{
+    const k=(cx+dx)+','+(cy+dy);
+    if(halo[k]||isc[k]||!fur(cx+dx,cy+dy))return;
+    halo[k]=1;X.fillStyle='rgba(255,90,20,.14)';X.fillRect(cx+dx,cy+dy,1,1);
+  }));
+  cp.forEach(([cx,cy,i,n,ci])=>{
+    let t=i<2?3:i<n*.5?2:i<n-2?1:0;
+    if(i===(ph*2+ci*3)%(n+2))t=Math.min(3,t+1);   /* one bright spark travels down each crack */
+    X.fillStyle=heat[t];X.fillRect(cx,cy,1,1);
+  });
   /* embers drift up from the flames (only drawn over empty space) */
-  [[12,17,0],[27,13,1],[8,30,2],[1,26,1],[19,9,2],[31,21,0],[6,20,1]].forEach(([ex,ey,k])=>{
+  [[16,16,0],[20,8,1],[23,11,2],[14,19,2],[19,13,0],[12,22,1],[9,23,0],[22,16,1],[17,11,2]].forEach(([ex,ey,k])=>{
     const y=ey-ph*(k+1)%7,px=ex+(ph%2?1:0);if(y<0||y>=W||px<0||px>=W)return;
     if(X.getImageData(px,y,1,1).data[3]===0){X.fillStyle=[P.n,P.o,P.m][(k+ph)%3];X.fillRect(px,y,1,1)}
   });
@@ -848,6 +878,7 @@ function bustGrid(look,full,eq){
 }
 let PV=null; /* dev preview override: {lv,cls,n} or null */
 let PVL=10;   /* dev: companion level shown in the previewer (tap the face, or Up/Down) */
+let PVS=null; /* dev preview of the subclass slot: {st:'off'|'ready'|'on',n:name} or null */
 let PVP=null; /* dev preview companion (pet key) or null */
 function gridCanvas(O,w,h){
   const c=document.createElement('canvas');c.width=w;c.height=h;c.className='px';
@@ -1040,14 +1071,14 @@ const pneed=l=>40*(l-1)*l;                                /* total companion XP 
 const plv=it=>{const x=it&&it.ce||0;let l=1;while(l<PMAX&&x>=pneed(l+1))l++;return l};
 const psize=l=>l<BIG_LV?34+7.5*(l-1):130+10*(l-BIG_LV);   /* sprite size in px: Lv 1 = 34, Lv 7 = 79, Lv 8 = 130, Lv 20 = 250 (taller than the hero) */
 const vlv=(k,l)=>PETS[k]&&PETS[k].sm?Math.min(l,BIG_LV-1):l;   /* look level: small companions (sm) stay in their small form forever; their bonuses still grow */
-const psz=(k,l)=>{const p=PETS[k]&&PETS[k].px;return p?Math.max(1,Math.round(psize(l)/p))*p:psize(l)};   /* pixel-art companions (px = native size) only grow in whole-number zooms so their pixels stay sharp */
+const psz=(k,l)=>{const p=PETS[k]&&PETS[k].px;return p?Math.max(2,Math.round(psize(l)/p))*p:psize(l)};   /* pixel-art companions (px = native size) only grow in whole-number zooms so their pixels stay sharp */
 const pres=l=>l>=14?64:l>=BIG_LV?48:32;                   /* sprite resolution: bigger companions get more detail */
 function eff(it,k){const v=it.b[k]||0;return it.slot==='companion'?Math.round(v*(1+.08*(plv(it)-1))):v}   /* companion bonuses grow +8% per level */
 const PETQ=['Stray','Tame','Loyal','Clever','Noble','Fabled','Mythic','Spirit'];
 const TNAME=['Bone Charm','Copper Ring','Silver Ring','Jade Ring','Gold Ring','Mythril Ring','Dragon Eye','Eye of the Void'];
 const SUF={xp:'of Insight',gold:'of Fortune',dmg:'of Warding',hp:'of Vitality',bd:'of Slaying'};
 const ICON={helm:{warrior:'\u26d1\ufe0f',mage:'\ud83c\udfa9',rogue:'\ud83e\udd77',cleric:'\ud83d\udc51'},armor:{warrior:'\ud83d\udee1\ufe0f',mage:'\ud83e\udde5',rogue:'\ud83e\udd4b',cleric:'\ud83d\udc58'},weapon:{warrior:'\u2694\ufe0f',great:'\ud83d\udde1\ufe0f',mage:'\ud83e\ude84',rogue:'\ud83d\udd2a',cleric:'\ud83d\udd28'},offhand:{warrior:'🛡️',mage:'📖',rogue:'🗡️',cleric:'🏮'}};
-const RAR=['#6b6478','#58b368','#4a9ae0','#2fc7c0','#a56be0','#e8b93c','#ff7a4a','#ff4fd8'];   /* frame colour per rarity */
+const RAR=['#8a7862','#58b368','#4a9ae0','#2fc7c0','#a56be0','#e8b93c','#ff7a4a','#ff4fd8'];   /* frame colour per rarity */
 const STAT_TXT={xp:v=>(v<0?'':'+')+v+'% XP',gold:v=>(v<0?'':'+')+v+'% gold',dmg:v=>v<0?'+'+(-v)+'% damage taken':'-'+v+'% damage taken',hp:v=>(v<0?'':'+')+v+' max HP',bd:v=>(v<0?'':'+')+v+'% boss damage'};
 /* Unique gear: hand-made named items, mostly weapons. Quirky rather than strong, some have trade-offs.
    v = which of the 6 hero looks it uses (0 plain .. 5 dragon). */
@@ -1137,7 +1168,8 @@ function streak(){
 const sbm=()=>1+(S.cls==='bard'?.5*cm():0)+(hasSub('scholar')?.5*cm():0);   /* Bard: streak bonus per day and its cap are both multiplied */
 const mult=()=>(1+Math.min(.5*sbm(),.1*sbm()*streak()))*(1+bsum('xp')/100)*(1+(S.cls==='mage'?.15*cm():0))*(1+.02*lvBonus());
 const doneToday=()=>S.done[today()]||[];
-function addLog(m,c){S.log.unshift({d:today(),m,c});S.log=S.log.slice(0,8)}
+let LT=null;   /* tag of the quest being completed right now: chronicle entries it causes are tagged so undo can remove them */
+function addLog(m,c,tag,lv){S.log.unshift({d:today(),m,c,k:tag===undefined?LT:tag,lv});S.log=S.log.slice(0,8)}
 
 /* ---------- consequences: runs for every day that has ended ---------- */
 function process(){
@@ -1172,14 +1204,15 @@ function process(){
 
 /* ---------- actions ---------- */
 function toggle(id,ev){
-  const t=today(),task=S.tasks.find(x=>x.id===id);if(!task||!active(task,t))return;ensureBoss();
+  const t=today(),task=S.tasks.find(x=>x.id===id);if(!task||!active(task,t))return;ensureBoss();JUST=id;
   const arr=S.done[t]=S.done[t]||[],k=t+':'+id,before=levelOf(S.xp),i=arr.indexOf(id);
   if(i<0){
-    const fq=arr.length===0;arr.push(id);const a=xpGain(task.xp,fq),g=Math.round(task.xp/2*goldMult()*firstMult(fq));S.award[k]=a;S.gAward[k]=g;S.xp+=a;S.gold+=g;pop('+'+a+' XP +'+g+'g',ev);buzz(30);const bd=bossDmg(task.xp);(S.bAward=S.bAward||{})[k]=bd;hitBoss(bd);attackFx(bd);if(hasSub('healer')&&task.xp>=40){const hh=Math.max(0,Math.min(Math.max(1,Math.round(hpBase(levelOf(S.xp))*.08*cm())),maxHp(levelOf(S.xp))-S.hp));if(hh){S.hp+=hh;(S.hAward=S.hAward||{})[k]=hh;toast('Healer: +'+hh+' HP')}}
+    LT=k;const fq=arr.length===0;arr.push(id);const a=xpGain(task.xp,fq),g=Math.round(task.xp/2*goldMult()*firstMult(fq));S.award[k]=a;S.gAward[k]=g;S.xp+=a;S.gold+=g;pop('+'+a+' XP +'+g+'g',ev);buzz(30);const bd=bossDmg(task.xp);(S.bAward=S.bAward||{})[k]=bd;hitBoss(bd);attackFx(bd);if(hasSub('healer')&&task.xp>=40){const hh=Math.max(0,Math.min(Math.max(1,Math.round(hpBase(levelOf(S.xp))*.08*cm())),maxHp(levelOf(S.xp))-S.hp));if(hh){S.hp+=hh;(S.hAward=S.hAward||{})[k]=hh;toast('Healer: +'+hh+' HP')}}
     const cp=worn('companion');
     if(cp){const b4=plv(cp);const cg=task.xp*(hasSub('beastmaster')?2:1);cp.ce=(cp.ce||0)+cg;(S.pAward=S.pAward||{})[k]={id:cp.id,x:cg};
       if(plv(cp)>b4){TR=bsum('hp');addLog(cp.n+' reached level '+plv(cp),'good');toast('Your companion reached level '+plv(cp)+(plv(cp)===BIG_LV&&!(PETS[cp.pet]&&PETS[cp.pet].sm)?'. It is big enough to stand behind you now.':''))}}
   }else{
+    LT=null;S.log=S.log.filter(l=>l.k!==k);
     arr.splice(i,1);S.xp=Math.max(0,S.xp-(S.award[k]||task.xp));delete S.award[k];S.gold=Math.max(0,S.gold-(S.gAward[k]||0));delete S.gAward[k];
     {const pa=(S.pAward||{})[k];if(pa){const ci=S.inv.find(z=>z.id===pa.id);if(ci){ci.ce=Math.max(0,(ci.ce||0)-pa.x);TR=bsum('hp')}delete S.pAward[k]}}
     const bd0=S.bAward&&S.bAward[k]!=null?S.bAward[k]:task.xp;if(S.bAward)delete S.bAward[k];{const ha=(S.hAward||{})[k];if(ha){S.hp=Math.max(1,S.hp-ha);delete S.hAward[k]}}
@@ -1190,18 +1223,22 @@ function toggle(id,ev){
     const lv0=levelOf(S.xp),bx=Math.round(BONUS*lscale(lv0)*(hasSub('herald')?1+.5*cm():1)),hb=Math.max(2,Math.round(hpBase(lv0)*.25));
     const h=Math.max(0,Math.min(Math.round(hb*(S.cls==='druid'?1+cm():1)),maxHp(levelOf(S.xp+bx))-S.hp));
     const nc=1+(hasSub('herald')&&seedR('herald'+t)<.35?1:0);S.bonus[t]={h,c:nc,x:bx};S.chests+=nc;S.perfect[t]=1;S.xp+=bx;S.hp+=h;
-    toast('Perfect day! +'+bx+' XP, +'+h+' HP, +'+nc+(nc>1?' chests (Herald bonus)':' chest'));buzz([40,60,40,60,120]);addLog('Perfect day! +'+bx+' XP','good');
+    toast('Perfect day! +'+bx+' XP, +'+h+' HP, +'+nc+(nc>1?' chests (Herald bonus)':' chest'));buzz([40,60,40,60,120]);addLog('Perfect day! +'+bx+' XP','good','p:'+t);
   }else if(!all&&S.bonus[t]){
-    S.xp=Math.max(0,S.xp-(S.bonus[t].x||BONUS));S.hp=Math.max(1,S.hp-(S.bonus[t].h||0));S.chests=Math.max(0,S.chests-(S.bonus[t].c||0));delete S.bonus[t];delete S.perfect[t];
+    S.xp=Math.max(0,S.xp-(S.bonus[t].x||BONUS));S.hp=Math.max(1,S.hp-(S.bonus[t].h||0));S.chests=Math.max(0,S.chests-(S.bonus[t].c||0));delete S.bonus[t];delete S.perfect[t];S.log=S.log.filter(l=>l.k!=='p:'+t);
   }
   const after=levelOf(S.xp);
+  if(i>=0){   /* undo: take back honours earned today that no longer hold, and level-ups that no longer hold */
+    const E=earned();Object.keys(S.badges).forEach(id=>{if(!E[id]&&S.bDay&&S.bDay[id]===t){delete S.badges[id];delete S.bDay[id]}});
+    S.log=S.log.filter(l=>!(l.lv&&l.lv>after));
+  }
   if(after>before){
     if(S.cls&&ctierAt(before)!==ctierAt(after))addLog('Promoted to '+CLS[S.cls].n[ctierAt(after)],'good');
-    S.hp=maxHp(after);addLog('Reached level '+after,'good');if(after===5)addLog('A class awaits in the Forge','good');if(before<15&&after>=15&&S.cls&&!S.sub)addLog('A subclass awaits in the Forge','good');
+    S.hp=maxHp(after);addLog('Reached level '+after,'good',undefined,after);if(after===5)addLog('A class awaits in the Forge','good');if(before<15&&after>=15&&S.cls&&!S.sub)addLog('A subclass awaits in the Forge','good');
     showModal(S.cls?CLS[S.cls].e:rk(after)[1],'Level up!','You are now level '+after+', '+(S.cls?clsName():rk(after)[0])+'.\nMax HP raised, HP restored and all your stats improved.'+(before<15&&after>=15&&S.cls&&!S.sub?'\nA subclass awaits in the Forge.':'')+(after===5&&!S.cls?'\nA class awaits in the Forge.':''));
     confetti();
   }else S.hp=Math.min(S.hp,maxHp(after));
-  save();render();
+  LT=null;save();render();
 }
 function pop(txt,ev){
   if(!ev||!ev.currentTarget)return;
@@ -1211,7 +1248,7 @@ function pop(txt,ev){
   document.body.appendChild(el);setTimeout(()=>el.remove(),900);
 }
 let tt;
-function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600)}
+function toast(m){const t=$('toast');t.onclick=null;t.classList.remove('act');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600)}
 function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
 function confetti(){
   if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
@@ -1320,7 +1357,7 @@ function hitBoss(dmg){
   const b=S.boss;if(!b||b.hp<=0)return;
   b.hp=Math.max(0,b.hp-dmg);
   if(b.hp===0){
-    const rw=b.rw||{g:50,c:1};S.chests+=rw.c;S.gold+=rw.g;addLog('Defeated '+bossOf(b)[0]+'! +'+rw.g+' gold, +'+rw.c+' chest'+(rw.c>1?'s':''),'good');
+    const rw=b.rw||{g:50,c:1};S.chests+=rw.c;S.gold+=rw.g;addLog('Defeated '+bossOf(b)[0]+'! +'+rw.g+' gold, +'+rw.c+' chest'+(rw.c>1?'s':''),'good',null);
     showModal('🏆','Boss defeated!',bossOf(b)[0]+' has fallen.\n+'+rw.g+' gold and '+(rw.c>1?rw.c+' chests.':'a chest.'));confetti();
   }
 }
@@ -1431,6 +1468,8 @@ function fitCap(){
   });
 }
 addEventListener('resize',fitCap);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitCap);   /* re-fit the name once the pixel font has loaded */
+if(window.ResizeObserver){let w0=0;new ResizeObserver(es=>{const w=Math.round(es[0].contentRect.width);if(w!==w0){w0=w;fitCap()}}).observe($('rank'))}   /* and whenever the card changes width, so the name always shrinks to fit instead of being cut */
 let SEL='weapon',SELI=null;   /* slot being browsed / item selected in the picker */
 function renderGear(){
   const lv=levelOf(S.xp),R=rk(lv),E=eqLook();applyScene();
@@ -1448,7 +1487,7 @@ function renderGear(){
   }
   {   /* companion beside the hero (a dev preview overrides what is worn) */
     const cw=worn('companion'),fk2=PVP||(cw?(PETS[cw.pet]?cw.pet:'wolfpup'):null),fp=$('fpet'),cl=PVP?PVL:(cw?plv(cw):1);
-    if(fk2){fp.hidden=false;fp.title=(PVP?PETS[fk2].n:cw.n)+' (Lv '+cl+')';const vl=vlv(fk2,cl);fp.classList.toggle('solid',!!PETS[fk2].sm);fp.classList.toggle('still',!!PETS[fk2].still);fp.classList.toggle('big',vl>=BIG_LV);fp.parentNode.style.setProperty('--pz',psz(fk2,vl));setSprite('fpet',PETS[fk2].e,pres(vl),vl);fp.style.filter=PETS[fk2].fire?'drop-shadow(0 0 6px rgba(255,120,30,.75))':''}else fp.hidden=true;
+    if(fk2){fp.hidden=false;fp.title=(PVP?PETS[fk2].n:cw.n)+' (Lv '+cl+')';const vl=vlv(fk2,cl);fp.classList.toggle('solid',!!PETS[fk2].sm);fp.classList.toggle('still',!!PETS[fk2].still);fp.classList.toggle('big',vl>=BIG_LV);fp.parentNode.style.setProperty('--pz',psz(fk2,vl));setSprite('fpet',PETS[fk2].e,pres(vl),vl);fp.classList.toggle('fire',!!PETS[fk2].fire)}else fp.hidden=true;
   }
   const slot=(k,wide)=>{
     const it=worn(k),b=el('button','eslot'+(SEL===k?' on':'')+(it?'':' base')),ic=el('span','ei'),lab=it?it.n+(it.slot==='companion'?' Lv '+plv(it):''):'Empty';
@@ -1602,7 +1641,7 @@ function renderArena(){
   const ah=$('ahero'),hk=(PV?'pv'+PV.n:Object.values(eqLook()).join('.'))+(S.look?Object.values(S.look).join(','):'');if(ah.dataset.k!==hk){ah.dataset.k=hk;ah.replaceChildren(heroPx(lv))}
   $('atag').textContent='Lv '+lv+' '+(S.cls?clsName():R[0]);
   const pt=worn('companion'),ap=$('apet'),pk=PVP||(pt?(PETS[pt.pet]?pt.pet:'wolfpup'):null),al=PVP?PVL:(pt?plv(pt):1);
-  if(pk){ap.hidden=false;ap.title=(PVP?PETS[pk].n:pt.n)+' (Lv '+al+')';const vl=vlv(pk,al);ap.classList.toggle('solid',!!PETS[pk].sm);ap.classList.toggle('still',!!PETS[pk].still);ap.classList.toggle('big',vl>=BIG_LV);ap.style.setProperty('--pz',PETS[pk].px?PETS[pk].px/.4737:psize(vl));setSprite('apet',PETS[pk].e,pres(vl),vl);ap.style.filter=PETS[pk].fire?'drop-shadow(0 0 5px rgba(255,120,30,.75))':''}else ap.hidden=true;
+  if(pk){ap.hidden=false;ap.title=(PVP?PETS[pk].n:pt.n)+' (Lv '+al+')';const vl=vlv(pk,al);ap.classList.toggle('solid',!!PETS[pk].sm);ap.classList.toggle('still',!!PETS[pk].still);ap.classList.toggle('big',vl>=BIG_LV);ap.style.setProperty('--pz',PETS[pk].px?PETS[pk].px/.4737:psize(vl));setSprite('apet',PETS[pk].e,pres(vl),vl);ap.classList.toggle('fire',!!PETS[pk].fire)}else ap.hidden=true;
   const b=S.boss;if(!b)return;
   const B=bossOf(b);setSprite('aboss',B[1],24);$('aboss').classList.toggle('art',B[1].slice(0,4)==='pet:');
   $('abname').textContent=B[0];$('abfill').style.width=(b.hp/b.max*100)+'%';$('abtxt').textContent=b.hp+' / '+b.max;
@@ -1629,6 +1668,7 @@ function renderSheet(){
 function tab(n){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id==='tab-'+n));
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('on',b.dataset.tab===n));
+  document.body.dataset.tab=n;   /* the tavern backdrop only shows on the Quests tab */
   const hud=document.querySelector('.hud');if(hud)hud.hidden=n==='hero';   /* Hero tab: just the full avatar and its gear */
   const th=$('tab-hero');if(th)th.style.paddingTop=n==='hero'?'env(safe-area-inset-top,0px)':'';
   fitCap();scrollTo(0,0);try{localStorage.setItem('dq.tab',n)}catch(e){}
@@ -1668,22 +1708,50 @@ function tween(el,to,dec,pre){   /* counts a number up or down to its new value 
 }
 function flashBar(b){b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash');setTimeout(()=>b.classList.remove('flash'),750)}
 function flipCoin(){const g=$('gc');g.classList.remove('flip');void g.offsetWidth;g.classList.add('flip');setTimeout(()=>g.classList.remove('flip'),650)}
+/* pixel-art icons for the subclass slot under the rank: a closed padlock (locked), an open padlock (ready to choose) and a gem (chosen) */
+const SUBPIX={
+  guardian:{p:{d:'#6a7488',s:'#c3ccda',g:'#e8b93c'},r:['.ddddddd.','dsssgsssd','dsssgsssd','dgggggggd','dsssgsssd','.dssgssd.','.dssgssd.','..dsgsd..','...ddd...']},
+  berserker:{p:{r:'#c9302c',o:'#ff7a1a',y:'#ffc02a'},r:['....r....','...rr....','...rro.r.','..rroorr.','.rroooorr','.rooyyoor','.rooyyoor','..roooor.','...rrrr..']},
+  scholar:{p:{b:'#3a6ac0',p:'#f4ecd6',d:'#8a7a58',g:'#e8b93c'},r:['.bbbbbbb.','bpppbpppb','bpddbddpb','bpppbpppb','bpddbddpb','bpppbpppb','bpddbddpb','bbbbbbbbb','..ggggg..']},
+  battlemage:{p:{y:'#ffd75a',w:'#ffffff',c:'#4aa8d8'},r:['....wyyy.','...wyyy..','..wyyy...','.yyyyyyy.','...yyyy..','..yyyy...','..yyy....','.yy......','.y.......']},
+  treasure:{p:{l:'#bff4ff',c:'#4aa8d8',d:'#2a6aa0'},r:['...lll...','..lcccd..','.lcccccd.','lcccccccd','.lcccccd.','..lcccd..','...lcd...','....d....']},
+  shadowblade:{p:{p:'#a56be0',d:'#5a3a8a',l:'#d9b8ff',y:'#ffd75a'},r:['...llpp..','..lpp....','.lpp..y..','.lp......','.lp......','.lpp.....','..lppp...','...lppppd','....dddd.']},
+  healer:{p:{g:'#58b368',l:'#a8f0b8',d:'#2f7d3e',w:'#ffffff'},r:['.ggg.ggg.','glgggwggd','gggwwwggd','gggggwggd','.gggwgggd','..gggggd.','...gggd..','....d....']},
+  beastmaster:{p:{b:'#c2682f',l:'#e8a060'},r:['..bb.bb..','..bb.bb..','bb.....bb','bb.....bb','...bbb...','..lbbbb..','.lbbbbbb.','.bbbbbbb.','..bbbbb..']},
+  chronicler:{p:{p:'#f2d3a0',d:'#a97f4a',k:'#6a4a2a',r:'#a8283a'},r:['.ddddddd.','dpppppppd','.pkkkkkp.','.ppppppp.','.pkkkkkp.','.ppppppp.','.pkkkprp.','dpppppppd','.ddddddd.']},
+  herald:{p:{g:'#e8b93c',l:'#fff1a8',d:'#a8761c'},r:['......ggd','.....glgd','..gggllgd','gllgglggd','ggdd.glgd','.gd...ggd','......ggd','.......dd']}
+};
+/* pixel-art icons for the subclass slot under the rank: a closed padlock (locked), an open padlock (ready to choose) and one custom icon per subclass (chosen) */
+function subIcon(st,id){
+  const sp=st==='on'&&SUBPIX[id],open=st==='ready';
+  const P=sp?sp.p:open?{s:'#ffc04a',b:'#e0801a',h:'#ff9f3a',k:'#3a1d05'}:{s:'#a29cab',b:'#615b69',h:'#7d7786',k:'#15100f'};
+  const rows=sp?sp.r:[ '..sss..','.s...s.',open?'.s.....':'.s...s.','bbbbbbb','bhhhhhb','bhhkhhb','bhhkhhb','bhhhhhb','bbbbbbb'];
+  const W=Math.max(...rows.map(r=>r.length)),H=rows.length,O=Array.from({length:H+2},()=>Array(W+2).fill(null));
+  rows.forEach((r,y)=>[...r].forEach((c,x)=>{if(c!=='.')O[y+1][x+1]=P[c]}));
+  const Q=O.map(r=>r.slice());
+  for(let y=0;y<H+2;y++)for(let x=0;x<W+2;x++)if(!O[y][x]&&((O[y-1]||[])[x]||O[y][x-1]||O[y][x+1]||(O[y+1]||[])[x]))Q[y][x]='#0a0812';
+  const cv=gridCanvas(Q,W+2,H+2);cv.style.width=(W+2)*2+'px';cv.style.height=(H+2)*2+'px';cv.style.flex='none';
+  return cv;
+}
 function initHud(){   /* a heart in front of HP, a star in front of XP */
   const ls=document.querySelectorAll('.hud .stats .row label');
   [['\u2764\ufe0f'],['\u2b50']].forEach((a,i)=>{const l=ls[i];if(l&&!l.querySelector('.px'))l.prepend(px(a[0],16))});
 }
 function render(){
+  if(DRAG)return;   /* never rebuild the board under a scroll that is being dragged */
+  if(!S.cqv&&canRun()){const E0=earned();S.log=[];S.badges={};S.bDay={};S.bSkip=Object.keys(E0).filter(k=>E0[k]);S.cqv=1;save()}   /* one-time: empty chronicle and honours (honours already true now stay empty until they are earned again) */
   const lv=levelOf(S.xp),lo=need(lv),hi=need(lv+1),mh=maxHp(lv),R=rk(lv);
   if(S.hp>mh)S.hp=mh;
   $('lvl').textContent=lv;$('av').replaceChildren(heroPx(lv,1));{const fr=document.querySelector('.hud .av');if(fr)fr.dataset.tier=lv>=40?4:lv>=25?3:lv>=15?2:lv>=5?1:0}   /* frame tier */{   /* top bar: your name big, rank small underneath (just the rank if there is no name) */
-    const rn=$('rank'),nm=heroName(),rl='Rank '+Math.min(lv,5)+': '+(S.cls?clsName():R[0]),ck=nm+'|'+rl;   /* rank number 1-5 (you stay at Rank 5 after level 5) */
+    const rn=$('rank'),nm=heroName(),rl='Rank '+Math.min(lv,5)+': '+(S.cls?clsName():R[0]),sst=PVS?PVS.st:S.sub?'on':(lv>=15&&S.cls?'ready':'off'),sbk=PVS&&PVS.n?PVS.n:S.sub&&!PVS?SUBD[S.sub].n:sst==='ready'?'Choose subclass':'Subclass',ck=nm+'|'+rl+'|'+sbk+'|'+sst;   /* subclass line: greyed out until level 15, then a prompt, then the chosen subclass */   /* rank number 1-5 (you stay at Rank 5 after level 5) */
     if(rn.dataset.k!==ck){
       rn.dataset.k=ck;
       /* banner name plate: name on a ribbon, rank / class underneath as a title */
-      const a=el('span','rk-name',nm||rl);a.dataset.max=17;
+      const a=el('span','rk-name',nm||rl);a.dataset.max=21;
       const rib=el('div','rk-rib');rib.appendChild(a);
       const bn=el('div','rk-banner');bn.append(rib);
-      if(nm){const b=el('span','rk-sub',rl);b.dataset.max=11;rn.replaceChildren(bn,b)}else rn.replaceChildren(bn);
+      const kids=[bn];if(nm){const b=el('span','rk-sub',rl);b.dataset.max=12;kids.push(b)}
+      const sb=el('div','rk-subc '+sst);if(sst==='on')sb.dataset.sub=PVS&&PVS.id?PVS.id:S.sub;sb.title=sst==='off'?'Subclass unlocks at level 15':'Subclass';sb.append(subIcon(sst,PVS&&PVS.id?PVS.id:S.sub),el('b','',sbk));if(sst==='on')for(let q=1;q<=4;q++)sb.appendChild(el('span','sp s'+q));   /* four empty layers the subclass styles turn into embers, sparkles, confetti and so on */if(sst==='off')sb.appendChild(el('i','','Lv 15'));kids.push(sb);rn.replaceChildren(...kids);
     }
     fitCap();
   }
@@ -1701,25 +1769,14 @@ function render(){
   if(lastGold!=null&&S.gold>lastGold)flipCoin();lastGold=S.gold;
 
   const d=doneToday(),list=$('list');list.innerHTML='';
-  const act=S.tasks.filter(t=>active(t)),shown=S.tasks.filter(t=>QT==='today'?active(t):(t.days||'all')===QT);
+  const act=S.tasks.filter(t=>active(t)),shown=S.tasks.filter(t=>QT==='any'||tabOf(t)===QT);
   document.querySelectorAll('.qtab').forEach(b=>{const on=b.dataset.g===QT;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
   if(!shown.length){
     const e=document.createElement('div');e.className='empty';
-    e.textContent=!S.tasks.length?'The board is bare. Pin a daily quest below. Finish it for XP, neglect it and you take damage.':QT==='today'?'A rest day. Nothing is posted for today.':'Nothing posted here yet. Choose this schedule when you pin a quest.';
+    e.textContent=!S.tasks.length?'The board is bare. Pin a daily quest below. Finish it for XP, neglect it and you take damage.':QT==='cu'?'No custom days yet. Pin a quest and tap the days you want it on.':'No every-day quests yet. Pin one with Every day selected.';
     list.appendChild(e);
   }
-  shown.forEach(t=>{
-    const on=d.includes(t.id),rest=!active(t),li=document.createElement('li');li.className='q'+(on?' done':'')+(rest?' rest':'');
-    const c=document.createElement('button');c.className='chk';c.type='button';
-    c.setAttribute('aria-label',(on?'Undo ':'Complete ')+t.name);c.textContent=on?'✓':'';c.disabled=rest;
-    c.onclick=ev=>toggle(t.id,ev);
-    const n=el('div','name');n.append(el('div','',t.name),el('small','meta','★'.repeat(t.xp>=40?3:t.xp>=20?2:1)+' +'+(on&&S.award[today()+':'+t.id]!=null?S.award[today()+':'+t.id]:xpGain(t.xp,!d.length))+' XP +'+(on&&S.gAward[today()+':'+t.id]!=null?S.gAward[today()+':'+t.id]:Math.round(t.xp/2*goldMult()*firstMult(!d.length)))+'g'));
-    const g=document.createElement('span');g.className='tag';g.textContent=rest?'REST':on?'DONE':'-'+penalty(t.xp)+' HP';
-    const x=document.createElement('button');x.className='del';x.type='button';x.textContent='×';
-    x.setAttribute('aria-label','Delete '+t.name);
-    x.onclick=()=>{S.tasks=S.tasks.filter(z=>z.id!==t.id);save();render()};
-    li.append(c,n,g,x);list.appendChild(li);
-  });
+  renderQuests(shown,d,list);
   const done=act.filter(t=>d.includes(t.id)).length;
   $('count').textContent=done+' / '+act.length+' done';$('dfill').style.width=(act.length?done/act.length*100:0)+'%';
   $('winbox').innerHTML=(act.length&&done===act.length)?'<div class="win">The realm is safe. Rest well, hero.</div>':'';
@@ -1727,14 +1784,15 @@ function render(){
   if(!addTouched)setAdd(!S.tasks.length);   /* open by default only while the board is empty */
 
   renderRPG();
-  document.querySelectorAll('.dbtn').forEach(b=>{const v=+b.dataset.v;b.querySelector('.dx').textContent='+'+xpGain(v)+' XP';b.querySelector('.dh').textContent='-'+penalty(v)+' HP'});
+  updatePv();
   const lg=$('log');lg.innerHTML='';
   if(!S.log.length)lg.innerHTML='<div><small>Nothing yet.</small>Your wins and losses will show up here.</div>';
   S.log.forEach(l=>{const r=document.createElement('div');const s=document.createElement('small');s.textContent=l.d.slice(5);const m=document.createElement('span');m.className=l.c||'';m.textContent=l.m;r.append(s,m);lg.appendChild(r)});
 
   const E=earned(),bx=$('badges');bx.innerHTML='';
   BADGES.forEach(b=>{
-    if(E[b.id]&&!S.badges[b.id]){S.badges[b.id]=1;save();setTimeout(()=>toast('Badge unlocked: '+b.n),900)}
+    if(S.bSkip&&S.bSkip.includes(b.id)&&!E[b.id]){S.bSkip=S.bSkip.filter(x=>x!==b.id);save()}
+    if(E[b.id]&&!S.badges[b.id]&&!(S.bSkip&&S.bSkip.includes(b.id))){S.badges[b.id]=1;(S.bDay=S.bDay||{})[b.id]=today();save();setTimeout(()=>toast('Badge unlocked: '+b.n),900)}
     const kind=/^s\d/.test(b.id)?'s':/^l\d/.test(b.id)?'l':'x',got=!!S.badges[b.id];   /* s = streak, l = level, x = other */
     const el=document.createElement('div');el.className='b k-'+kind+(got?' got':' lock');
     el.innerHTML='<span class="e"></span><b></b><span class="bd"></span>';
@@ -1752,24 +1810,222 @@ function render(){
   maybeCreator();
 }
 
+/* ---------- quest board: pending first, 7-day history, per-quest streaks, inline edit, undo delete ---------- */
+let EDIT=null,JUST=null,DRAG=null;   /* DRAG = the scroll being dragged right now */
+const QDIFF=[[10,'Easy'],[20,'Medium'],[40,'Hard']],QSCHED=[['all','Every day'],['wk','Weekdays'],['we','Weekends']];
+function qStreak(t){   /* consecutive active days done, counting back from today (a day with nothing scheduled is skipped) */
+  const dn=k=>(S.done[k]||[]).includes(t.id);let k=today(),n=0,g=0;
+  if(!dn(k))k=addDays(k,-1);
+  while(g++<365&&k>=t.created){if(active(t,k)){if(dn(k))n++;else break}k=addDays(k,-1)}
+  return n;
+}
+function qDots(t){   /* last 7 days: green done, red missed, blinking = today still open, dotted = not scheduled */
+  const w=el('span','qd');
+  for(let i=6;i>=0;i--){
+    const k=addDays(today(),-i);let c='na';
+    if(k>=t.created)c=!active(t,k)?'off':(S.done[k]||[]).includes(t.id)?'on':i===0?'now':'miss';
+    const s=el('i','dt '+c);s.title=k.slice(5);w.appendChild(s);
+  }
+  return w;
+}
+function renderSum(d){
+  const b=$('bsum'),p=S.tasks.filter(t=>active(t)&&!d.includes(t.id));
+  if(!S.tasks.some(t=>active(t))){b.replaceChildren();return}
+  const xp=p.reduce((a,t)=>a+xpGain(t.xp,false),0),g=p.reduce((a,t)=>a+Math.round(t.xp/2*goldMult()),0);
+  const chip=(l,v)=>{const s=el('span','bs');s.append(el('small','',l),el('b','',v));return s};
+  b.replaceChildren(chip('Left',p.length),chip('XP to earn','+'+xp),chip('Gold to earn','+'+g+'g'));
+}
+function delQuest(t){
+  const i=S.tasks.findIndex(z=>z.id===t.id);if(i<0)return;
+  S.tasks.splice(i,1);EDIT=null;save();render();
+  const T=$('toast');T.textContent='Quest removed. Tap to undo.';T.classList.add('on','act');
+  const off=()=>{T.classList.remove('on','act');T.onclick=null};
+  T.onclick=()=>{S.tasks.splice(Math.min(i,S.tasks.length),0,t);clearTimeout(tt);off();save();render()};
+  clearTimeout(tt);tt=setTimeout(off,5000);
+}
+function confirmDelete(t){   /* the x on a scroll asks first: a deliberate second tap on a red button is needed */
+  const ov=el('div','modal on'),card=el('div','card down'),box=el('div','stack');
+  ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');
+  const esc=e=>{if(e.key==='Escape')close()};
+  const close=()=>{ov.remove();document.removeEventListener('keydown',esc)};
+  const keep=el('button','btn','Keep it'),del=el('button','btn danger','Delete');
+  keep.type=del.type='button';keep.onclick=close;
+  del.disabled=true;setTimeout(()=>{del.disabled=false},500);   /* a quick double tap cannot go straight through */
+  del.onclick=()=>{close();delQuest(t)};
+  box.append(keep,del);
+  card.append(el('h2','','Delete quest?'),el('p','','\u201c'+t.name+'\u201d will be removed from your board.'),box);
+  ov.onclick=e=>{if(e.target===ov)close()};
+  ov.appendChild(card);document.body.appendChild(ov);document.addEventListener('keydown',esc);keep.focus();
+}
+const QRANK=[['Rank E'],['Rank C'],['Rank A']];
+function dayRow(get,set,after){   /* seven weekday toggles (Mon..Sun); at least one day always stays on */
+  const w=el('div','dayrow');w.setAttribute('role','group');w.setAttribute('aria-label','Days of the week');
+  DORDER.forEach(d=>{
+    const b=el('button','dbt',DNAMES[d].slice(0,2));b.type='button';b.dataset.d=d;b.title=DNAMES[d];b.setAttribute('aria-label',DNAMES[d]);
+    b.onclick=()=>{const c=get().slice(),i=c.indexOf(d);if(i>=0){if(c.length<2)return;c.splice(i,1)}else c.push(d);set(c);if(after)after()};
+    w.appendChild(b);
+  });
+  w.paint=()=>{const c=get();w.querySelectorAll('.dbt').forEach(b=>{const on=c.includes(+b.dataset.d);b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})};
+  return w;
+}
+function qEditor(t){
+  const li=el('li','qc edit'),cd=el('div','qcard'),bd=el('div','qedit'),inp=document.createElement('input');
+  let xp=t.xp,ds=dayList(t).slice();
+  inp.type='text';inp.maxLength=80;inp.value=t.name;inp.setAttribute('aria-label','Quest name');
+  const seg=(items,get,set)=>{
+    const g=el('div','diffs');
+    items.forEach(it=>{
+      const b=el('button','sbtn'+(get()===it[0]?' on':''),it[1]);b.type='button';b.setAttribute('aria-pressed',get()===it[0]);
+      b.onclick=()=>{set(it[0]);g.querySelectorAll('.sbtn').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on)})};
+      g.appendChild(b);
+    });
+    return g;
+  };
+  const pg=el('div','diffs');   /* presets + your own days */
+  QSCHED.forEach(it=>{const b=el('button','sbtn',it[1]);b.type='button';b.dataset.g=it[0];b.onclick=()=>{ds=DAYSETS[it[0]].slice();paintD()};pg.appendChild(b)});
+  const dr=dayRow(()=>ds,v=>{ds=v},()=>paintD());
+  const paintD=()=>{const k=dayKey(ds);pg.querySelectorAll('.sbtn').forEach(x=>{const on=x.dataset.g===k;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on)});dr.paint()};
+  paintD();
+  const ok=el('button','btn','Save quest'),no=el('button','ghost','Cancel');ok.type=no.type='button';
+  const saveIt=()=>{
+    const nm=inp.value.trim();if(!nm){inp.focus();return}
+    t.name=nm;t.xp=xp;t.days=saveDays(ds);
+    if(QT!=='any')QT=tabOf(t);
+    EDIT=null;save();render();toast('Quest updated');
+  };
+  const cancel=()=>{EDIT=null;render()};
+  ok.onclick=saveIt;no.onclick=cancel;
+  inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();saveIt()}else if(e.key==='Escape')cancel()};
+  const ea=el('div','eacts');ea.append(ok,no);
+  const band=el('div','qband');band.appendChild(el('span','qrk','Edit quest'));
+  bd.append(inp,seg(QDIFF,()=>xp,v=>{xp=v}),pg,dr,ea);
+  cd.append(band,bd);li.appendChild(cd);
+  setTimeout(()=>{inp.focus();inp.select()},0);
+  return li;
+}
+function renderQuests(shown,d,list){
+  renderSum(d);
+  const rw=(c,e,txt,ti)=>{const s=el('span','rw '+c);s.title=ti||'';s.append(px(e,16),document.createTextNode(txt));return s};
+  shown.forEach(t=>{   /* order = S.tasks order, which you set by dragging */
+    if(EDIT===t.id){list.appendChild(qEditor(t));return}
+    const T=today(),on=d.includes(t.id),rest=!active(t),first=!d.length,k=T+':'+t.id,lv=t.xp>=40?3:t.xp>=20?2:1,R=QRANK[lv-1];
+    const li=el('li','qc d'+lv+(on?' done':'')+(rest?' rest':'')+(on&&JUST===t.id?' just':'')),cd=el('div','qcard');li.dataset.id=t.id;
+    /* rank band: difficulty as a guild rank, with edit / delete tucked into the corner */
+    const band=el('div','qband'),ed=el('button','qbtn','\u270e'),x=el('button','qbtn','\u00d7');
+    band.appendChild(el('span','qrk',on?'Done':rest?dayLabel(t):R[0]));
+    ed.type=x.type='button';ed.setAttribute('aria-label','Edit '+t.name);x.setAttribute('aria-label','Delete '+t.name);
+    ed.onclick=()=>{EDIT=t.id;render()};x.onclick=()=>confirmDelete(t);band.append(x);
+    /* wax seal */
+    const c=el('button','qchk');c.type='button';c.setAttribute('aria-label',(on?'Undo ':'Complete ')+t.name);c.textContent=on?'\u2713':'';c.disabled=rest;c.onclick=ev=>toggle(t.id,ev);
+    const xv=on&&S.award[k]!=null?S.award[k]:xpGain(t.xp,first),gv=on&&S.gAward[k]!=null?S.gAward[k]:Math.round(t.xp/2*goldMult()*firstMult(first));
+    const rws=el('div','qrw');rws.append(rw('xp','\u2b50','+'+xv,'XP'),rw('g','\ud83e\ude99','+'+gv,'Gold'));
+    const sk=qStreak(t);if(sk)rws.appendChild(rw('fl','\ud83d\udd25',String(sk),'Day streak'));
+    const nm=el('div','qname',t.name),ft=el('div','qfoot');nm.title=t.name;ft.append(qDots(t),c);
+    cd.append(band,nm,rws,ft);li.appendChild(cd);list.appendChild(li);
+  });
+  JUST=null;
+}
+/* ---------- drag the scrolls to rearrange them ----------
+   Mouse: press a scroll and move. Touch: press and hold a moment, then drag (a quick swipe still scrolls the page).
+   The scrolls shuffle out of the way live; on drop the new order is saved into S.tasks (and so synced to the cloud). */
+(function(){
+  const list=$('list'),HOLD=380,MOVE=10;
+  let P=null,SUP=0;                                   /* P = a press that has not turned into a drag yet */
+  const cards=()=>[...list.children].filter(c=>c.dataset&&c.dataset.id);
+  const stop=()=>{if(P){clearTimeout(P.timer);P=null}};
+  function place(x,y){                                 /* keep the grabbed scroll under the pointer */
+    const li=DRAG.li;li.style.transform='none';
+    const r=li.getBoundingClientRect();
+    li.style.transform='translate('+(x-DRAG.gx-r.left)+'px,'+(y-DRAG.gy-r.top)+'px) scale(1.05) rotate(-2deg)';
+  }
+  function reorder(x,y){                               /* hovering another scroll: take its slot, the others slide over */
+    const t=document.elementFromPoint(x,y),over=t&&t.closest&&t.closest('li.qc');
+    if(!over||over===DRAG.li||over.parentNode!==list||!over.dataset.id||over.classList.contains('edit'))return;
+    const all=cards(),sibs=all.filter(l=>l!==DRAG.li),was=new Map(sibs.map(l=>[l,l.getBoundingClientRect()]));
+    list.insertBefore(DRAG.li,all.indexOf(DRAG.li)<all.indexOf(over)?over.nextSibling:over);
+    sibs.forEach(l=>{
+      const a=was.get(l),b=l.getBoundingClientRect(),dx=a.left-b.left,dy=a.top-b.top;
+      if(!dx&&!dy)return;
+      l.style.transition='none';l.style.transform='translate('+dx+'px,'+dy+'px)';void l.offsetWidth;
+      l.style.transition='';l.style.transform='';
+    });
+    place(x,y);buzz(10);
+  }
+  function loop(){                                     /* scroll the page when the scroll is held near the top or bottom edge */
+    if(!DRAG)return;
+    const m=80,h=innerHeight;let dy=0;
+    if(DRAG.y<m)dy=-Math.ceil((m-DRAG.y)/4);else if(DRAG.y>h-m)dy=Math.ceil((DRAG.y-(h-m))/4);
+    if(dy){scrollBy(0,dy);place(DRAG.x,DRAG.y);reorder(DRAG.x,DRAG.y)}
+    DRAG.raf=requestAnimationFrame(loop);
+  }
+  function begin(x,y){
+    const li=P.li,r=li.getBoundingClientRect();
+    clearTimeout(P.timer);
+    DRAG={li,pid:P.pid,gx:x-r.left,gy:y-r.top,x,y,raf:0};P=null;
+    li.classList.add('dragging');list.classList.add('sorting');document.body.classList.add('dragmode');
+    place(x,y);buzz(20);loop();
+  }
+  function end(commit){
+    if(!DRAG)return;
+    const li=DRAG.li;cancelAnimationFrame(DRAG.raf);
+    if(commit){                                        /* the visible scrolls take the slots they already held in S.tasks, in their new order */
+      const ids=cards().map(l=>l.dataset.id),have=new Set(ids),pos=[],by={};
+      S.tasks.forEach((t,i)=>{if(have.has(t.id)){pos.push(i);by[t.id]=t}});
+      const nt=S.tasks.slice();ids.forEach((id,k)=>{if(by[id])nt[pos[k]]=by[id]});
+      if(nt.some((t,i)=>t!==S.tasks[i])){S.tasks=nt;save()}
+    }
+    DRAG=null;SUP=Date.now()+350;
+    li.style.transition='transform .15s ease';li.style.transform='';   /* settle into its slot, then redraw */
+    list.classList.remove('sorting');document.body.classList.remove('dragmode');
+    setTimeout(()=>{li.classList.remove('dragging');render()},160);
+  }
+  list.addEventListener('pointerdown',e=>{
+    if(DRAG||(e.pointerType==='mouse'&&e.button!==0))return;
+    const li=e.target.closest('li.qc');
+    if(!li||!li.dataset.id||li.classList.contains('edit')||e.target.closest('button,input'))return;
+    stop();P={li,pid:e.pointerId,x:e.clientX,y:e.clientY,touch:e.pointerType!=='mouse',timer:0};
+    if(P.touch)P.timer=setTimeout(()=>{if(P)begin(P.x,P.y)},HOLD);
+  });
+  addEventListener('pointermove',e=>{
+    if(DRAG){
+      if(e.pointerId!==DRAG.pid)return;
+      DRAG.x=e.clientX;DRAG.y=e.clientY;place(DRAG.x,DRAG.y);reorder(DRAG.x,DRAG.y);return;
+    }
+    if(!P||e.pointerId!==P.pid||Math.hypot(e.clientX-P.x,e.clientY-P.y)<=MOVE)return;
+    if(P.touch)stop();else begin(e.clientX,e.clientY);   /* touch: moved before the hold finished = the user is scrolling */
+  });
+  addEventListener('pointerup',e=>{stop();if(DRAG&&e.pointerId===DRAG.pid)end(true)});
+  addEventListener('pointercancel',e=>{stop();if(DRAG&&e.pointerId===DRAG.pid)end(false)});
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&DRAG)end(false)});
+  addEventListener('touchmove',e=>{if(DRAG&&e.cancelable)e.preventDefault()},{passive:false});   /* no page scroll while a scroll is held */
+  list.addEventListener('contextmenu',e=>{if(P||DRAG)e.preventDefault()});
+  list.addEventListener('click',e=>{if(Date.now()<SUP){e.stopPropagation();e.preventDefault()}},true);   /* a drop is not a tap on the tick box */
+})();
+function updatePv(){const v=+$('diff').value;$('pvx').textContent='+'+xpGain(v)+' XP';$('pvg').textContent='+'+Math.round(v/2*goldMult())+'g';$('pvh').textContent='-'+penalty(v)+' HP'}
 function setAdd(o){ADDOPEN=o;$('addbody').hidden=!o;$('addtoggle').setAttribute('aria-expanded',o?'true':'false');$('add').classList.toggle('open',o)}
 $('addtoggle').onclick=()=>{addTouched=true;setAdd(!ADDOPEN);if(ADDOPEN)$('newname').focus()};
 $('add').onsubmit=e=>{
   e.preventDefault();
   const inp=$('newname'),name=inp.value.trim();if(!name)return;
-  const nt={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,xp:+$('diff').value,created:today(),days:$('days').value};
+  const nt={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,xp:+$('diff').value,created:today(),days:saveDays(ADAYS)};
   S.tasks.push(nt);
-  if(QT==='today'?!active(nt):QT!==nt.days)QT=nt.days;   /* jump to the tab where the new quest lives */
+  if(QT!=='any')QT=tabOf(nt);   /* jump to the tab where the new quest lives */
   inp.value='';addTouched=true;setAdd(false);save();render();toast('Quest pinned');
 };
 document.querySelectorAll('.dbtn').forEach(b=>b.onclick=()=>{
-  $('diff').value=b.dataset.v;
+  $('diff').value=b.dataset.v;updatePv();
   document.querySelectorAll('.dbtn').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on)});
 });
-document.querySelectorAll('.sbtn').forEach(b=>b.onclick=()=>{
-  $('days').value=b.dataset.g;
-  document.querySelectorAll('.sbtn').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on)});
-});
+let ADAYS=DAYSETS.all.slice();   /* days picked in the new-quest note */
+const addDR=$('dayhost')?dayRow(()=>ADAYS,v=>{ADAYS=v},()=>syncAddDays()):null;
+function syncAddDays(){
+  const k=dayKey(ADAYS);$('days').value=k||saveDays(ADAYS).join();
+  document.querySelectorAll('#add .sbtn').forEach(x=>{const on=x.dataset.g===k;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on)});
+  if(addDR)addDR.paint();
+}
+document.querySelectorAll('#add .sbtn').forEach(b=>b.onclick=()=>{ADAYS=DAYSETS[b.dataset.g].slice();syncAddDays()});
+if(addDR)$('dayhost').appendChild(addDR);
+syncAddDays();
 document.querySelectorAll('.qtab').forEach(b=>b.onclick=()=>{QT=b.dataset.g;render()});
 $('theme').onclick=()=>{
   const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
@@ -1838,10 +2094,22 @@ if(DEV){
   addEventListener('keydown',e=>{if(!DEVON||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);if(PVP&&(e.key==='ArrowUp'||e.key==='ArrowDown')){e.preventDefault();PVL=Math.max(1,Math.min(PMAX,PVL+(e.key==='ArrowUp'?1:-1)));pdraw()}});
   draw();
   /* button on the Realm tab (next to Day / Night) that hides or shows every dev tool: both previewers, the avatar tap menu and the arrow-key shortcuts */
+  /* dev: preview the subclass slot under the rank in every state (locked, ready, each of the 10 subclasses). Sits at the top of the Realm tab, right under the profile card. */
+  const sLIST=[{st:'off',t:'Locked (before Lv 15)'},{st:'ready',t:'Ready to choose'}].concat(Object.keys(SUBD).map(id=>({st:'on',id,n:SUBD[id].n,t:SUBD[id].n})));
+  let si=-1;
+  const sp=el('div','panel dev'),sRow=el('div','devrow'),sPrev=el('button','ghost','<'),sNext=el('button','ghost','>'),sMid=el('div','devmid'),sName=el('b','','My subclass'),sReset=el('button','ghost','Back to my subclass');
+  sPrev.type=sNext.type=sReset.type='button';sPrev.setAttribute('aria-label','Previous subclass look');sNext.setAttribute('aria-label','Next subclass look');
+  sMid.appendChild(sName);sRow.append(sPrev,sMid,sNext);
+  sp.append(sRow,el('div','sub','Dev: preview the subclass slot under your rank. Your save is not changed.'),sReset);
+  const sdraw=()=>{sName.textContent=PVS?sLIST[si].t:'My subclass';render()};
+  const sgo=n=>{si=PVS?(si+n+sLIST.length)%sLIST.length:(n>0?0:sLIST.length-1);PVS=sLIST[si];sdraw()};
+  sPrev.onclick=()=>sgo(-1);sNext.onclick=()=>sgo(1);
+  sReset.onclick=()=>{PVS=null;si=-1;sdraw()};
+  $('tab-realm').insertBefore(sp,$('arena'));
   const dtb=el('button','ghost','');dtb.type='button';dtb.id='devtoggle';
   const applyDev=()=>{
-    if(!DEVON){$('dreset').onclick();$('dpreset').onclick()}   /* drop any preview so you see your real hero and companion */
-    $('dev').hidden=!DEVON;$('devpet').hidden=!DEVON;
+    if(!DEVON){PVS=null;si=-1;sName.textContent='My subclass';$('dreset').onclick();$('dpreset').onclick()}   /* drop any preview so you see your real hero and companion */
+    $('dev').hidden=!DEVON;$('devpet').hidden=!DEVON;sp.hidden=!DEVON;
     dtb.textContent='Dev tools: '+(DEVON?'On':'Off');dtb.setAttribute('aria-pressed',DEVON?'true':'false');
   };
   dtb.onclick=()=>{DEVON=!DEVON;try{localStorage.setItem('dq.dev',DEVON?'1':'0')}catch(e){}applyDev()};
