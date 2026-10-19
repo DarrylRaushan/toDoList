@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=64">
+<link rel="stylesheet" href="style.css?v=76">
 </head>
 <body class="wait">
 <div id="tavern" aria-hidden="true">
@@ -58,7 +58,7 @@
       <div class="chips">
         <div class="chip off" id="streak" title="Perfect-day streak"><div class="ch"><span id="fl"></span><small>Streak</small></div><b id="sn">0</b></div>
         <div class="chip" id="mult" title="XP multiplier"><div class="ch"><span id="mi"></span><small>XP</small></div><b id="mv">x1.0</b></div>
-        <div class="chip" title="Gold"><div class="ch"><span id="gc"></span><small>Gold</small></div><b id="gd">0</b></div>
+        <div class="chip" title="Coins"><div class="ch"><span id="gc"></span><small>Coins</small></div><b id="gd" class="cb">0b</b></div>
       </div>
     </section>
   </header>
@@ -73,30 +73,39 @@
         <button type="button" class="qtab on" data-g="any" role="tab" aria-selected="true">All</button>
         <button type="button" class="qtab" data-g="all" role="tab" aria-selected="false">Daily</button>
         <button type="button" class="qtab" data-g="cu" role="tab" aria-selected="false">Custom</button>
+        <button type="button" class="qtab" data-g="once" role="tab" aria-selected="false">One-off</button>
       </div>
       <div class="cork">
         <ul id="list"></ul>
         <form id="add">
       <button type="button" class="newq-toggle" id="addtoggle" aria-expanded="false" aria-controls="addbody"><span>Post a new quest</span><i class="plus" aria-hidden="true"></i></button>
       <div class="newq-body" id="addbody" hidden>
-      <div class="nrow">
-        <input id="newname" placeholder="e.g. Drink 2L water" maxlength="80" aria-label="Quest name" required>
-        <button class="btn" type="submit">Pin</button>
+      <div class="nf">
+        <label class="nl" for="newname">Quest</label>
+        <input id="newname" placeholder="e.g. Drink 2L water" maxlength="80" required>
       </div>
       <input type="hidden" id="diff" value="20">
-      <div class="diffs" role="group" aria-label="Difficulty">
-        <button type="button" class="dbtn" data-v="10" aria-pressed="false"><span class="st">★</span>Easy</button>
-        <button type="button" class="dbtn on" data-v="20" aria-pressed="true"><span class="st">★★</span>Medium</button>
-        <button type="button" class="dbtn" data-v="40" aria-pressed="false"><span class="st">★★★</span>Hard</button>
+      <div class="nf">
+        <span class="nl">Difficulty</span>
+        <div class="diffs" role="group" aria-label="Difficulty">
+          <button type="button" class="dbtn" data-v="10" aria-pressed="false"><span class="st">★</span>Easy</button>
+          <button type="button" class="dbtn on" data-v="20" aria-pressed="true"><span class="st">★★</span>Medium</button>
+          <button type="button" class="dbtn" data-v="40" aria-pressed="false"><span class="st">★★★</span>Hard</button>
+        </div>
       </div>
       <input type="hidden" id="days" value="all">
-      <div class="diffs" role="group" aria-label="Repeats">
-        <button type="button" class="sbtn on" data-g="all" aria-pressed="true">Every day</button>
-        <button type="button" class="sbtn" data-g="wk" aria-pressed="false">Weekdays</button>
-        <button type="button" class="sbtn" data-g="we" aria-pressed="false">Weekends</button>
+      <div class="nf">
+        <span class="nl">Repeats</span>
+        <div class="diffs rep" role="group" aria-label="Repeats">
+          <button type="button" class="sbtn on" data-g="all" aria-pressed="true">Daily</button>
+          <button type="button" class="sbtn" data-g="wk" aria-pressed="false">Mon-Fri</button>
+          <button type="button" class="sbtn" data-g="we" aria-pressed="false">Sat-Sun</button>
+          <button type="button" class="sbtn" data-g="once" aria-pressed="false">Once</button>
+        </div>
+        <div id="dayhost"></div>
       </div>
-      <div id="dayhost"></div>
-      <div class="npv" aria-live="polite">Earn <b class="dx" id="pvx">+20 XP</b> <b class="dg" id="pvg">+10g</b>. Miss it: <b class="dh" id="pvh">-3 HP</b>.</div>
+      <div class="npv" aria-live="polite"><span class="pc">Earn <b class="dx" id="pvx">+20 XP</b></span><span class="pc"><b class="dg" id="pvg">+10g</b></span><span class="pc miss">Miss it <b class="dh" id="pvh">-3 HP</b></span></div>
+      <button class="btn nsub" type="submit"><span class="pin" aria-hidden="true"></span>Pin quest</button>
       </div>
     </form>
       </div>
@@ -112,6 +121,9 @@
         <div class="figure" id="figure" role="img" aria-label="Your hero"></div>
         <div class="scol" id="scol-r"></div>
         <div class="fpet" id="fpet" hidden></div>
+        <div class="aura" id="aura" aria-hidden="true"></div>
+        <svg class="links" id="links" aria-hidden="true"></svg>
+        <div class="trytag" id="trytag" hidden></div>
       </div>
       <div class="figname" id="figname"></div>
       <div class="slotrow" id="slotrow"></div>
@@ -133,6 +145,16 @@
     <div class="panel" id="forge"></div>
     <h3>Honors</h3>
     <div class="badges" id="badges"></div>
+  </section>
+
+  <section class="tab" id="tab-shop">
+    <h3>Wallet</h3>
+    <div class="panel wallet" id="wallet"></div>
+    <div class="sub shopnote">Streak Freezes are used automatically when you miss a day and have a streak to save (you still lose HP). Gems drop from the weekly boss and on every 7th day of a perfect streak.</div>
+    <h3>Coin shop</h3>
+    <div class="shopgrid" id="shopgold"></div>
+    <h3>Gem shop</h3>
+    <div class="shopgrid" id="shopgem"></div>
   </section>
 
   <section class="tab" id="tab-realm">
@@ -178,6 +200,7 @@
   <nav class="nav" aria-label="Main">
     <button class="navbtn on" data-tab="quests" type="button"><span class="ni"></span>Quests</button>
     <button class="navbtn" data-tab="hero" type="button"><span class="ni"></span>Hero<span class="dot" id="dot-hero" hidden>!</span></button>
+    <button class="navbtn" data-tab="shop" type="button"><span class="ni"></span>Shop</button>
     <button class="navbtn" data-tab="realm" type="button"><span class="ni"></span>Realm</button>
   </nav>
 </main>
@@ -209,7 +232,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=6"></script>
-<script src="script.js?v=47"></script>
+<script src="script.js?v=60"></script>
 <script src="wendigo-idle.js?v=1"></script>
 </body>
 </html>

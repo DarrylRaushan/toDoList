@@ -28,7 +28,8 @@ const PEN={10:1,20:3,40:5};                          /* HP lost per missed quest
 const penBase=xp=>PEN[xp]||Math.max(1,Math.round(xp/8));
 const penalty=xp=>Math.max(1,Math.round(penBase(xp)*lscale(levelOf(S.xp))*dmgMult()*(hasSub('berserker')?1.25:1)));
 const firstMult=first=>first&&hasSub('shadowblade')?1+.6*cm():1;   /* Shadowblade: first quest of the day */
-const xpGain=(xp,first)=>Math.round(xp*lscale(levelOf(S.xp))*mult()*firstMult(first));
+const xpGain=(xp,first,t)=>Math.round(xp*lscale(levelOf(S.xp))*mult()*firstMult(first)*masteryMult(t));   /* t = the quest (optional): adds its weekly mastery bonus */
+const goldGain=(t,first)=>Math.round(t.xp/2*goldMult()*firstMult(first)*masteryMult(t));
 const lvBonus=()=>levelOf(S.xp)-1;                   /* levels above 1: every level adds +2% XP, +2% gold, -1% damage taken */
 function levelOf(xp){let l=1;while(xp>=need(l+1))l++;return l}
 const pad=n=>String(n).padStart(2,'0');
@@ -43,12 +44,48 @@ const dayKey=ds=>{const s=ds.slice().sort((a,b)=>a-b).join();return Object.keys(
 const saveDays=ds=>dayKey(ds)||ds.slice().sort((a,b)=>a-b);
 const dayLabel=t=>{const k=dayKey(dayList(t));return k==='all'?'Daily':k==='wk'?'Mo-Fr':k==='we'?'Sa-Su':DORDER.filter(d=>dayList(t).includes(d)).map(d=>DNAMES[d].slice(0,2)).join(' ')};   /* short text for a resting quest's header */
 const dayGroup=t=>dayKey(dayList(t))||'cu';
-const tabOf=t=>dayKey(dayList(t))==='all'?'all':'cu';   /* which tab a quest lives in: Daily (every day) or Custom (any other days) */
-const active=(t,k)=>{k=k||today();return dayList(t).includes(dow(k))};
+const tabOf=t=>t.once?'once':dayKey(dayList(t))==='all'?'all':'cu';   /* which tab a quest lives in: Daily (every day) or Custom (any other days) */
+const active=(t,k)=>{k=k||today();if(t.once)return k===t.once;return dayList(t).includes(dow(k))};   /* a one-off quest (t.once = its date) is only due on that one day */
+const expired=t=>!!t.once&&t.once<today();   /* a one-off from an earlier day: kept in S.tasks for the streak maths, but no longer shown */
 const addDays=(k,n)=>{const d=new Date(k+'T12:00:00');d.setDate(d.getDate()+n);return dkey(d)};
 const $=id=>document.getElementById(id);
 /* draws an emoji tiny, then scales it up unsmoothed so it looks like pixel art */
-function px(e,n){if(typeof e==='string'&&e.slice(0,4)==='pet:')return petIcon(e.slice(4),n);const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.font=Math.round(n*.78)+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,n/2,n/2+1);c.className='px';return c}
+function px(e,n){if(typeof e==='string'&&e.slice(0,4)==='pet:')return petIcon(e.slice(4),n);if(typeof e==='string'&&e.slice(0,5)==='coin:')return coinIcon(e.slice(5));const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.font=Math.round(n*.78)+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,n/2,n/2+1);c.className='px';return c}
+/* ---------- currency: bronze, silver and gold ----------
+   One number is saved (S.gold = the BRONZE count, so old saves keep working). 1 silver = 10 bronze, 1 gold = 100 bronze.
+   Everything you see is just that number written as coins: 125 -> '1g 2s 5b'. */
+const COIN_S=10,COIN_G=100,COIN_U=['g','s','b'];
+const COINS={
+  b:{o:'#3a1e0c',d:'#8a4a1c',m:'#c27a3a',l:'#e8a468',h:'#ffd8aa'},
+  s:{o:'#2c3340',d:'#7a869c',m:'#b4bfd0',l:'#e2e9f4',h:'#ffffff'},
+  g:{o:'#4a2f06',d:'#b07a10',m:'#e8b93c',l:'#f8d870',h:'#fff6c8'}
+};
+function coinIcon(k){   /* 10x10 pixel coin; CSS scales it up unsmoothed */
+  const C=COINS[k]||COINS.g,S=10,c=document.createElement('canvas');c.width=c.height=S;c.className='px coin';
+  const x=c.getContext('2d');
+  for(let j=0;j<S;j++)for(let i=0;i<S;i++){
+    const dx=i-4.5,dy=j-4.5,d=Math.hypot(dx,dy);
+    if(d>5)continue;
+    x.fillStyle=d>4.1?C.o:d>3.1?(dx+dy<-1?C.l:C.d):C.m;x.fillRect(i,j,1,1);
+  }
+  x.fillStyle=C.d;[[4,3],[5,3],[3,4],[4,4],[5,4],[6,4],[3,5],[4,5],[5,5],[6,5],[4,6],[5,6]].forEach(p=>x.fillRect(p[0],p[1],1,1));   /* stamped mark in the middle */
+  x.fillStyle=C.l;x.fillRect(4,4,1,1);x.fillStyle=C.h;x.fillRect(2,2,1,1);   /* glints */
+  return c;
+}
+const coinParts=n=>{n=Math.max(0,Math.round(n)||0);return [Math.floor(n/COIN_G),Math.floor(n%COIN_G/COIN_S),n%COIN_S]};   /* [gold, silver, bronze] */
+const topCoin=n=>n>=COIN_G?'g':n>=COIN_S?'s':'b';   /* the biggest coin you can make from n bronze */
+function coinText(n,max){   /* '1g 2s 5b'; empty units are skipped; max = most units shown, biggest first */
+  const o=[];coinParts(n).forEach((v,i)=>{if(v)o.push(v+COIN_U[i])});
+  return o.length?(max?o.slice(0,max):o).join(' '):'0b';
+}
+function coinEl(n,max){   /* the same, as coloured spans (used on dark panels) */
+  const w=el('span','coins'),o=[];
+  coinParts(n).forEach((v,i)=>{if(v)o.push([v,i])});
+  if(!o.length)o.push([0,2]);
+  (max?o.slice(0,max):o).forEach(([v,i])=>w.appendChild(el('span','cn '+COIN_U[i],v+COIN_U[i])));
+  return w;
+}
+
 /* ---------- companion pixel art: Wendigo (drawn procedurally, then snapped to a palette, shaded and outlined) ---------- */
 const WP={ink:'#15100f',sk:'#a8a295',sk2:'#827c70',skd:'#4d4841',fur:'#3b3640',fur2:'#2b2730',bone:'#ebe2c8',boned:'#a9996f',ant:'#d6c8a2',antd:'#8a7b58',eye:'#ff5a2a',eyeh:'#ffe6a8',mouth:'#2a1214',tooth:'#f7f2de',claw:'#e4dcc0',sh:'#3f3548',shd:'#2a2232',frost:'#bfe6f2',ear:'#6e5d5e',fur3:'#d6d0c2',fur4:'#8d877b',hat:'#4d4259',ant2:'#bdb08c'};
 function wendigoCanvas(res,tier){
@@ -1079,7 +1116,7 @@ const TNAME=['Bone Charm','Copper Ring','Silver Ring','Jade Ring','Gold Ring','M
 const SUF={xp:'of Insight',gold:'of Fortune',dmg:'of Warding',hp:'of Vitality',bd:'of Slaying'};
 const ICON={helm:{warrior:'\u26d1\ufe0f',mage:'\ud83c\udfa9',rogue:'\ud83e\udd77',cleric:'\ud83d\udc51'},armor:{warrior:'\ud83d\udee1\ufe0f',mage:'\ud83e\udde5',rogue:'\ud83e\udd4b',cleric:'\ud83d\udc58'},weapon:{warrior:'\u2694\ufe0f',great:'\ud83d\udde1\ufe0f',mage:'\ud83e\ude84',rogue:'\ud83d\udd2a',cleric:'\ud83d\udd28'},offhand:{warrior:'🛡️',mage:'📖',rogue:'🗡️',cleric:'🏮'}};
 const RAR=['#8a7862','#58b368','#4a9ae0','#2fc7c0','#a56be0','#e8b93c','#ff7a4a','#ff4fd8'];   /* frame colour per rarity */
-const STAT_TXT={xp:v=>(v<0?'':'+')+v+'% XP',gold:v=>(v<0?'':'+')+v+'% gold',dmg:v=>v<0?'+'+(-v)+'% damage taken':'-'+v+'% damage taken',hp:v=>(v<0?'':'+')+v+' max HP',bd:v=>(v<0?'':'+')+v+'% boss damage'};
+const STAT_TXT={xp:v=>(v<0?'':'+')+v+'% XP',gold:v=>(v<0?'':'+')+v+'% coins',dmg:v=>v<0?'+'+(-v)+'% damage taken':'-'+v+'% damage taken',hp:v=>(v<0?'':'+')+v+' max HP',bd:v=>(v<0?'':'+')+v+'% boss damage'};
 /* Unique gear: hand-made named items, mostly weapons. Quirky rather than strong, some have trade-offs.
    v = which of the 6 hero looks it uses (0 plain .. 5 dragon). */
 const UNIQ={
@@ -1137,9 +1174,10 @@ function migrate(s){
 const wornOf=(s,k)=>{const id=(s.worn||{})[k];return id?((s.inv||[]).find(i=>i.id===id)||null):null};
 const worn=k=>wornOf(S,k);
 const hpOf=s=>SLOTS.reduce((a,k)=>{const i=wornOf(s,k);return a+(i?eff(i,'hp'):0)},0);
-function bsum(k){return SLOTS.reduce((a,s)=>{const i=worn(s);return a+(i?eff(i,k):0)},0)}
+let TRYIT=null,WFX=null;   /* TRYIT: item being tried on in the Hero tab (only set briefly while previewing stats). WFX: slot just worn, for the flash */
+function bsum(k){return SLOTS.reduce((a,s)=>{const i=TRYIT&&TRYIT.slot===s?TRYIT:worn(s);return a+(i?eff(i,k):0)},0)}
 
-function fresh(){return {tasks:[],done:{},perfect:{},bonus:{},award:{},xp:0,badges:{},hp:hpBase(1),lastDay:addDays(today(),-1),log:[],defeats:0,gold:0,gAward:{},inv:[],worn:{},rv:2,cls:null,sub:null,chests:0,boss:null,look:null}}
+function fresh(){return {gems:0,freezes:0,frozen:{},tasks:[],done:{},perfect:{},bonus:{},award:{},xp:0,badges:{},hp:hpBase(1),lastDay:addDays(today(),-1),log:[],defeats:0,gold:0,gAward:{},inv:[],worn:{},rv:2,cls:null,sub:null,chests:0,boss:null,look:null}}
 function load(){
   let s={};try{s=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
   s=migrate(s);
@@ -1154,35 +1192,120 @@ function save(){S.ts=Date.now();saveSeq++;try{localStorage.setItem(KEY,JSON.stri
 let S=load();TR=bsum('hp');
 let shown=today();
 
-function streak(){
-  let d=today(),n=0,g=0,grace=hasSub('chronicler');
-  if(!S.perfect[d])d=addDays(d,-1);
-  const rest=k=>!S.tasks.some(t=>t.created<=k&&active(t,k));   /* nothing scheduled that day: doesn't break the streak */
+/* consecutive perfect days ending at day d. A day with nothing scheduled, or a day covered by a Streak Freeze, does not break it (and does not add to it) */
+function streakEnd(d,grace){
+  let n=0,g=0;
+  const rest=k=>!S.tasks.some(t=>t.created<=k&&active(t,k));
   while(g++<730){
     if(S.perfect[d])n++;
+    else if(S.frozen&&S.frozen[d]){}
     else if(!rest(d)){if(grace)grace=false;else break}   /* Chronicler forgives one missed day */
     d=addDays(d,-1);
   }
   return n;
 }
+function streak(){let d=today();if(!S.perfect[d])d=addDays(d,-1);return streakEnd(d,hasSub('chronicler'))}
 const sbm=()=>1+(S.cls==='bard'?.5*cm():0)+(hasSub('scholar')?.5*cm():0);   /* Bard: streak bonus per day and its cap are both multiplied */
 const mult=()=>(1+Math.min(.5*sbm(),.1*sbm()*streak()))*(1+bsum('xp')/100)*(1+(S.cls==='mage'?.15*cm():0))*(1+.02*lvBonus());
 const doneToday=()=>S.done[today()]||[];
 let LT=null;   /* tag of the quest being completed right now: chronicle entries it causes are tagged so undo can remove them */
 function addLog(m,c,tag,lv){S.log.unshift({d:today(),m,c,k:tag===undefined?LT:tag,lv});S.log=S.log.slice(0,8)}
 
+/* ---------- check-in: before a day's missed quests cost HP, ask if they were really missed ----------
+   You may just have forgotten to tick them. Days up to a week old can be corrected; anything you tick is marked done for that day
+   (full rewards, boss damage, companion XP and perfect-day bonus, exactly as if ticked on the day), everything left unticked goes ahead with the usual penalties. */
+let REV=0,REVDONE='';   /* REV = the check-in dialog is open; REVDONE = the last ended day that has already been checked in */
+function missedDays(y){   /* ended days (a week back at most) that still have quests nobody marked */
+  const out=[],from=addDays(today(),-7);
+  for(let d=addDays(S.lastDay,1);d<=y;d=addDays(d,1)){
+    if(d<from)continue;
+    const done=S.done[d]||[],ts=S.tasks.filter(t=>t.created<=d&&active(t,d)&&!done.includes(t.id));
+    if(ts.length)out.push({d,ts});
+  }
+  return out;
+}
+function applyReview(md,ticked){   /* mark the ticked quests as done on their own day, with the same rewards as ticking them on the day */
+  let n=0,xp=0,gd=0,perf=0;const before=levelOf(S.xp);ensureBoss();
+  md.forEach(({d,ts})=>{
+    const arr=S.done[d]=S.done[d]||[];
+    ts.forEach(task=>{
+      const k=d+':'+task.id;
+      if(!ticked.has(k)||arr.includes(task.id)||!S.tasks.some(z=>z.id===task.id))return;
+      const fq=arr.length===0;arr.push(task.id);
+      const a=xpGain(task.xp,fq,task),g=goldGain(task,fq);S.award[k]=a;S.gAward[k]=g;S.xp+=a;S.gold+=g;xp+=a;gd+=g;n++;
+      const bd=bossDmg(task.xp);(S.bAward=S.bAward||{})[k]=bd;hitBoss(bd);
+      if(hasSub('healer')&&task.xp>=40){const hh=Math.max(0,Math.min(Math.max(1,Math.round(hpBase(levelOf(S.xp))*.08*cm())),maxHp(levelOf(S.xp))-S.hp));if(hh){S.hp+=hh;(S.hAward=S.hAward||{})[k]=hh}}
+      const cp=worn('companion');
+      if(cp){const b4=plv(cp),cg=task.xp*(hasSub('beastmaster')?2:1);cp.ce=(cp.ce||0)+cg;(S.pAward=S.pAward||{})[k]={id:cp.id,x:cg};
+        if(plv(cp)>b4){TR=bsum('hp');addLog(cp.n+' reached level '+plv(cp),'good')}}
+    });
+    const act=S.tasks.filter(z=>z.created<=d&&active(z,d));
+    if(act.length&&act.every(z=>arr.includes(z.id))&&!S.bonus[d]){   /* the day is now fully done: perfect-day bonus and streak, as normal */
+      const lv0=levelOf(S.xp),bx=Math.round(BONUS*lscale(lv0)*(hasSub('herald')?1+.5*cm():1)),hb=Math.max(2,Math.round(hpBase(lv0)*.25));
+      const h=Math.max(0,Math.min(Math.round(hb*(S.cls==='druid'?1+cm():1)),maxHp(levelOf(S.xp+bx))-S.hp));
+      const nc=1+(hasSub('herald')&&seedR('herald'+d)<.35?1:0);S.perfect[d]=1;const gm=streakEnd(d,hasSub('chronicler'))%7===0?2:0;
+      S.bonus[d]={h,c:nc,x:bx,gm};S.chests+=nc;S.xp+=bx;S.hp+=h;S.gems=(S.gems||0)+gm;xp+=bx;perf++;
+      addLog('Perfect day! +'+bx+' XP','good','p:'+d);
+    }
+  });
+  if(!n)return;
+  addLog('Marked '+n+' forgotten quest'+(n>1?'s':'')+' as done: +'+xp+' XP','good',null);
+  const after=levelOf(S.xp);
+  if(after>before){
+    if(S.cls&&ctierAt(before)!==ctierAt(after))addLog('Promoted to '+CLS[S.cls].n[ctierAt(after)],'good');
+    S.hp=maxHp(after);addLog('Reached level '+after,'good',undefined,after);
+  }else S.hp=Math.min(S.hp,maxHp(after));
+  toast('Marked '+n+' quest'+(n>1?'s':'')+' as done: +'+xp+' XP, +'+coinText(gd)+(perf?', '+perf+' perfect day'+(perf>1?'s':''):''));
+  save();
+}
+function reviewMissed(md,y){
+  const ticked=new Set(),keys=[],total=md.reduce((a,x)=>a+x.ts.length,0);
+  const ov=el('div','modal on'),card=el('div','card rv'),list=el('div','rvlist'),rows=[];
+  ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label','Unmarked quests');
+  const info=el('p',''),ok=el('button','btn',''),all=el('button','ghost','Tick all'),box=el('div','stack');
+  ok.type=all.type='button';
+  const paint=()=>{
+    const n=ticked.size;let hp=0;
+    md.forEach(({d,ts})=>ts.forEach(t=>{if(!ticked.has(d+':'+t.id))hp+=penalty(t.xp)}));
+    rows.forEach(([b,k])=>{const on=ticked.has(k);b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.firstChild.textContent=on?'✓':''});
+    info.textContent=hp?'Tap the ones you did. The rest will cost you '+hp+' HP.':'Everything is marked. No HP will be lost.';
+    ok.textContent=n===0?'No, I missed them':n===total?'Yes, I did them all':'Mark '+n+' done, rest missed';
+    all.textContent=n===total?'Untick all':'Tick all';
+  };
+  md.forEach(({d,ts})=>{
+    list.appendChild(el('div','rvday',d===y?'Yesterday':new Date(d+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})));
+    ts.forEach(t=>{
+      const k=d+':'+t.id,b=el('button','rvrow'),c=el('span','rvchk','');
+      b.type='button';b.setAttribute('aria-label',t.name);keys.push(k);
+      b.append(c,el('span','rvname',t.name),el('span','rvhp','-'+penalty(t.xp)+' HP'));
+      b.onclick=()=>{if(ticked.has(k))ticked.delete(k);else ticked.add(k);paint()};
+      rows.push([b,k]);list.appendChild(b);
+    });
+  });
+  all.onclick=()=>{if(ticked.size===total)ticked.clear();else keys.forEach(k=>ticked.add(k));paint()};
+  ok.onclick=()=>{ov.remove();REV=0;REVDONE=y;applyReview(md,ticked);process();render()};   /* what is left unticked now goes ahead with the penalties */
+  box.append(ok,all);
+  card.append(el('h2','','Did you finish these?'),info,list,box);
+  ov.appendChild(card);document.body.appendChild(ov);   /* no outside tap or Esc: it has to be answered */
+  paint();ok.focus();
+}
+
 /* ---------- consequences: runs for every day that has ended ---------- */
 function process(){
+  S.tasks=S.tasks.filter(t=>!(t.once&&t.once<addDays(today(),-90)));
   const y=addDays(today(),-1);
   if(S.lastDay>=y)return;
   if(S.lastDay<addDays(today(),-60))S.lastDay=addDays(today(),-60);
-  let hit=0,missed=0,days=0,fell=0;
+  if(REV)return;   /* the check-in is open: wait for the answer */
+  if(REVDONE<y){const md=missedDays(y);if(md.length){REV=1;reviewMissed(md,y);return}}
+  let hit=0,missed=0,days=0,fell=0,fz=0;
   for(let d=addDays(S.lastDay,1);d<=y;d=addDays(d,1)){
     const done=S.done[d]||[];let dmg=0,m=0;
     S.tasks.forEach(t=>{if(t.created<=d&&active(t,d)&&!done.includes(t.id)){dmg+=penalty(t.xp);m++}});
     if(!m)continue;
     days++;missed+=m;hit+=dmg;S.hp-=dmg;
     S.log.unshift({d,m:'Missed '+m+' quest'+(m>1?'s':'')+': -'+dmg+' HP',c:'bad'});
+    if((S.freezes|0)>0&&streakEnd(addDays(d,-1),hasSub('chronicler'))>0){S.freezes--;(S.frozen=S.frozen||{})[d]=1;fz++;S.log.unshift({d,m:'Streak Freeze used: your streak is safe',c:'good'})}   /* only spent when there is a streak to protect */
     if(S.hp<=0){
       const lv=levelOf(S.xp),nl=Math.max(1,lv-1);
       S.xp=lv>1?need(nl)+Math.floor((need(nl+1)-need(nl))/2):0;
@@ -1194,7 +1317,7 @@ function process(){
   S.lastDay=y;save();
   if(missed){
     const lv=levelOf(S.xp);
-    let msg='You missed '+missed+' quest'+(missed>1?'s':'')+' over '+days+' day'+(days>1?'s':'')+'.\nYou lost '+hit+' HP and your streak.';
+    let msg='You missed '+missed+' quest'+(missed>1?'s':'')+' over '+days+' day'+(days>1?'s':'')+'.\nYou lost '+hit+' HP'+(fz?'. '+fz+' Streak Freeze'+(fz>1?'s':'')+' protected your streak.':' and your streak.');
     if(fell)msg+='\nYour HP ran out. You were defeated and dropped to level '+lv+'.';
     showModal(fell?'💀':'💔',fell?'Defeated':'Quests missed',msg,true);
     document.body.classList.add('shake');setTimeout(()=>document.body.classList.remove('shake'),500);
@@ -1207,7 +1330,7 @@ function toggle(id,ev){
   const t=today(),task=S.tasks.find(x=>x.id===id);if(!task||!active(task,t))return;ensureBoss();JUST=id;
   const arr=S.done[t]=S.done[t]||[],k=t+':'+id,before=levelOf(S.xp),i=arr.indexOf(id);
   if(i<0){
-    LT=k;const fq=arr.length===0;arr.push(id);const a=xpGain(task.xp,fq),g=Math.round(task.xp/2*goldMult()*firstMult(fq));S.award[k]=a;S.gAward[k]=g;S.xp+=a;S.gold+=g;pop('+'+a+' XP +'+g+'g',ev);buzz(30);const bd=bossDmg(task.xp);(S.bAward=S.bAward||{})[k]=bd;hitBoss(bd);attackFx(bd);if(hasSub('healer')&&task.xp>=40){const hh=Math.max(0,Math.min(Math.max(1,Math.round(hpBase(levelOf(S.xp))*.08*cm())),maxHp(levelOf(S.xp))-S.hp));if(hh){S.hp+=hh;(S.hAward=S.hAward||{})[k]=hh;toast('Healer: +'+hh+' HP')}}
+    LT=k;const fq=arr.length===0;arr.push(id);const a=xpGain(task.xp,fq,task),g=goldGain(task,fq);S.award[k]=a;S.gAward[k]=g;S.xp+=a;S.gold+=g;pop('+'+a+' XP +'+coinText(g),ev);buzz(30);const bd=bossDmg(task.xp);(S.bAward=S.bAward||{})[k]=bd;hitBoss(bd);attackFx(bd);if(hasSub('healer')&&task.xp>=40){const hh=Math.max(0,Math.min(Math.max(1,Math.round(hpBase(levelOf(S.xp))*.08*cm())),maxHp(levelOf(S.xp))-S.hp));if(hh){S.hp+=hh;(S.hAward=S.hAward||{})[k]=hh;toast('Healer: +'+hh+' HP')}}
     const cp=worn('companion');
     if(cp){const b4=plv(cp);const cg=task.xp*(hasSub('beastmaster')?2:1);cp.ce=(cp.ce||0)+cg;(S.pAward=S.pAward||{})[k]={id:cp.id,x:cg};
       if(plv(cp)>b4){TR=bsum('hp');addLog(cp.n+' reached level '+plv(cp),'good');toast('Your companion reached level '+plv(cp)+(plv(cp)===BIG_LV&&!(PETS[cp.pet]&&PETS[cp.pet].sm)?'. It is big enough to stand behind you now.':''))}}
@@ -1222,10 +1345,10 @@ function toggle(id,ev){
   if(all&&!S.bonus[t]){
     const lv0=levelOf(S.xp),bx=Math.round(BONUS*lscale(lv0)*(hasSub('herald')?1+.5*cm():1)),hb=Math.max(2,Math.round(hpBase(lv0)*.25));
     const h=Math.max(0,Math.min(Math.round(hb*(S.cls==='druid'?1+cm():1)),maxHp(levelOf(S.xp+bx))-S.hp));
-    const nc=1+(hasSub('herald')&&seedR('herald'+t)<.35?1:0);S.bonus[t]={h,c:nc,x:bx};S.chests+=nc;S.perfect[t]=1;S.xp+=bx;S.hp+=h;
-    toast('Perfect day! +'+bx+' XP, +'+h+' HP, +'+nc+(nc>1?' chests (Herald bonus)':' chest'));buzz([40,60,40,60,120]);addLog('Perfect day! +'+bx+' XP','good','p:'+t);
+    const nc=1+(hasSub('herald')&&seedR('herald'+t)<.35?1:0);S.perfect[t]=1;const gm=streak()%7===0?2:0;S.bonus[t]={h,c:nc,x:bx,gm};S.chests+=nc;S.xp+=bx;S.hp+=h;S.gems=(S.gems||0)+gm;
+    toast('Perfect day! +'+bx+' XP, +'+h+' HP, +'+nc+(nc>1?' chests (Herald bonus)':' chest')+(gm?', +'+gm+' gems (7-day streak)':''));buzz([40,60,40,60,120]);addLog('Perfect day! +'+bx+' XP','good','p:'+t);
   }else if(!all&&S.bonus[t]){
-    S.xp=Math.max(0,S.xp-(S.bonus[t].x||BONUS));S.hp=Math.max(1,S.hp-(S.bonus[t].h||0));S.chests=Math.max(0,S.chests-(S.bonus[t].c||0));delete S.bonus[t];delete S.perfect[t];S.log=S.log.filter(l=>l.k!=='p:'+t);
+    S.xp=Math.max(0,S.xp-(S.bonus[t].x||BONUS));S.hp=Math.max(1,S.hp-(S.bonus[t].h||0));S.chests=Math.max(0,S.chests-(S.bonus[t].c||0));S.gems=Math.max(0,(S.gems||0)-(S.bonus[t].gm||0));delete S.bonus[t];delete S.perfect[t];S.log=S.log.filter(l=>l.k!=='p:'+t);
   }
   const after=levelOf(S.xp);
   if(i>=0){   /* undo: take back honours earned today that no longer hold, and level-ups that no longer hold */
@@ -1276,7 +1399,7 @@ $('mok').onclick=nextModal;
 const CLS={
   warrior:{e:'🛡️',n:['Warrior','Knight','Champion','Paladin','Crusader','Warlord'],d:'-20% damage taken'},
   mage:{e:'🔮',n:['Mage','Wizard','Sorcerer','Magister','Archmage','Archon'],d:'+15% XP'},
-  rogue:{e:'🗡️',n:['Rogue','Thief','Trickster','Assassin','Shadowblade','Phantom'],d:'+20% gold'},
+  rogue:{e:'🗡️',n:['Rogue','Thief','Trickster','Assassin','Shadowblade','Phantom'],d:'+20% coins'},
   druid:{e:'🌿',n:['Druid','Warden','Shaman','Hierophant','Archdruid','Wildheart'],d:'Double healing on perfect days'},
   bard:{e:'🎻',n:['Bard','Minstrel','Troubadour','Maestro','Virtuoso','Songweaver'],d:'Stronger streak bonus'}
 };
@@ -1285,7 +1408,7 @@ const ctierAt=l=>Math.max(0,Math.min(5,Math.floor(l/5)-1));   /* a new class tit
 const ctier=()=>ctierAt(levelOf(S.xp));
 const cmAt=l=>.4+.07*Math.max(0,l-5);   /* class bonus strength: 40% of its base at Lv 5, +7% every level after (Lv 15 = 110%, Lv 25 = 180%) */
 const cm=()=>cmAt(levelOf(S.xp));
-const CB={warrior:[20,'% damage taken','-'],mage:[15,'% XP','+'],rogue:[20,'% gold','+'],bard:[50,'% streak bonus','+']};
+const CB={warrior:[20,'% damage taken','-'],mage:[15,'% XP','+'],rogue:[20,'% coins','+'],bard:[50,'% streak bonus','+']};
 const clsBonusTxt=(k,l)=>{const m=cmAt(l);if(k==='druid')return 'Heals x'+(1+m).toFixed(2)+' on perfect days';const c=CB[k];return c[2]+(Math.round(c[0]*m*10)/10)+c[1]};
 const roman=n=>{let r='';[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']].forEach(([v,s])=>{while(n>=v){r+=s;n-=v}});return r};
 const clsName=()=>{const lv=levelOf(S.xp);return CLS[S.cls].n[ctier()]+(lv>=40?' '+roman(Math.floor(lv/10)-2):'')};   /* top title at Lv 30, then II at Lv 40, III at Lv 50... */
@@ -1305,8 +1428,8 @@ function subTxt(id,l){
     berserker:'+'+r(30)+'% boss damage, but missed quests cost 25% more HP',
     scholar:'+'+r(50)+'% streak bonus',
     battlemage:'+'+r(40)+'% boss damage',
-    treasure:'+'+r(15)+'% gold and better chest rolls',
-    shadowblade:'+'+r(60)+'% XP and gold on your first quest each day',
+    treasure:'+'+r(15)+'% coins and better chest rolls',
+    shadowblade:'+'+r(60)+'% XP and coins on your first quest each day',
     healer:'Heal '+Math.max(1,Math.round(hpBase(l)*.08*m))+' HP on every hard quest',
     beastmaster:'Companion XP doubled',
     chronicler:'One missed day will not break your streak',
@@ -1357,9 +1480,55 @@ function hitBoss(dmg){
   const b=S.boss;if(!b||b.hp<=0)return;
   b.hp=Math.max(0,b.hp-dmg);
   if(b.hp===0){
-    const rw=b.rw||{g:50,c:1};S.chests+=rw.c;S.gold+=rw.g;addLog('Defeated '+bossOf(b)[0]+'! +'+rw.g+' gold, +'+rw.c+' chest'+(rw.c>1?'s':''),'good',null);
-    showModal('🏆','Boss defeated!',bossOf(b)[0]+' has fallen.\n+'+rw.g+' gold and '+(rw.c>1?rw.c+' chests.':'a chest.'));confetti();
+    const rw=b.rw||{g:50,c:1};const gm=2+(b.tier||0);S.chests+=rw.c;S.gold+=rw.g;S.gems=(S.gems||0)+gm;addLog('Defeated '+bossOf(b)[0]+'! +'+coinText(rw.g)+', +'+rw.c+' chest'+(rw.c>1?'s':'')+', +'+gm+' gems','good',null);
+    showModal('🏆','Boss defeated!',bossOf(b)[0]+' has fallen.\n+'+coinText(rw.g)+', '+(rw.c>1?rw.c+' chests':'a chest')+' and '+gm+' gems.');confetti();
   }
+}
+/* ---------- shop: gold and gems ----------
+   Gold comes from quests and bosses. Gems are rarer: the weekly boss drops 2+ and every 7th day of a perfect streak gives 2. */
+const FREEZE_MAX=3;
+function healHp(f){const m=maxHp(levelOf(S.xp));S.hp=Math.min(m,S.hp+Math.max(1,Math.round(m*f)))}
+function epicChest(){
+  const it=rollLoot(3);S.inv.push(it);addLog('Found '+it.n,'good');
+  showModal(iicon(it),RNAME[it.r]+' loot!',it.n+'\n'+bonusTxt(it)+(it.u&&UNIQ[it.u]?'\n'+UNIQ[it.u].d:'')+'\nFind it in the Hero tab.');
+}
+const SHOP={
+  g:[
+    {id:'fz',cost:120,e:'🧊',n:'Streak Freeze',d:'Saves your streak when you miss a day. Used automatically. Hold up to '+FREEZE_MAX+'.',ok:()=>(S.freezes|0)<FREEZE_MAX,full:'Max',buy:()=>{S.freezes=(S.freezes|0)+1;toast('Streak Freeze ready')}},
+    {id:'pot',cost:50,e:'🧪',n:'Healing Potion',d:'Restores 40% of your max HP.',ok:()=>S.hp<maxHp(levelOf(S.xp)),full:'Full',buy:()=>{healHp(.4);toast('Healed')}},
+    {id:'ch',cost:150,e:'🎁',n:'Loot Chest',d:'A random chest. Open it in the Hero tab.',buy:()=>{S.chests++;toast('Bought a chest')}}
+  ],
+  m:[
+    {id:'fz',cost:4,e:'🧊',n:'Streak Freeze',d:'The same freeze, paid in gems.',ok:()=>(S.freezes|0)<FREEZE_MAX,full:'Max',buy:()=>{S.freezes=(S.freezes|0)+1;toast('Streak Freeze ready')}},
+    {id:'heal',cost:3,e:'💖',n:'Full Heal',d:'Restores all your HP.',ok:()=>S.hp<maxHp(levelOf(S.xp)),full:'Full',buy:()=>{healHp(1);toast('Fully healed')}},
+    {id:'epic',cost:6,e:'💠',n:'Epic Chest',d:'Opens at once: loot of Very rare quality or better.',buy:epicChest}
+  ]
+};
+function shopBuy(cur,it){
+  const have=cur==='g'?S.gold:(S.gems||0);
+  if(have<it.cost||(it.ok&&!it.ok()))return;
+  if(cur==='g')S.gold-=it.cost;else S.gems-=it.cost;
+  it.buy();buzz(30);save();render();
+}
+function renderShop(){
+  const w=$('wallet');if(!w)return;
+  const tile=(e,l,v)=>{const t=el('div','wtile');t.append(px(e,24),el('small','',l),el('b','',String(v)));return t};
+  const purse=()=>{   /* one tile with all three coins: gold, silver, bronze */
+    const t=el('div','wtile purse'),row=el('div','prow'),p=coinParts(S.gold);t.title='1 gold = 10 silver = 100 bronze';
+    p.forEach((v,i)=>{const g=el('span','pc '+COIN_U[i]);g.title=['Gold','Silver','Bronze'][i];g.append(px('coin:'+COIN_U[i],10),el('b','',String(v)));row.appendChild(g)});
+    t.append(el('small','','Coins'),row);return t};
+  w.replaceChildren(purse(),tile('💎','Gems',S.gems||0),tile('🧊','Freezes',(S.freezes|0)+'/'+FREEZE_MAX),tile('🎁','Chests',S.chests));
+  const fill=(id,cur)=>{
+    const box=$(id);if(!box)return;box.replaceChildren();
+    SHOP[cur].forEach(it=>{
+      const have=cur==='g'?S.gold:(S.gems||0),blocked=!!(it.ok&&!it.ok());
+      const r=el('div','panel sitem'),ic=el('span','ei'),tx=el('div','itx'),b=el('button','btn',blocked?it.full:(cur==='g'?coinText(it.cost):it.cost+' 💎'));
+      ic.appendChild(px(it.e,24));tx.append(el('b','',it.n),el('small','',it.d));
+      b.type='button';b.disabled=blocked||have<it.cost;b.onclick=()=>shopBuy(cur,it);
+      r.append(ic,tx,b);box.appendChild(r);
+    });
+  };
+  fill('shopgold','g');fill('shopgem','m');
 }
 const CHEST_COST=150;
 function buyChest(){if(S.gold<CHEST_COST)return;S.gold-=CHEST_COST;S.chests++;toast('Bought a chest');buzz(30);save();render()}
@@ -1384,8 +1553,8 @@ function rollRarity1(){
 }
 const RSC=[1,1.8,2.6,3.5,4.5,5.5,6.8,8.5];   /* bonus size per rarity */
 const STAT_STEP={xp:3,gold:4,dmg:3,hp:1.6,bd:4};   /* per rarity step; each stat rolls 60-140% of it */
-function rollLoot(){
-  let r=rollRarity();
+function rollLoot(minR){
+  let r=rollRarity();if(minR&&r!==7&&r<minR)r=minR;   /* minR: guaranteed minimum rarity (Epic Chest) */
   if(r===7){   /* a unique: pick a named item you don't already own */
     const own=new Set(S.inv.map(i=>i.u).filter(Boolean)),pool=Object.keys(UNIQ).filter(k=>!own.has(k));
     if(pool.length){
@@ -1414,7 +1583,7 @@ function openChest(){
     e=iicon(it);t=RNAME[it.r]+' loot!';m=it.n+'\n'+bonusTxt(it)+(it.u&&UNIQ[it.u]?'\n'+UNIQ[it.u].d:'')+'\nFind it in the Hero tab.';
     addLog('Found '+it.n,'good');
   }else{
-    if(r<lp+(1-lp)*.64){const g=30+Math.floor(Math.random()*51);S.gold+=g;e='🪙';t='Gold!';m='You found '+g+' gold.'}
+    if(r<lp+(1-lp)*.64){const g=30+Math.floor(Math.random()*51);S.gold+=g;e='coin:'+topCoin(g);t='Coins!';m='You found '+coinText(g)+'.'}
     else{const h=Math.max(0,Math.min(Math.round(hpBase(levelOf(S.xp))*.4),maxHp(levelOf(S.xp))-S.hp));S.hp+=h;e='🧪';t='Healing potion';m='You recovered '+h+' HP.'}
     addLog('Opened a chest: '+t,'good');
   }
@@ -1423,22 +1592,22 @@ function openChest(){
 function wear(id){
   const it=S.inv.find(i=>i.id===id);if(!it)return;
   S.worn=S.worn||{};
-  if(S.worn[it.slot]===id)delete S.worn[it.slot];else S.worn[it.slot]=id;
+  if(S.worn[it.slot]===id)delete S.worn[it.slot];else{S.worn[it.slot]=id;WFX=it.slot}
   TR=bsum('hp');save();render();
 }
 function sell(id){
   const it=S.inv.find(i=>i.id===id);if(!it||(S.worn||{})[it.slot]===id)return;
   const v=sellVal(it);S.inv=S.inv.filter(i=>i.id!==id);S.gold+=v;
-  toast('Sold '+it.n+' for '+v+'g');save();render();
+  toast('Sold '+it.n+' for '+coinText(v));save();render();
 }
 /* ---------- hero tab: equipment showcase ---------- */
 /* what you wear sets your bonuses and your look. Nothing worn in a slot = plain starter look. */
-function eqLook(){
-  const e={},dflt=k=>S.cls&&NOUN[k][S.cls]?S.cls:'warrior',sk={helm:'sH',armor:'sA',weapon:'sW'};
-  ['helm','armor','weapon'].forEach(k=>{const i=worn(k);e[k]=i?visOf(i):0;e[sk[k]]=i?i.st:dflt(k)});
-  e.nH=!worn('helm');e.nA=!worn('armor');e.nW=!worn('weapon');
-  const t=worn('trinket');e.trinket=t?Math.max(1,visOf(t)):0;
-  const oh=worn('offhand');e.offhand=oh?visOf(oh):0;e.sO=oh?oh.st:dflt('offhand');e.nO=!oh;
+function eqLook(over){   /* over = an item to show instead of what is worn in its slot (try-on) */
+  const e={},dflt=k=>S.cls&&NOUN[k][S.cls]?S.cls:'warrior',sk={helm:'sH',armor:'sA',weapon:'sW'},wk=k=>over&&over.slot===k?over:worn(k);
+  ['helm','armor','weapon'].forEach(k=>{const i=wk(k);e[k]=i?visOf(i):0;e[sk[k]]=i?i.st:dflt(k)});
+  e.nH=!wk('helm');e.nA=!wk('armor');e.nW=!wk('weapon');
+  const t=wk('trinket');e.trinket=t?Math.max(1,visOf(t)):0;
+  const oh=wk('offhand');e.offhand=oh?visOf(oh):0;e.sO=oh?oh.st:dflt('offhand');e.nO=!oh;
   return e;
 }
 /* selectable hero-tab backgrounds (CSS in style.css via data-bg on .stage); the choice is saved in S.bg */
@@ -1471,10 +1640,62 @@ addEventListener('resize',fitCap);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitCap);   /* re-fit the name once the pixel font has loaded */
 if(window.ResizeObserver){let w0=0;new ResizeObserver(es=>{const w=Math.round(es[0].contentRect.width);if(w!==w0){w0=w;fitCap()}}).observe($('rank'))}   /* and whenever the card changes width, so the name always shrinks to fit instead of being cut */
 let SEL='weapon',SELI=null;   /* slot being browsed / item selected in the picker */
+let TRYI=null;                /* item being tried on: selected in the picker but not worn. It is shown on the hero, with its stat changes as +/- numbers */
+/* the four sheet numbers as they would be with `it` worn (null = what you wear now) */
+function previewStats(it){
+  const sv=TR;TRYIT=it;TR=bsum('hp');
+  try{return {xp:mult(),gold:goldMult(),dmg:dmgMult(),hp:maxHp(levelOf(S.xp))}}
+  finally{TRYIT=null;TR=sv}
+}
+/* rarity aura: the best item you wear (or are trying on) tints the stage. tier 0 none, 1 glow, 2 sparkles, 3 embers, 4 unique */
+const AURA_TIER=r=>r<2?0:r<4?1:r<5?2:r<7?3:4;
+function setAura(sg,pv){
+  let r=-1;SLOTS.forEach(k=>{const i=pv&&pv.slot===k?pv:worn(k);if(i&&i.r>r)r=i.r});
+  const t=r<0?0:AURA_TIER(r);
+  sg.dataset.at=t;sg.style.setProperty('--aura',RAR[Math.max(0,r)]);
+  const a=$('aura');if(!a||a.dataset.k===String(t))return;
+  a.dataset.k=String(t);a.replaceChildren();
+  const n=t>=3?16:t===2?9:0;
+  for(let i=0;i<n;i++){
+    const p=el('i','ap'+(t>=3?' em':''));
+    p.style.left=(10+Math.random()*80)+'%';p.style.setProperty('--d',(Math.random()*4).toFixed(2)+'s');
+    p.style.setProperty('--t',(2.6+Math.random()*2.4).toFixed(2)+'s');p.style.setProperty('--x',Math.round((Math.random()-.5)*36)+'px');
+    a.appendChild(p);
+  }
+}
+/* glowing links: a curve from each slot to the part of the hero it belongs to (x, y as a share of the hero canvas) */
+const LANCH={helm:[.5,.2],armor:[.56,.68],trinket:[.52,.5],weapon:[.88,.52],offhand:[.14,.58],companion:[.3,.93]};
+function drawLinks(){
+  const sg=document.querySelector('.stage'),sv=$('links'),cv=document.querySelector('#figure canvas');
+  if(!sg||!sv||!cv||!sg.offsetParent)return;
+  const sr=sg.getBoundingClientRect(),cr=cv.getBoundingClientRect(),ox=sr.left+sg.clientLeft,oy=sr.top+sg.clientTop;
+  if(!sg.clientWidth||!cr.width)return;
+  const NS='http://www.w3.org/2000/svg',pv=TRYI,mk=(t,c,o)=>{const n=document.createElementNS(NS,t);n.setAttribute('class',c);Object.keys(o).forEach(k=>n.setAttribute(k,o[k]));return n};
+  sv.setAttribute('viewBox','0 0 '+sg.clientWidth+' '+sg.clientHeight);sv.replaceChildren();
+  SLOTS.forEach(k=>{
+    const b=sg.querySelector('.eslot[data-k="'+k+'"]');if(!b)return;
+    const br=b.getBoundingClientRect(),left=br.left+br.width/2<cr.left+cr.width/2;
+    const sx=(left?br.right:br.left)-ox,sy=br.top+br.height/2-oy;
+    let ax=cr.left+cr.width*LANCH[k][0]-ox,ay=cr.top+cr.height*LANCH[k][1]-oy;
+    if(k==='companion'){const fp=$('fpet'),pc=fp&&!fp.hidden&&fp.querySelector('canvas');if(pc){const q=pc.getBoundingClientRect();ax=q.left+q.width/2-ox;ay=q.top+q.height*.7-oy}}
+    const tr=!!pv&&pv.slot===k,it=tr?pv:worn(k),col=it?RAR[it.r]:'rgba(255,255,255,.3)',mx=sx+(ax-sx)*.5;
+    const d='M'+sx+' '+sy+' C'+mx+' '+sy+' '+mx+' '+ay+' '+ax+' '+ay;
+    const p1=mk('path','lk'+(it?'':' off')+(tr?' try':''),{d});p1.style.setProperty('--c',col);sv.appendChild(p1);
+    if(it){const p2=mk('path','lk fl',{d});p2.style.setProperty('--c',col);sv.appendChild(p2)}
+    const dot=mk('circle','ld'+(it?'':' off'),{cx:ax,cy:ay,r:it?3.5:2.5});dot.style.setProperty('--c',col);sv.appendChild(dot);
+  });
+}
 function renderGear(){
-  const lv=levelOf(S.xp),R=rk(lv),E=eqLook();applyScene();
+  const lv=levelOf(S.xp),R=rk(lv);applyScene();
+  const cur=worn(SEL),items=S.inv.filter(i=>i.slot===SEL).sort((a,c)=>c.r-a.r||a.n.localeCompare(c.n));
+  if(items.length&&!items.some(i=>i.id===SELI))SELI=cur&&items.some(i=>i.id===cur.id)?cur.id:items[0].id;
+  const sel=items.find(i=>i.id===SELI)||null,pv=sel&&(!cur||cur.id!==sel.id)?sel:null;   /* pv = the selected item when it is not worn yet: it is tried on */
+  TRYI=pv;
+  const E=eqLook(pv),sg=document.querySelector('.stage');
   const fg=$('figure'),fk=(PV?'pv'+PV.n:Object.values(E).join('.'))+'|'+(S.look?Object.values(S.look).join(','):'');
-  if(fg.dataset.k!==fk){fg.dataset.k=fk;fg.replaceChildren(heroPx(lv))}
+  if(fg.dataset.k!==fk){fg.dataset.k=fk;fg.replaceChildren(heroPx(lv,undefined,null,E))}
+  fg.classList.toggle('tryon',!!pv);
+  {const tt=$('trytag');if(tt){tt.hidden=!pv;if(pv)tt.textContent='Try on: '+pv.n}}
   {   /* caption under the hero: username on top, level + rank below, each sized to fill the width */
     const fn=$('figname'),nm=heroName(),rl='Lv '+lv+' '+(S.cls?clsName():R[0]),ck=nm+'|'+rl;
     if(fn.dataset.k!==ck){
@@ -1485,17 +1706,18 @@ function renderGear(){
     }
     fitCap();
   }
-  {   /* companion beside the hero (a dev preview overrides what is worn) */
-    const cw=worn('companion'),fk2=PVP||(cw?(PETS[cw.pet]?cw.pet:'wolfpup'):null),fp=$('fpet'),cl=PVP?PVL:(cw?plv(cw):1);
+  {   /* companion beside the hero (a dev preview overrides what is worn; a companion being tried on shows too) */
+    const cw=pv&&pv.slot==='companion'?pv:worn('companion'),fk2=PVP||(cw?(PETS[cw.pet]?cw.pet:'wolfpup'):null),fp=$('fpet'),cl=PVP?PVL:(cw?plv(cw):1);
     if(fk2){fp.hidden=false;fp.title=(PVP?PETS[fk2].n:cw.n)+' (Lv '+cl+')';const vl=vlv(fk2,cl);fp.classList.toggle('solid',!!PETS[fk2].sm);fp.classList.toggle('still',!!PETS[fk2].still);fp.classList.toggle('big',vl>=BIG_LV);fp.parentNode.style.setProperty('--pz',psz(fk2,vl));setSprite('fpet',PETS[fk2].e,pres(vl),vl);fp.classList.toggle('fire',!!PETS[fk2].fire)}else fp.hidden=true;
   }
-  const slot=(k,wide)=>{
-    const it=worn(k),b=el('button','eslot'+(SEL===k?' on':'')+(it?'':' base')),ic=el('span','ei'),lab=it?it.n+(it.slot==='companion'?' Lv '+plv(it):''):'Empty';
-    b.type='button';b.style.setProperty('--rar',RAR[it?it.r:0]);b.setAttribute('aria-pressed',SEL===k);
-    b.setAttribute('aria-label',SLOTN[k]+': '+(it?it.n:'empty'));ic.appendChild(px(it?iicon(it):dicon(k),16));
-    if(wide){const tx=el('div','etx');tx.append(el('span','ek',SLOTN[k]),el('small','',lab));b.classList.add('wide');b.append(ic,tx)}
-    else b.append(el('span','ek',SLOTN[k]),ic,el('small','',lab));
-    if(S.inv.some(i=>i.slot===k&&i.isNew))b.appendChild(el('i','up','!'));
+  /* gear mounts: six plaques in an arc around the hero, each with an iron hook; what you wear hangs from it */
+  const slot=k=>{
+    const tr=!!pv&&pv.slot===k,it=tr?pv:worn(k),b=el('button','eslot'+(SEL===k?' on':'')+(it?'':' base')+(tr?' try':'')),ic=el('span','ei'),lab=it?it.n+(it.slot==='companion'?' Lv '+plv(it):''):'Empty';
+    b.type='button';b.dataset.k=k;b.title=lab;b.style.setProperty('--rar',RAR[it?it.r:0]);b.setAttribute('aria-pressed',SEL===k);
+    b.setAttribute('aria-label',SLOTN[k]+': '+(it?it.n:'empty')+(tr?' (trying on)':''));ic.appendChild(px(it?iicon(it):dicon(k),16));
+    b.append(el('i','hook'),el('span','ek',SLOTN[k]),ic,el('small','',lab));
+    if(tr)b.appendChild(el('i','tryb','TRY'));
+    else if(S.inv.some(i=>i.slot===k&&i.isNew))b.appendChild(el('i','up','!'));
     b.onclick=()=>{
       SEL=k;let ch=false;
       S.inv.forEach(i=>{if(i.slot===k&&i.isNew){delete i.isNew;ch=true}});
@@ -1503,41 +1725,65 @@ function renderGear(){
     };
     return b;
   };
-  $('scol-l').replaceChildren(slot('helm'),slot('armor'));
-  $('scol-r').replaceChildren(slot('weapon'),slot('offhand'));
-  $('slotrow').replaceChildren(slot('trinket',1),slot('companion',1));
-  const pk=$('picker'),hd=el('div','pkhead'),cur=worn(SEL);
-  const items=S.inv.filter(i=>i.slot===SEL).sort((a,c)=>c.r-a.r||a.n.localeCompare(c.n));
-  hd.append(el('b','',SLOTN[SEL]),el('span','',(items.length?items.length+(items.length===1?' item':' items')+' \u00b7 ':'')+S.gold+'g'));
+  $('scol-l').replaceChildren(slot('helm'),slot('offhand'),slot('companion'));
+  $('scol-r').replaceChildren(slot('trinket'),slot('weapon'),slot('armor'));
+  $('slotrow').replaceChildren();
+  setAura(sg,pv);
+  const pk=$('picker'),hd=el('div','pkhead');
+  hd.append(el('b','',SLOTN[SEL]),el('span','',(items.length?items.length+(items.length===1?' item':' items')+' · ':'')+coinText(S.gold)));
   pk.replaceChildren(hd);
   if(!items.length){   /* nothing for this slot: one compact line instead of a big empty panel */
     const e=el('div','pkempty'),ic=el('span','ei');ic.appendChild(px(dicon(SEL),16));
     e.append(ic,el('span','','Nothing yet. Chests drop random loot.'));pk.appendChild(e);
   }else{
-    if(!items.some(i=>i.id===SELI))SELI=cur&&items.some(i=>i.id===cur.id)?cur.id:items[0].id;
-    /* inventory grid: one small tile per item, tap one to see its details below */
+    /* inventory grid: one small tile per item, tap one to try it on and see its details below */
     const g=el('div','ig');
     items.forEach(i=>{
       const isOn=!!cur&&cur.id===i.id,t=el('button','itile'+(i.id===SELI?' sel':'')+(isOn?' on':'')),ic=el('span','ei');
       t.type='button';t.style.setProperty('--rar',RAR[i.r]);t.setAttribute('aria-pressed',i.id===SELI);
       t.setAttribute('aria-label',i.n+(isOn?' (worn)':''));t.title=i.n;
       ic.appendChild(px(iicon(i),16));t.appendChild(ic);
-      if(isOn)t.appendChild(el('i','wn','\u2713'));
+      if(isOn)t.appendChild(el('i','wn','✓'));
       t.onclick=()=>{SELI=i.id;renderGear()};
       g.appendChild(t);
     });
     pk.appendChild(g);
-    const sel=items.find(i=>i.id===SELI),on=!!cur&&cur.id===sel.id,d=el('div','idet'),act=el('div','iact2');
+    const on=!!cur&&cur.id===sel.id,d=el('div','idet'),act=el('div','iact2');
     d.style.setProperty('--rar',RAR[sel.r]);
     d.append(el('b','',sel.n),el('small','',RNAME[sel.r]+': '+bonusTxt(sel)));
     if(sel.slot==='companion'){const L=plv(sel);d.appendChild(el('small','',L>=PMAX?'Level '+L+' (max)':'Level '+L+': '+((sel.ce||0)-pneed(L))+' / '+(pneed(L+1)-pneed(L))+' XP. Grows as you finish quests.'))}
     if(sel.u&&UNIQ[sel.u])d.appendChild(el('small','',UNIQ[sel.u].d));
-    if(!on)d.appendChild(el('small','dim','Bonuses only count while worn.'));
+    if(!on){
+      const dl=el('div','tdelta');   /* what changes if you wear it instead of what you wear now */
+      ['xp','gold','dmg','hp','bd'].forEach(k=>{const df=eff(sel,k)-(cur?eff(cur,k):0);if(df)dl.appendChild(el('span','dc '+(df>0?'up':'dn'),STAT_TXT[k](df)))});
+      if(dl.children.length){d.appendChild(el('small','dim',cur?'Compared with what you wear:':'If you wear it:'));d.appendChild(dl)}
+      d.appendChild(el('small','dim','Bonuses only count while worn.'));
+    }
     const wb=el('button','btn',on?'Take off':'Wear');wb.type='button';wb.onclick=()=>wear(sel.id);act.appendChild(wb);
-    if(!on){const sb=el('button','ghost','Sell '+sellVal(sel)+'g');sb.type='button';sb.onclick=()=>sell(sel.id);act.appendChild(sb)}
+    if(!on){const sb=el('button','ghost','Sell '+coinText(sellVal(sel)));sb.type='button';sb.onclick=()=>sell(sel.id);act.appendChild(sb)}
     d.appendChild(act);pk.appendChild(d);
   }
+  {   /* the four numbers at the bottom show how they would change with the item you are trying on */
+    const sh=$('sheet');sh.querySelectorAll('.dl').forEach(n=>n.remove());
+    if(pv){
+      const a=previewStats(null),b=previewStats(pv),ks=['xp','gold','dmg','hp'];
+      [...sh.children].forEach((st,i)=>{
+        const k=ks[i],df=b[k]-a[k];if(!k||Math.abs(df)<(k==='hp'?.5:.005))return;
+        const good=k==='dmg'?df<0:df>0,tx=k==='hp'?(df>0?'+':'')+Math.round(df):(df>0?'+':'')+df.toFixed(2);
+        st.appendChild(el('i','dl '+(good?'up':'dn'),tx));
+      });
+    }
+  }
+  if(WFX){   /* just put something on: a flash on the hero and on its mount */
+    const k=WFX;WFX=null;
+    fg.classList.remove('wfx');void fg.offsetWidth;fg.classList.add('wfx');setTimeout(()=>fg.classList.remove('wfx'),850);
+    const sb=sg.querySelector('.eslot[data-k="'+k+'"]');if(sb){sb.classList.add('flash');setTimeout(()=>sb.classList.remove('flash'),800)}
+  }
+  requestAnimationFrame(drawLinks);setTimeout(drawLinks,300);   /* the hero and companion slide a little, so measure once more when they settle */
 }
+addEventListener('resize',()=>requestAnimationFrame(drawLinks));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>drawLinks());
+if(window.ResizeObserver){const sg0=document.querySelector('.stage');if(sg0)new ResizeObserver(()=>requestAnimationFrame(drawLinks)).observe(sg0)}
 /* ---------- chest stage: pixel chest that shakes, glows and bursts open ---------- */
 let CHEST_BUSY=false,LOCKSEL=null;   /* LOCKSEL = class tapped in the locked preview */
 function chestPx(open){
@@ -1595,7 +1841,7 @@ function renderRPG(){
     fill.style.width=pct+'%';bar.append(fill,el('em','',dead?'Defeated':b.hp+' / '+b.max));hr.append(px(dead?'\u2620\ufe0f':'\u2694\ufe0f',16),bar);
     const rw=b.rw||{g:50,c:1},dn=(8-new Date().getDay())%7||7,cs=el('div','bxc');
     const tile=(lab,e,val,ti,c)=>{const s=el('span','bxk'+(c?' '+c:'')),v=el('span','v');s.title=ti;v.append(px(e,16),document.createTextNode(val));s.append(el('small','',lab),v);return s};
-    cs.append(tile(dead?'CLAIMED':'REWARD','\ud83e\ude99','+'+rw.g+'g','Gold reward',dead?'got':''),tile(dead?'CLAIMED':'REWARD','\ud83d\udce6','+'+rw.c+(rw.c>1?' chests':' chest'),'Chest reward',dead?'got':''),tile('RESETS IN','\u23f3',dn+(dn===1?' day':' days'),'A new boss arrives on Monday'));
+    cs.append(tile(dead?'CLAIMED':'REWARD','coin:'+topCoin(rw.g),'+'+coinText(rw.g),'Coin reward',dead?'got':''),tile(dead?'CLAIMED':'REWARD','\ud83d\udce6','+'+rw.c+(rw.c>1?' chests':' chest'),'Chest reward',dead?'got':''),tile('RESETS IN','\u23f3',dn+(dn===1?' day':' days'),'A new boss arrives on Monday'));
     info.append(el('div','bxn',B[0]),tg,hr,cs,el('div','bxm',dead?'Reward claimed. Rest up for the next one.':'Every quest you finish deals damage.'));
     bb.append(pf,info);
   }
@@ -1639,7 +1885,7 @@ function renderRPG(){
   f.appendChild(st);
   const ob=el('button','btn wide','Open chest');ob.type='button';ob.disabled=nc<1;ob.onclick=()=>openChestFx(fg,st);f.appendChild(ob);
   const br=el('div','buyrow'),gb=el('div','bar gold gbar'+(S.gold>=CHEST_COST?' full':'')),gf=document.createElement('i');
-  gf.style.width=Math.min(100,S.gold/CHEST_COST*100)+'%';gb.append(gf,el('em','',S.gold+' / '+CHEST_COST+'g'));
+  gf.style.width=Math.min(100,S.gold/CHEST_COST*100)+'%';gb.append(gf,el('em','',coinText(S.gold)+' / '+coinText(CHEST_COST)));
   const bc=el('button','ghost','Buy chest');bc.type='button';bc.disabled=S.gold<CHEST_COST;bc.onclick=buyChest;br.append(gb,bc);f.appendChild(br);
   const aff=S.inv.some(i=>i.isNew);
   $('dot-hero').hidden=!(S.chests>0||aff||(lv>=5&&!S.cls)||(lv>=15&&S.cls&&!S.sub));
@@ -1671,7 +1917,7 @@ function attackFx(dmg){
 }
 function renderSheet(){
   const s=$('sheet');s.innerHTML='';
-  [['XP','x'+mult().toFixed(2)],['Gold','x'+goldMult().toFixed(2)],['Damage','x'+dmgMult().toFixed(2)],['Max HP',maxHp(levelOf(S.xp))]].forEach(([k,v])=>{
+  [['XP','x'+mult().toFixed(2)],['Coins','x'+goldMult().toFixed(2)],['Damage','x'+dmgMult().toFixed(2)],['Max HP',maxHp(levelOf(S.xp))]].forEach(([k,v])=>{
     const d=el('div','stat');d.append(el('small','',k),el('b','',v));s.appendChild(d);
   });
   const gb=$('gearbonus');
@@ -1688,10 +1934,10 @@ function tab(n){
   document.body.dataset.tab=n;   /* the tavern backdrop only shows on the Quests tab */
   const hud=document.querySelector('.hud');if(hud)hud.hidden=n==='hero';   /* Hero tab: just the full avatar and its gear */
   const th=$('tab-hero');if(th)th.style.paddingTop=n==='hero'?'env(safe-area-inset-top,0px)':'';
-  fitCap();scrollTo(0,0);try{localStorage.setItem('dq.tab',n)}catch(e){}
+  fitCap();requestAnimationFrame(drawLinks);scrollTo(0,0);try{localStorage.setItem('dq.tab',n)}catch(e){}
 }
 function initNav(){
-  const ic={quests:'📜',hero:'🛡️',realm:'🏰'};
+  const ic={quests:'📜',hero:'🛡️',shop:'🛒',realm:'🏰'};
   document.querySelectorAll('.navbtn').forEach(b=>{b.querySelector('.ni').appendChild(px(ic[b.dataset.tab],16));b.onclick=()=>tab(b.dataset.tab)});
   let t='quests';try{t=localStorage.getItem('dq.tab')||t}catch(e){}
   tab(ic[t]?t:'quests');
@@ -1722,6 +1968,16 @@ function tween(el,to,dec,pre){   /* counts a number up or down to its new value 
   const step=n=>{const k=Math.min(1,(n-t0)/550),v=from+(to-from)*(1-Math.pow(1-k,3));el._v=v;el.textContent=fmt(v);if(k<1)el._raf=requestAnimationFrame(step);else{el._v=to;el.textContent=fmt(to)}};
   el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');
   el._raf=requestAnimationFrame(step);
+}
+function tweenCoins(b,to){   /* same count-up as tween(), but written as coins */
+  const paint=v=>b.replaceChildren(coinEl(v,2));
+  if(b._v==null||NOMOVE){b._v=to;b._to=to;paint(to);return}
+  if(b._to===to)return;
+  const from=b._v;b._to=to;cancelAnimationFrame(b._raf);
+  const t0=performance.now();
+  const step=n=>{const k=Math.min(1,(n-t0)/550),v=from+(to-from)*(1-Math.pow(1-k,3));b._v=v;paint(Math.round(v));if(k<1)b._raf=requestAnimationFrame(step);else{b._v=to;paint(to)}};
+  b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');
+  b._raf=requestAnimationFrame(step);
 }
 function flashBar(b){b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash');setTimeout(()=>b.classList.remove('flash'),750)}
 function flipCoin(){const g=$('gc');g.classList.remove('flip');void g.offsetWidth;g.classList.add('flip');setTimeout(()=>g.classList.remove('flip'),650)}
@@ -1780,17 +2036,17 @@ function render(){
   $('bar').classList.toggle('near',(S.xp-lo)/(hi-lo)>=.85);
   if(lastXp!=null&&S.xp>lastXp)flashBar($('bar'));if(lastHp!=null&&S.hp>lastHp)flashBar($('hpbar'));lastXp=S.xp;lastHp=S.hp;
   const sk=streak();
-  tween($('sn'),sk,0,'');$('streak').classList.toggle('off',sk===0);
+  tween($('sn'),sk,0,'');$('streak').title='Perfect-day streak'+((S.freezes|0)?' ('+(S.freezes|0)+' Streak Freeze'+(S.freezes>1?'s':'')+' ready)':'');$('streak').classList.toggle('off',sk===0);
   {const st=$('streak');st.classList.remove('s1','s2','s3','s4');st.classList.add(sk>=14?'s4':sk>=7?'s3':sk>=3?'s2':'s1')}
-  tween($('mv'),mult(),2,'x');tween($('gd'),S.gold,0,'');
+  tween($('mv'),mult(),2,'x');tweenCoins($('gd'),S.gold);{const g=$('gc'),tc=topCoin(S.gold);if(g._k!==tc){g._k=tc;g.replaceChildren(px('coin:'+tc,10))}$('gd').parentNode.title='Coins: '+coinText(S.gold)}
   if(lastGold!=null&&S.gold>lastGold)flipCoin();lastGold=S.gold;
 
   const d=doneToday(),list=$('list');list.innerHTML='';
-  const act=S.tasks.filter(t=>active(t)),shown=S.tasks.filter(t=>QT==='any'||tabOf(t)===QT);
+  const act=S.tasks.filter(t=>active(t)),vis=S.tasks.filter(t=>!expired(t)),shown=vis.filter(t=>QT==='any'||tabOf(t)===QT);
   document.querySelectorAll('.qtab').forEach(b=>{const on=b.dataset.g===QT;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
   if(!shown.length){
     const e=document.createElement('div');e.className='empty';
-    e.textContent=!S.tasks.length?'The board is bare. Pin a daily quest below. Finish it for XP, neglect it and you take damage.':QT==='cu'?'No custom days yet. Pin a quest and tap the days you want it on.':'No every-day quests yet. Pin one with Every day selected.';
+    e.textContent=!vis.length?'The board is bare. Pin a daily quest below. Finish it for XP, neglect it and you take damage.':QT==='cu'?'No custom days yet. Pin a quest and tap the days you want it on.':QT==='once'?'No one-off quests for today. Pin one with Once selected.':'No every-day quests yet. Pin one with Daily selected.';
     list.appendChild(e);
   }
   renderQuests(shown,d,list);
@@ -1798,9 +2054,10 @@ function render(){
   $('count').textContent=done+' / '+act.length+' done';$('dfill').style.width=(act.length?done/act.length*100:0)+'%';
   $('winbox').innerHTML=(act.length&&done===act.length)?'<div class="win">The realm is safe. Rest well, hero.</div>':'';
   timer();
-  if(!addTouched)setAdd(!S.tasks.length);   /* open by default only while the board is empty */
+  if(!addTouched)setAdd(!vis.length);   /* open by default only while the board is empty */
 
   renderRPG();
+  renderShop();
   updatePv();
   const lg=$('log');lg.innerHTML='';
   if(!S.log.length)lg.innerHTML='<div><small>Nothing yet.</small>Your wins and losses will show up here.</div>';
@@ -1829,28 +2086,45 @@ function render(){
 
 /* ---------- quest board: pending first, 7-day history, per-quest streaks, inline edit, undo delete ---------- */
 let EDIT=null,JUST=null,DRAG=null;   /* DRAG = the scroll being dragged right now */
-const QDIFF=[[10,'Easy'],[20,'Medium'],[40,'Hard']],QSCHED=[['all','Every day'],['wk','Weekdays'],['we','Weekends']];
+const QDIFF=[[10,'Easy'],[20,'Medium'],[40,'Hard']],QSCHED=[['all','Daily'],['wk','Mon-Fri'],['we','Sat-Sun']];
 function qStreak(t){   /* consecutive active days done, counting back from today (a day with nothing scheduled is skipped) */
   const dn=k=>(S.done[k]||[]).includes(t.id);let k=today(),n=0,g=0;
   if(!dn(k))k=addDays(k,-1);
   while(g++<365&&k>=t.created){if(active(t,k)){if(dn(k))n++;else break}k=addDays(k,-1)}
   return n;
 }
-function qDots(t){   /* last 7 days: green done, red missed, blinking = today still open, dotted = not scheduled */
-  const w=el('span','qd');
-  for(let i=6;i>=0;i--){
-    const k=addDays(today(),-i);let c='na';
-    if(k>=t.created)c=!active(t,k)?'off':(S.done[k]||[]).includes(t.id)?'on':i===0?'now':'miss';
-    const s=el('i','dt '+c);s.title=k.slice(5);w.appendChild(s);
+/* ---- weekly mastery: every FULL Mon-Sun week in which you finish a quest on ALL of its scheduled days adds +3% XP and gold to that quest
+   (max 10 weeks = +30%). A week with a missed scheduled day sets it back ONE week (never below 0). The quest must have existed for the whole week.
+   The bonus multiplies the level-scaled reward, so it is worth more the higher your level. ---- */
+const MASTERY={step:.03,max:10};
+function masteryWeeks(t){
+  const M=weekKey();let n=0;
+  for(let i=60;i>=1;i--){   /* oldest week first */
+    const w=addDays(M,-7*i);
+    if(t.created>w)continue;
+    let ok=true,any=false;
+    for(let j=0;j<7;j++){const d=addDays(w,j);if(active(t,d)){any=true;if(!(S.done[d]||[]).includes(t.id)){ok=false;break}}}
+    if(!any)continue;
+    n=ok?Math.min(MASTERY.max,n+1):Math.max(0,n-1);
   }
+  return n;
+}
+const masteryMult=t=>1+MASTERY.step*Math.min(MASTERY.max,t?masteryWeeks(t):0);
+function qDots(t){   /* streak meter: one dot per day of the current streak, green from the left; the next dot blinks while today is still open (7 dots, a longer streak just keeps them all green) */
+  const w=el('span','qd'),n=qStreak(t),T=today(),open=active(t,T)&&!(S.done[T]||[]).includes(t.id);
+  for(let i=0;i<7;i++)w.appendChild(el('i','dt'+(i<n?' on':i===n&&open?' now':'')));
+  w.title=n?n+(n===1?' day':' days')+' in a row':'No streak yet';
   return w;
 }
 function renderSum(d){
   const b=$('bsum'),p=S.tasks.filter(t=>active(t)&&!d.includes(t.id));
   if(!S.tasks.some(t=>active(t))){b.replaceChildren();return}
-  const xp=p.reduce((a,t)=>a+xpGain(t.xp,false),0),g=p.reduce((a,t)=>a+Math.round(t.xp/2*goldMult()),0);
+  /* everything still obtainable today: each open quest, the Shadowblade first-quest boost (if nothing is done yet; the best quest gets it) and the perfect-day bonus once the last one is done */
+  const fi=(!d.length&&hasSub('shadowblade'))?p.reduce((m,t,i)=>t.xp>p[m].xp?i:m,0):-1;
+  const lv=levelOf(S.xp),pb=S.bonus[today()]?0:Math.round(BONUS*lscale(lv)*(hasSub('herald')?1+.5*cm():1));
+  const xp=p.reduce((a,t,i)=>a+xpGain(t.xp,i===fi,t),0)+pb,g=p.reduce((a,t,i)=>a+goldGain(t,i===fi),0);
   const chip=(l,v)=>{const s=el('span','bs');s.append(el('small','',l),el('b','',v));return s};
-  b.replaceChildren(chip('Left',p.length),chip('XP to earn','+'+xp),chip('Gold to earn','+'+g+'g'));
+  b.replaceChildren(chip('Left',p.length),chip('XP to earn','+'+xp),chip('Coin to earn','+'+coinText(g)));
 }
 function delQuest(t){
   const i=S.tasks.findIndex(z=>z.id===t.id);if(i<0)return;
@@ -1906,7 +2180,7 @@ function qEditor(t){
   const ok=el('button','btn','Save quest'),no=el('button','ghost','Cancel');ok.type=no.type='button';
   const saveIt=()=>{
     const nm=inp.value.trim();if(!nm){inp.focus();return}
-    t.name=nm;t.xp=xp;t.days=saveDays(ds);
+    t.name=nm;t.xp=xp;if(!t.once)t.days=saveDays(ds);
     if(QT!=='any')QT=tabOf(t);
     EDIT=null;save();render();toast('Quest updated');
   };
@@ -1915,10 +2189,75 @@ function qEditor(t){
   inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();saveIt()}else if(e.key==='Escape')cancel()};
   const ea=el('div','eacts');ea.append(ok,no);
   const band=el('div','qband');band.appendChild(el('span','qrk','Edit quest'));
-  bd.append(inp,seg(QDIFF,()=>xp,v=>{xp=v}),pg,dr,ea);
+  if(t.once)bd.append(inp,seg(QDIFF,()=>xp,v=>{xp=v}),el('div','sub onehint','One-off quest: only for today.'),ea);
+  else bd.append(inp,seg(QDIFF,()=>xp,v=>{xp=v}),pg,dr,ea);
   cd.append(band,bd);li.appendChild(cd);
   setTimeout(()=>{inp.focus();inp.select()},0);
   return li;
+}
+/* ---------- tap a scroll: full details of that quest ---------- */
+function qStats(t){   /* history numbers for one quest, from the day it was posted until today (today only counts once it is done) */
+  const T=today(),dn=k=>(S.done[k]||[]).includes(t.id),lim=addDays(T,-799);
+  let k=t.created<lim?lim:t.created,done=0,due=0,run=0,best=0;
+  while(k<=T){
+    if(active(t,k)){
+      if(dn(k)){done++;due++;run++;if(run>best)best=run}
+      else if(k<T){due++;run=0}
+    }
+    k=addDays(k,1);
+  }
+  return {done,best,cur:qStreak(t),rate:due?Math.round(done/due*100):0};
+}
+function qDetails(t){
+  const T=today(),d=doneToday(),on=d.includes(t.id),rest=!active(t),first=!d.length,k=T+':'+t.id,lv=t.xp>=40?3:t.xp>=20?2:1;
+  const st=qStats(t),dn=z=>(S.done[z]||[]).includes(t.id);
+  const xv=on&&S.award[k]!=null?S.award[k]:xpGain(t.xp,first,t),gv=on&&S.gAward[k]!=null?S.gAward[k]:goldGain(t,first);
+  const ov=el('div','modal qdm on'),card=el('div','card qdet d'+lv),paper=el('div','qdsc qcard');   /* the paper reuses the quest-card scroll art */
+  ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label',t.name);
+  const esc=e=>{if(e.key==='Escape')close()};
+  let closing=false;
+  const close=()=>{
+    if(closing)return;closing=true;document.removeEventListener('keydown',esc);
+    if(matchMedia('(prefers-reduced-motion:reduce)').matches){ov.remove();return}
+    card.classList.add('closing');                                   /* roll the scroll back up, then remove it */
+    const fin=()=>ov.remove();
+    card.addEventListener('animationend',fin,{once:true});
+    setTimeout(fin,600);                                            /* safety net if animationend never fires */
+  };
+  /* rank header: diamonds in the difficulty colour, double rule underneath (same as the cards) */
+  const band=el('div','qdb');band.append(el('div','qdk',QRANK[lv-1][0]),el('div','qdd','\u2605'.repeat(lv)+' '+QDIFF[lv-1][1]));   /* big rank, stars + difficulty under it */
+  /* name, schedule, and today's status as a rubber stamp */
+  const sched=t.once?'Today only':({all:'Every day',wk:'Mon-Fri',we:'Sat-Sun'})[dayKey(dayList(t))]||DORDER.filter(z=>dayList(t).includes(z)).map(z=>DNAMES[z].slice(0,2)).join(' ');
+  let nxt='';if(rest){let n=1;while(n<=7&&!active(t,addDays(T,n)))n++;if(n<=7)nxt=n===1?' \u00b7 back tomorrow':' \u00b7 back '+DNAMES[dow(addDays(T,n))]}
+  const sub=el('div','qds',sched+nxt);
+  const stw=el('div','qdsw'),stamp=el('span','qst '+(rest?'st-rest':on?'st-done':'st-open'),rest?'Not active':on?'Done today':'Active');stw.appendChild(stamp);
+  /* this week, Sunday to Saturday, left to right (days still to come are dashed) */
+  const wk=el('div','qdw'),sun=addDays(T,-dow(T));
+  for(let i=0;i<7;i++){
+    const z=addDays(sun,i);let c='na',m='';
+    if(z>=t.created){if(!active(t,z)){c='off';m='\u2013'}else if(dn(z)){c='on';m='\u2713'}else if(z>T){c='fut'}else if(z===T){c='now';m='?'}else{c='miss';m='\u00d7'}}
+    const cell=el('div',c+(z===T?' tdy':''));cell.title=z;cell.append(el('small','',DNAMES[dow(z)].slice(0,2)),el('b','',m));wk.appendChild(cell);
+  }
+  /* numbers in one plaque */
+  const tile=(l,v)=>{const q=el('div');q.append(el('b','',String(v)),el('small','',l));return q};
+  const grid=el('div','qdg');grid.append(tile('Streak',st.cur),tile('Best',st.best),tile('Done',st.done),tile('Rate',st.rate+'%'));
+  /* rewards and risk: a 2x2 plaque of icon chips */
+  const chip=(ic,txt,c,ti)=>{const s=el('span','qdc '+c);s.title=ti;s.append(px(ic,16),document.createTextNode(txt));return s};
+  const rw=el('div','qdp');
+  rw.append(chip('\u2b50','+'+xv,'c-xp',on?'XP earned today':'XP reward'),chip('coin:'+topCoin(gv),'+'+coinText(gv,2),'c-g','Coins: '+coinText(gv)),chip('\u2764\ufe0f','-'+penalty(t.xp),'c-hp','HP lost if you miss it'),chip('\u2694\ufe0f',String(bossDmg(t.xp)),'c-bd','Damage to the weekly boss'));
+  paper.append(band,el('h2','qdn',t.name),sub,stw,wk,grid,rw);
+  if(!t.once){
+    const mw=masteryWeeks(t);
+    if(mw){const q=el('div','qdq'+(mw>=MASTERY.max?' max':''),'\u2605 Wk '+mw+' \u00b7 +'+Math.round(Math.min(mw,MASTERY.max)*MASTERY.step*100)+'%');q.title='Weekly mastery: finish this quest on every scheduled day of a Mon-Sun week to grow it.';paper.appendChild(q)}
+  }
+  const yr=new Date(t.created+'T12:00:00').getFullYear()!==new Date().getFullYear();
+  paper.appendChild(el('div','qdy','Posted '+new Date(t.created+'T12:00:00').toLocaleDateString(undefined,yr?{day:'numeric',month:'short',year:'numeric'}:{day:'numeric',month:'short'})));
+  const acts=el('div','qda'),ed=el('button','qdbn','Edit');
+  ed.type='button';ed.onclick=()=>{close();EDIT=t.id;render()};
+  acts.appendChild(ed);paper.appendChild(acts);
+  card.appendChild(paper);
+  ov.onclick=e=>{if(e.target===ov)close()};
+  ov.appendChild(card);document.body.appendChild(ov);document.addEventListener('keydown',esc);   /* close: tap outside the scroll, or Esc */
 }
 function renderQuests(shown,d,list){
   renderSum(d);
@@ -1929,16 +2268,19 @@ function renderQuests(shown,d,list){
     const li=el('li','qc d'+lv+(on?' done':'')+(rest?' rest':'')+(on&&JUST===t.id?' just':'')),cd=el('div','qcard');li.dataset.id=t.id;
     /* rank band: difficulty as a guild rank, with edit / delete tucked into the corner */
     const band=el('div','qband'),ed=el('button','qbtn','\u270e'),x=el('button','qbtn','\u00d7');
-    band.appendChild(el('span','qrk',on?'Done':rest?dayLabel(t):R[0]));
+    band.appendChild(el('span','qrk',rest?dayLabel(t):R[0]));
     ed.type=x.type='button';ed.setAttribute('aria-label','Edit '+t.name);x.setAttribute('aria-label','Delete '+t.name);
     ed.onclick=()=>{EDIT=t.id;render()};x.onclick=()=>confirmDelete(t);band.append(x);
     /* wax seal */
-    const c=el('button','qchk');c.type='button';c.setAttribute('aria-label',(on?'Undo ':'Complete ')+t.name);c.textContent=on?'\u2713':'';c.disabled=rest;c.onclick=ev=>toggle(t.id,ev);
-    const xv=on&&S.award[k]!=null?S.award[k]:xpGain(t.xp,first),gv=on&&S.gAward[k]!=null?S.gAward[k]:Math.round(t.xp/2*goldMult()*firstMult(first));
-    const rws=el('div','qrw');rws.append(rw('xp','\u2b50','+'+xv,'XP'),rw('g','\ud83e\ude99','+'+gv,'Gold'));
-    const sk=qStreak(t);if(sk)rws.appendChild(rw('fl','\ud83d\udd25',String(sk),'Day streak'));
-    const nm=el('div','qname',t.name),ft=el('div','qfoot');nm.title=t.name;ft.append(qDots(t),c);
-    cd.append(band,nm,rws,ft);li.appendChild(cd);list.appendChild(li);
+    const c=el('button','qchk');c.type='button';c.setAttribute('aria-label',(on?'Undo ':'Complete ')+t.name);c.textContent=rest?'Resting':on?'\u2713 Done':'Complete';c.disabled=rest;c.onclick=ev=>toggle(t.id,ev);
+    const xv=on&&S.award[k]!=null?S.award[k]:xpGain(t.xp,first,t),gv=on&&S.gAward[k]!=null?S.gAward[k]:goldGain(t,first);
+    const rws=el('div','qrw');rws.append(rw('xp','\u2b50','+'+xv,'XP'),rw('g','coin:'+topCoin(gv),'+'+coinText(gv,2),'Coins: '+coinText(gv)));
+        const nm=el('div','qname'),ft=el('div','qfoot');nm.appendChild(el('span','',t.name));nm.title=t.name;if(t.once)ft.append(c);else ft.append(qDots(t),c);
+    const mw=t.once?0:masteryWeeks(t),ms=t.once?el('div','qms once','\u26a1 Today only'):mw?el('div','qms'+(mw>=MASTERY.max?' max':''),'\u2605 Wk '+mw+' \u00b7 +'+Math.round(Math.min(mw,MASTERY.max)*MASTERY.step*100)+'%'):null;
+    if(ms&&!t.once)ms.title='Weekly mastery: '+mw+' perfect week'+(mw>1?'s':'')+' in a row. Finish this quest on every scheduled day each week to keep it growing; a missed week sets it back one week (max +'+Math.round(MASTERY.max*MASTERY.step*100)+'% XP and coins).';
+    cd.append(band,nm);if(ms)cd.appendChild(ms);cd.append(rws,ft);
+    cd.onclick=ev=>{if(ev.target.closest('button'))return;qDetails(t)};   /* tap the scroll (not a button) for its details; a drag is swallowed by the capture handler below */
+    li.appendChild(cd);list.appendChild(li);
   });
   JUST=null;
 }
@@ -2018,13 +2360,14 @@ function renderQuests(shown,d,list){
   list.addEventListener('contextmenu',e=>{if(P||DRAG)e.preventDefault()});
   list.addEventListener('click',e=>{if(Date.now()<SUP){e.stopPropagation();e.preventDefault()}},true);   /* a drop is not a tap on the tick box */
 })();
-function updatePv(){const v=+$('diff').value;$('pvx').textContent='+'+xpGain(v)+' XP';$('pvg').textContent='+'+Math.round(v/2*goldMult())+'g';$('pvh').textContent='-'+penalty(v)+' HP'}
+function updatePv(){const v=+$('diff').value;$('pvx').textContent='+'+xpGain(v)+' XP';$('pvg').textContent='+'+coinText(Math.round(v/2*goldMult()));$('pvh').textContent='-'+penalty(v)+' HP'}
 function setAdd(o){ADDOPEN=o;$('addbody').hidden=!o;$('addtoggle').setAttribute('aria-expanded',o?'true':'false');$('add').classList.toggle('open',o)}
 $('addtoggle').onclick=()=>{addTouched=true;setAdd(!ADDOPEN);if(ADDOPEN)$('newname').focus()};
 $('add').onsubmit=e=>{
   e.preventDefault();
   const inp=$('newname'),name=inp.value.trim();if(!name)return;
-  const nt={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,xp:+$('diff').value,created:today(),days:saveDays(ADAYS)};
+  const nt={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,xp:+$('diff').value,created:today(),days:AONCE?'all':saveDays(ADAYS)};
+  if(AONCE)nt.once=today();   /* one-off: exists only today */
   S.tasks.push(nt);
   if(QT!=='any')QT=tabOf(nt);   /* jump to the tab where the new quest lives */
   inp.value='';addTouched=true;setAdd(false);save();render();toast('Quest pinned');
@@ -2033,15 +2376,17 @@ document.querySelectorAll('.dbtn').forEach(b=>b.onclick=()=>{
   $('diff').value=b.dataset.v;updatePv();
   document.querySelectorAll('.dbtn').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on)});
 });
-let ADAYS=DAYSETS.all.slice();   /* days picked in the new-quest note */
-const addDR=$('dayhost')?dayRow(()=>ADAYS,v=>{ADAYS=v},()=>syncAddDays()):null;
+let ADAYS=DAYSETS.all.slice(),AONCE=false;   /* days picked in the new-quest note; AONCE = a one-off quest for today only */
+const addDR=$('dayhost')?dayRow(()=>ADAYS,v=>{ADAYS=v;AONCE=false},()=>syncAddDays()):null;
+const onceHint=el('div','sub onehint','Just for today. Finish it before midnight or take the damage.');onceHint.hidden=true;
 function syncAddDays(){
-  const k=dayKey(ADAYS);$('days').value=k||saveDays(ADAYS).join();
+  const k=AONCE?'once':dayKey(ADAYS);$('days').value=AONCE?'once':(k||saveDays(ADAYS).join());
   document.querySelectorAll('#add .sbtn').forEach(x=>{const on=x.dataset.g===k;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on)});
-  if(addDR)addDR.paint();
+  if(addDR){addDR.paint();addDR.style.display=AONCE?'none':''}
+  onceHint.hidden=!AONCE;
 }
-document.querySelectorAll('#add .sbtn').forEach(b=>b.onclick=()=>{ADAYS=DAYSETS[b.dataset.g].slice();syncAddDays()});
-if(addDR)$('dayhost').appendChild(addDR);
+document.querySelectorAll('#add .sbtn').forEach(b=>b.onclick=()=>{if(b.dataset.g==='once')AONCE=true;else{AONCE=false;ADAYS=DAYSETS[b.dataset.g].slice()}syncAddDays()});
+if(addDR)$('dayhost').appendChild(addDR);$('dayhost').appendChild(onceHint);
 syncAddDays();
 document.querySelectorAll('.qtab').forEach(b=>b.onclick=()=>{QT=b.dataset.g;render()});
 $('theme').onclick=()=>{
@@ -2062,7 +2407,7 @@ function confirmReset(){
   const step=n=>{
     box.replaceChildren();
     if(n===1){
-      h.textContent='Reset progress?';p.textContent='This erases your hero, gear, quests and gold.';
+      h.textContent='Reset progress?';p.textContent='This erases your hero, gear, quests and coins.';
       box.append(mk('Yes, continue','btn danger',()=>step(2),600),mk('Cancel','btn',close));
       box.lastChild.focus();
     }else{
@@ -2076,19 +2421,54 @@ function confirmReset(){
 $('reset').onclick=confirmReset;
 /* day rollover + penalties only run once the cloud save has been pulled, otherwise a stale device would "miss" quests done elsewhere */
 function canRun(){return cloudOff||!cloudConfigured()||synced}
-function daily(){if(!canRun())return;ensureBoss();process()}
+/* ONE-TIME RESTORE of lost progress (runs once, then S.restored stops it; the flag syncs, so it never runs twice across devices).
+   Edit these numbers if they are not what you want. Values only ever go UP, never down. */
+const RESTORE={id:'r1',level:2,streak:2,gold:70,chests:2,boss:'Direwolf Pack'};
+function restoreProgress(){
+  if(S.restored===RESTORE.id)return;
+  const t=today();
+  S.xp=Math.max(S.xp,need(RESTORE.level));
+  S.gold=Math.max(S.gold,RESTORE.gold);
+  S.chests=Math.max(S.chests,RESTORE.chests);
+  for(let i=1;i<=RESTORE.streak;i++){                       /* the last N days count as perfect days */
+    const d=addDays(t,-i);
+    S.perfect[d]=1;
+    S.done[d]=S.tasks.filter(x=>active(x,d)).map(x=>x.id);
+  }
+  if(S.lastDay<addDays(t,-1))S.lastDay=addDays(t,-1);        /* those days are settled: no penalties for them */
+  S.boss=null;                                               /* last week's boss is already beaten; this week gets a fresh one */
+  TR=bsum('hp');S.hp=maxHp(levelOf(S.xp));
+  addLog('Defeated '+RESTORE.boss+'! (progress restored)','good',null);
+  S.restored=RESTORE.id;save();
+  toast('Progress restored: level '+levelOf(S.xp)+', '+streak()+'-day streak');
+}
+function daily(){if(!canRun())return;restoreProgress();ensureBoss();process()}
+let lastPull=0,pulling=null;
+/* ask the server for the newest copy and apply it (a sleeping tab / computer can miss live updates). resolves false if the server could not be reached */
+function pullFresh(){
+  if(!user||!fb||!synced||dirty)return Promise.resolve(true);   /* nothing to compare, or our own change is on its way up */
+  if(Date.now()-lastPull<5000)return Promise.resolve(true);
+  if(pulling)return pulling;
+  pulling=docRef().get({source:'server'}).then(snap=>{lastPull=Date.now();if(!dirty)onCloud(snap,false);return true}).catch(()=>false).then(ok=>{pulling=null;return ok});
+  return pulling;
+}
 function checkDay(){
   if(dirty&&user&&synced&&!pushT)pushNow();   /* retry any save that failed or was interrupted */
   if(!canRun()){timer();return}
-  if(shown!==today()){shown=today();process();ensureBoss();render()}else timer();
+  if(shown!==today()){
+    pullFresh().then(ok=>{
+      if(!ok){timer();return}   /* cloud unreachable: no penalties from a possibly stale copy, try again next tick */
+      if(shown!==today()){shown=today();process();ensureBoss();render()}else timer();
+    });
+  }else timer();
 }
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'){flushPush();return}   /* leaving the app: save to cloud right now */
-  checkDay();                                                       /* coming back: the live listener has already caught up */
+  pullFresh().then(()=>checkDay());                                 /* coming back: catch up with the cloud first, then check the day */
 });
 addEventListener('pagehide',flushPush);
 setInterval(checkDay,30000);
-$('fl').appendChild(px('🔥',16));$('gc').appendChild(px('🪙',16));$('mi').appendChild(px('⚡',16));initNav();initCreator();initScene();initHud();
+$('fl').appendChild(px('🔥',16));$('mi').appendChild(px('⚡',16));initNav();initCreator();initScene();initHud();
 daily();render();
 /* ---------- dev: scroll through every avatar (set DEV=false to hide) ---------- */
 const DEV=true;
@@ -2161,6 +2541,9 @@ function cloudConfigured(){return typeof firebaseConfig!=='undefined'&&!!firebas
    - a plain "has the content actually changed?" check stops the two devices echoing each other */
 const PEND='dq.pending';
 function setPending(v){try{v?localStorage.setItem(PEND,'1'):localStorage.removeItem(PEND)}catch(e){}}
+const BASE='dq.base';   /* the cloud timestamp this device last pulled or pushed: tells us if ANOTHER device has written since */
+const getBase=()=>{try{return localStorage.getItem(BASE)}catch(e){return null}};
+const setBase=t=>{try{if(t==null)localStorage.removeItem(BASE);else localStorage.setItem(BASE,String(t))}catch(e){}};
 function isPending(){try{return localStorage.getItem(PEND)==='1'}catch(e){return false}}
 function stable(o){return Array.isArray(o)?'['+o.map(stable).join(',')+']':(o&&typeof o==='object')?'{'+Object.keys(o).sort().map(k=>JSON.stringify(k)+':'+stable(o[k])).join(',')+'}':JSON.stringify(o)}
 function sig(o){const c=Object.assign({},o);delete c.ts;delete c.ver;delete c.cloudUid;return stable(c)}
@@ -2171,14 +2554,17 @@ function pushNow(force){
   if(!user||!fb||!synced||(emptyState(S)&&!force))return;
   const seq=saveSeq;
   S.cloudUid=user.uid;
-  docRef().set({data:JSON.stringify(S),ts:S.ts||Date.now()})
+  const ts=S.ts||Date.now();
+  docRef().set({data:JSON.stringify(S),ts})
     .then(()=>{
+      setBase(ts);
       if(seq===saveSeq){dirty=false;setPending(false)}   /* only "done" if nothing changed while it was uploading */
       setMsg('Saved to cloud at '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
     })
     .catch(e=>setMsg('Cloud save failed ('+(e.code||'error')+'). Your progress is still saved on this device.'));
 }
 function applyCloud(c){
+  setBase(c.ts);
   if(sig(c)===sig(S))return;                 /* identical content: nothing to do (also stops echo loops) */
   const keepLook=(!c.look&&!c.wiped&&S.look)?S.look:null;   /* never lose the hero's look because a copy came without one */
   const keepName=(!c.name&&!c.wiped&&S.name)?S.name:null;   /* same for the hero's name */
@@ -2210,7 +2596,8 @@ function onCloud(snap,first){
     /* this device made changes the cloud never got (app closed / offline): send those up instead of discarding them.
        Same for progress made before this device was ever signed in, if it is newer than the cloud copy. */
     const unsent=isPending(),adopt=!S.cloudUid&&(S.ts||0)>(c.ts||0);
-    if(!emptyState(S)&&(unsent||adopt)&&sig(c)!==sig(S)){dirty=true;pushNow();daily();setMsg('Synced');render();return}
+    const cloudSame=getBase()!=null&&getBase()===String(c.ts);   /* nobody else wrote since this device last synced */
+    if(!emptyState(S)&&((unsent&&cloudSame)||adopt)&&sig(c)!==sig(S)){dirty=true;pushNow();daily();setMsg('Synced');render();return}
     applyCloud(c);
     if(sig(c)===sig(S)){dirty=false;setPending(false)}
     daily();setMsg('Synced');render();
@@ -2228,6 +2615,7 @@ function startSync(){
     let first=true;
     unsub=docRef().onSnapshot(snap=>{
       if(!user||snap.metadata.hasPendingWrites)return;
+      if(first&&snap.metadata.fromCache){done();return}   /* not confirmed by the server yet: never treat it as the real copy */
       const f=first;first=false;
       try{onCloud(snap,f)}catch(e){console.error(e)}
       if(f)done();

@@ -1807,3 +1807,381 @@ h3:has(+#bossbox)::after{background-size:9px 100%;animation:bxmarch 1.4s linear 
 @keyframes bxmarch{to{background-position:9px 0}}
 .bxp.dead .bxst{animation:none}
 .bxk.got .px{animation:none!important}
+
+
+
+
+
+/* ---- scroll text layout v2 ----
+   header: centred rank between two diamonds, delete tucked in the corner
+   title: centred in the free space, up to 3 lines
+   rewards: one plaque split into equal columns (icon over number)
+   footer: the 7-day dots centred, and a full-width Complete bar under them (big tap target) */
+.qband{position:relative;justify-content:center;gap:4px;padding:0 14px 4px}
+.qband::before{margin-right:0}
+.qband::after{content:'';flex:none;width:6px;height:6px;border:2px solid #3a2410;background:var(--dc);transform:rotate(45deg)}
+.qrk{flex:none;max-width:100%;text-align:center;text-transform:uppercase;letter-spacing:1px;font-size:8px;font-size:clamp(7px,5cqw,9px)}
+.qband .qbtn{position:absolute;right:-4px;top:-3px;width:16px;height:16px;font-size:16px}
+
+.qname{flex:1;display:flex;align-items:center;justify-content:center;min-height:2.1em;padding:6px 0 7px;text-align:center}
+.qname span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+
+.qrw{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:0;margin:0;padding:0;
+  background:rgba(120,75,30,.13);border:2px solid rgba(90,55,15,.45);box-shadow:inset 0 2px 0 rgba(255,255,255,.25)}
+.rw{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:0;padding:3px 0 1px}
+.rw+.rw{border-left:2px dotted rgba(90,55,15,.4)}
+.rw .px{width:14px;height:14px}
+
+.qfoot{flex-direction:column;align-items:stretch;gap:6px;margin-top:7px;padding:0}
+.qfoot .qd{justify-content:center;gap:3px}
+.qfoot .dt{width:8px;height:8px;border-width:2px}
+.qfoot .qchk{width:100%;height:28px;margin:0;font:400 20px/1 var(--body);letter-spacing:.5px;color:#3a2410;text-shadow:none;white-space:nowrap}
+.qc.done .qchk{color:#fff;text-shadow:1px 1px 0 #000}
+.qc.rest .qchk{color:#7a6a4a}
+
+/* ---- scroll layout v2: size fixes (labels fit the narrow card, long titles push the card taller instead of overlapping the header) ---- */
+.qname{flex:1 0 auto;font-size:19px;font-size:clamp(18px,11cqw,26px)}
+.qname span{line-height:.95}
+.rw{font-size:15px;font-size:clamp(14px,8.5cqw,19px);padding:3px 0 2px}
+.qfoot .qchk{font-size:15px;font-size:clamp(14px,8.5cqw,19px);letter-spacing:0}
+
+
+/* ---- weekly mastery tag (under the quest title) ---- */
+.qms{align-self:center;margin:-3px 0 6px;padding:1px 6px 0;font:400 17px/1 var(--body);font-size:clamp(15px,9cqw,19px);white-space:nowrap;color:#8a5a12;background:rgba(232,185,60,.22);border:2px solid rgba(138,90,18,.5)}
+.qms.max{color:#fff;text-shadow:1px 1px 0 #000;background:#b8820f;border-color:#6e4a08}
+
+
+/* ---- shop tab ---- */
+#tab-shop>h3:first-child{margin-top:20px}
+.wallet{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px}
+.wtile{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:10px 2px 8px;background:var(--panel2);border:3px solid var(--ink);box-shadow:inset 3px 3px 0 rgba(0,0,0,.22)}
+.wtile small{font:400 8px var(--head);color:var(--muted)}
+.wtile b{font:400 14px var(--head);color:var(--text)}
+.shopnote{margin:10px 4px 0;font-size:19px}
+.shopgrid{display:grid;gap:12px}
+.sitem{display:flex;align-items:center;gap:12px;padding:12px}
+.sitem .ei{flex:none;display:grid;place-items:center;width:48px;height:48px;background:var(--panel2);border:3px solid var(--ink);box-shadow:inset 3px 3px 0 rgba(0,0,0,.22)}
+.sitem .itx{flex:1;min-width:0}
+.sitem .itx b{display:block;font:400 10px/1.5 var(--head);color:var(--gold)}
+.sitem .itx small{display:block;margin-top:3px;color:var(--muted);font-size:19px;line-height:1.05}
+.sitem .btn{flex:none;min-width:76px;min-height:44px;padding:6px 8px;font-size:10px}
+.navbtn{font-size:8px}
+
+/* ---- coins: bronze / silver / gold (1 silver = 10 bronze, 1 gold = 100 bronze) ---- */
+:root{--cg:#f2c64a;--cs:#d3dae8;--cb:#e0905a}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--cg:#8a5a08;--cs:#58637a;--cb:#8a4a1c}}
+:root[data-theme="dark"]{--cg:#f2c64a;--cs:#d3dae8;--cb:#e0905a}
+:root[data-theme="light"]{--cg:#8a5a08;--cs:#58637a;--cb:#8a4a1c}
+.coins{display:inline-flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:0 5px;white-space:nowrap}
+.cn.g{color:var(--cg)}.cn.s{color:var(--cs)}.cn.b{color:var(--cb)}
+.hero .chip b.cb{font:400 21px/1 var(--body);letter-spacing:0}
+/* pixel coin icons are 10x10: show them at whole-number scales so the pixels stay sharp */
+#gc .px.coin{width:20px;height:20px}
+.me .px.coin{width:100px;height:100px}
+.rw .px.coin{width:15px;height:15px}
+.bxk .v .px.coin{width:20px;height:20px}
+/* shop wallet: the purse (gold / silver / bronze) takes the whole top row, the other three sit under it */
+.wallet{grid-template-columns:repeat(3,minmax(0,1fr))}
+.wtile.purse{grid-column:1/-1;gap:8px}
+.wtile .prow{display:flex;justify-content:space-around;align-items:center;width:100%}
+.wtile .pc{display:flex;align-items:center;gap:8px}
+.wtile .pc .px{width:30px;height:30px}
+.wtile .pc b{font:400 26px/1 var(--body)}
+.wtile .pc.g b{color:var(--cg)}.wtile .pc.s b{color:var(--cs)}.wtile .pc.b b{color:var(--cb)}
+/* quest scroll: reward columns share the room by content, so '1g 2s' is not squeezed */
+.qrw{display:flex}
+.rw{flex:1 1 auto;white-space:nowrap}
+
+/* ---- one-off quests: a fourth tab, a fourth 'Repeats' choice, and a 'Today only' tag on the scroll ---- */
+.qtabs{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.qtab{font-size:17px}
+.diffs.rep{grid-template-columns:repeat(4,minmax(0,1fr))}
+.diffs.rep .sbtn{font-size:18px}
+@media (max-width:370px){.diffs.rep .sbtn{font-size:15px}.qtab{font-size:15px}}
+.onehint{margin:0;padding:6px 8px 4px;text-align:center;font:400 19px/1.1 var(--body);color:var(--paperink);background:rgba(58,42,24,.08);border:3px dotted rgba(58,42,24,.35)}
+.onehint[hidden]{display:none}
+.qms.once{color:#1f4f80;background:rgba(74,154,224,.2);border-color:rgba(31,79,128,.5)}
+
+/* ---- tap a scroll: quest details popup = the same pixel-art scroll as the quest cards, unrolled bigger ----
+   the paper element also carries .qcard, so it gets the scroll art (rollers top and bottom) for free; only its size and padding are set here */
+.modal.qdm{overflow-y:auto;place-items:start center}
+.card.qdet{--dc:#3a7fc2;margin:auto;width:min(94vw,370px);max-width:none;padding:0;border:0;background:none;box-shadow:none;text-align:center;color:var(--paperink);
+  filter:drop-shadow(2px 4px 0 rgba(0,0,0,.45));transform-origin:50% 0;animation:qunroll .4s steps(6) both}
+.card.qdet.closing{animation:qrollup .4s steps(6) both;pointer-events:none}   /* closing = the same unroll played backwards */
+@keyframes qunroll{from{transform:scaleY(.2);opacity:0}to{transform:none;opacity:1}}
+@keyframes qrollup{from{transform:none;opacity:1}to{transform:scaleY(.2);opacity:0}}
+.qdet.d2{--dc:#b8820f}
+.qdet.d3{--dc:#a8283a}
+.qdet .qdsc.qcard{display:block;aspect-ratio:auto;padding:18.6% 23.2% 21.5%;clip-path:none;box-shadow:none;filter:none}
+
+/* header: diamonds in the difficulty colour, ink rank, double rule */
+.qdb{display:flex;flex-direction:column;align-items:center;gap:5px;margin:0 0 8px;padding:0 0 7px;border-bottom:3px double rgba(90,55,15,.55);text-transform:uppercase;color:#2a1808}
+.qdk{display:flex;align-items:center;justify-content:center;gap:8px;font:400 16px/1 var(--head);letter-spacing:1px;text-shadow:1px 1px 0 rgba(255,240,200,.6)}
+.qdk::before,.qdk::after{content:'';flex:none;width:10px;height:10px;background:var(--dc);border:3px solid #3a2410;transform:rotate(45deg)}
+.qdd{font:400 9px/1 var(--head);letter-spacing:2px;color:var(--dc)}
+.qdet h2.qdn{margin:0 0 2px;font:400 27px/.92 var(--body);color:#2a1808;overflow-wrap:anywhere}
+.qds{margin-bottom:6px;font:400 18px/1.1 var(--body);color:#6e5a3a}
+/* status as a tilted rubber stamp */
+.qdsw{margin:0 0 9px}
+.qst{display:inline-block;padding:3px 7px 1px;font:400 9px/1.3 var(--head);letter-spacing:1px;text-transform:uppercase;border:3px solid currentColor;box-shadow:inset 0 0 0 2px rgba(255,255,255,.2);transform:rotate(-3deg)}
+.qst.st-open{color:#8a5a12}
+.qst.st-done{color:#2f7d3e;transform:rotate(-5deg)}
+.qst.st-rest{color:#7a6a4a}
+/* last 7 days */
+.qdw{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+.qdw div{display:flex;flex-direction:column;align-items:center;padding:2px 0 1px;background:rgba(58,42,24,.08);border:2px solid rgba(58,42,24,.35)}
+.qdw small{font:400 14px/1 var(--body);color:#7a6a4a}
+.qdw b{min-height:18px;font:400 19px/1 var(--body);color:#7a6a4a}
+.qdw .on{background:#2f7d3e;border-color:#1f5a2a}
+.qdw .miss{background:#a8283a;border-color:#6e1624}
+.qdw .on small,.qdw .on b,.qdw .miss small,.qdw .miss b{color:#fff4d0}
+.qdw .now{border:2px dashed #b8820f;animation:blink 1.2s steps(2) infinite}
+.qdw .now b{color:#8a5a12}
+.qdw .off{border-style:dotted;opacity:.5}
+.qdw .na{opacity:.2}
+.qdw .fut{border-style:dashed;opacity:.6}
+.qdw .tdy{position:relative;z-index:1;box-shadow:0 0 0 2px #e8b93c}   /* today's cell is ringed */
+/* numbers plaque */
+.qdg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:8px 0 0;background:rgba(120,75,30,.13);border:2px solid rgba(90,55,15,.45);box-shadow:inset 0 2px 0 rgba(255,255,255,.25)}
+.qdg div{padding:4px 0 3px}
+.qdg div+div{border-left:2px dotted rgba(90,55,15,.4)}
+.qdg b{display:block;font:400 23px/1 var(--body);color:#2a1808}
+.qdg small{display:block;margin-top:1px;font:400 6px/1 var(--head);color:#8a5a12;text-transform:uppercase}
+/* rewards plaque (2x2) */
+.qdp{display:grid;grid-template-columns:1fr 1fr;margin:6px 0 0;background:rgba(120,75,30,.13);border:2px solid rgba(90,55,15,.45);box-shadow:inset 0 2px 0 rgba(255,255,255,.25)}
+.qdc{display:flex;align-items:center;justify-content:center;gap:4px;padding:3px 2px 1px;font:400 21px/1 var(--body)}
+.qdc:nth-child(odd){border-right:2px dotted rgba(90,55,15,.4)}
+.qdc:nth-child(n+3){border-top:2px dotted rgba(90,55,15,.4)}
+.qdc .px{flex:none;width:16px;height:16px}
+.qdc .px.coin{width:15px;height:15px}
+.c-xp{color:#2a6a38}
+.c-g{color:#8a5a12}
+.c-hp{color:#a8283a}
+.c-bd{color:#4a3a6a}
+.qdq{display:inline-block;margin-top:7px;padding:1px 6px 0;font:400 18px/1.1 var(--body);color:#8a5a12;background:rgba(232,185,60,.22);border:2px solid rgba(138,90,18,.5)}
+.qdq.max{color:#fff;text-shadow:1px 1px 0 #000;background:#b8820f;border-color:#6e4a08}
+.qdy{margin-top:7px;font:400 16px/1 var(--body);color:#7a6a4a}
+/* buttons: a dark wooden Edit and an orange Close, like the board's tabs and buttons */
+.qda{display:grid;grid-template-columns:1fr;margin-top:10px}
+.qdbn{min-width:0;min-height:32px;padding:4px 4px 2px;font:400 20px/1 var(--body);color:#d9c38c;background:#2e1c0e;border:3px solid #1a0f06;cursor:pointer;box-shadow:inset 3px 3px 0 rgba(255,255,255,.12),inset -3px -3px 0 rgba(0,0,0,.35),2px 2px 0 rgba(0,0,0,.35)}
+.qdbn.pri{color:var(--acttxt);background:var(--act);border-color:var(--dark);box-shadow:inset 3px 3px 0 rgba(255,255,255,.35),inset -3px -3px 0 rgba(0,0,0,.2),2px 2px 0 rgba(0,0,0,.35)}
+.qdbn:active{transform:translate(2px,2px)}
+@media (prefers-reduced-motion:reduce){.card.qdet,.card.qdet.closing{animation:none}}
+
+
+
+
+
+/* ---- quest board redesign: iron-cornered frame, one hanging sign with the progress bar fused to it, stat slots, a timer ribbon,
+   folder tabs that open into the cork wall, and an even spacing rhythm. Only layout and look: every id and class the script uses is unchanged. ---- */
+.board{display:flex;flex-direction:column;padding:14px 14px 16px;
+  background:
+    linear-gradient(#b9c2d0,#b9c2d0) left 0 top 0/24px 6px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) left 0 top 0/6px 24px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) right 0 top 0/24px 6px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) right 0 top 0/6px 24px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) left 0 bottom 0/24px 6px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) left 0 bottom 0/6px 24px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) right 0 bottom 0/24px 6px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) right 0 bottom 0/6px 24px no-repeat,
+    var(--wood)}
+body[data-tab="quests"] .board,.board{box-shadow:4px 4px 0 var(--ink),0 18px 46px -8px rgba(255,120,30,.4),inset 0 0 0 3px #3a2410,inset 3px 3px 0 3px rgba(255,255,255,.1),inset -3px -3px 0 3px rgba(0,0,0,.3),inset 0 -22px 26px -18px rgba(255,120,30,.28)}
+.board>*{flex:none}
+
+/* 1. the sign: title on the left, a dark plaque with the count on the right, rivets at both ends */
+.board .today{order:1;position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0;padding:13px 14px 11px 20px;
+  background:
+    radial-gradient(circle 3px at 9px 50%,#b9c2d0 92%,transparent),
+    radial-gradient(circle 3px at calc(100% - 9px) 50%,#b9c2d0 92%,transparent),
+    repeating-linear-gradient(90deg,transparent 0 22px,rgba(0,0,0,.25) 22px 24px),
+    linear-gradient(#7a5028,#563518);
+  border:3px solid #1a0f06;border-bottom:0;box-shadow:inset 0 3px 0 rgba(255,220,160,.24)}
+.board .today h2{margin:0;font-size:13px;letter-spacing:1px}
+.board .today span{flex:none;padding:3px 10px 1px;background:#1a0f06;color:var(--gold);border:3px solid #0d0a09;box-shadow:inset 0 0 0 2px #5a3a1a;font:400 22px/1 var(--body);white-space:nowrap}
+
+/* 2. progress bar: fused to the bottom of the sign so the two read as one piece */
+.board .dbar{order:2;margin:0 0 14px;height:18px;border:3px solid #1a0f06;background:#1a0f06}
+
+/* 3. what is left today: three dark slots with coloured numbers */
+.board .bsum{order:3;gap:8px;margin:0 0 12px}
+.board .bs{gap:3px;padding:8px 2px 5px;background:linear-gradient(180deg,#34200f,#241508);color:#b39f7f;border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(0,0,0,.35),inset 0 -2px 0 rgba(255,225,160,.08)}
+.board .bs::before{display:none}
+.board .bs small{color:#b39f7f;font-size:7.5px}
+.board .bs b{font-size:23px;color:#f0e2c0}
+.board .bs:nth-child(2) b{color:#8de08d}
+.board .bs:nth-child(3) b{color:#f2c64a}
+
+/* 4. timer: a ribbon with an accent edge, red and blinking when the day is nearly over */
+.board .timer{order:4;margin:0 0 14px;padding:8px 12px 6px 14px;background:linear-gradient(180deg,#2e1c0e,#241508);color:#f0e2c0;border:3px solid #1a0f06;border-left:7px solid var(--act);font-size:20px;line-height:1.1;text-align:left;box-shadow:inset 0 3px 0 rgba(0,0,0,.3)}
+.board .timer.warn{color:#ffd0c0;border-left-color:#c9302c}
+
+/* 5. folder tabs: the picked one is raised and made of the same cork as the wall below it, so it opens straight into it */
+.board .qtabs{order:5;position:relative;z-index:3;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:end;gap:4px;margin:0 6px -4px}
+.board .qtab{min-height:32px;margin-top:6px;padding:6px 2px 3px;background:#2e1c0e;color:#c9b27c;border:3px solid #1a0f06;border-bottom:4px solid #1a0f06;font:400 19px/1 var(--body);box-shadow:inset 3px 3px 0 rgba(255,255,255,.08)}
+.board .qtab.on{margin-top:0;min-height:40px;background:#b38a55;color:#2a1808;border-bottom-color:transparent;box-shadow:inset 3px 3px 0 rgba(255,255,255,.28),inset -3px 0 0 rgba(0,0,0,.12)}
+
+/* 6. the cork wall, with a little more room around the scrolls */
+.board .cork{order:6;padding:26px 14px 18px;box-shadow:inset 4px 4px 0 rgba(0,0,0,.4),inset -2px -2px 0 rgba(255,255,255,.12),inset 0 0 0 3px #7a5230,inset 0 0 40px rgba(60,30,5,.3)}
+.board ul{gap:24px 14px;min-height:110px}
+
+/* ---- board header polish: the title stays on one line, the plaque is a little tighter, and the progress bar is a clear track with notches (it was a dark strip that blended into the sign) ---- */
+.board .today{padding:11px 12px 9px 20px}
+.board .today h2{flex:1;min-width:0;white-space:nowrap;font-size:12px;letter-spacing:.5px}
+.board .today span{padding:3px 8px 1px;font-size:20px}
+.board .dbar{height:16px;background:#4a2e18;box-shadow:inset 0 3px 0 rgba(0,0,0,.45),inset 0 -2px 0 rgba(255,225,160,.14)}
+.board .dbar::after{background:repeating-linear-gradient(90deg,transparent 0 11px,rgba(0,0,0,.38) 11px 13px)}
+.board .dbar i{box-shadow:inset 0 4px 0 rgba(255,255,255,.28),inset 0 -4px 0 rgba(0,0,0,.22)}
+
+/* ---- post-a-quest, wooden desk version ----
+   closed: a plank like the board's hanging sign (rivets, gold lettering, dark plaque with a +)
+   open: the plank stays as the header and a dark inset panel drops below it, with small labelled rows and a light name field */
+#add{margin:22px 0 4px;color:#f0e2c0;
+  background:
+    radial-gradient(circle 3px at 9px 28px,#b9c2d0 92%,transparent),
+    radial-gradient(circle 3px at calc(100% - 9px) 28px,#b9c2d0 92%,transparent),
+    repeating-linear-gradient(90deg,transparent 0 22px,rgba(0,0,0,.25) 22px 24px),
+    linear-gradient(#7a5028,#563518);
+  border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.24),3px 5px 0 rgba(0,0,0,.45)}
+#add::after{display:none}
+#add .newq-toggle{min-height:56px;padding:10px 14px 10px 22px;color:var(--gold);font-size:11px;letter-spacing:1px;text-shadow:2px 2px 0 #000}
+#add .newq-toggle .plus{width:34px;height:34px;background:#1a0f06;color:var(--gold);border:3px solid #0d0a09;box-shadow:inset 0 0 0 2px #5a3a1a;font-size:18px}
+#add .newq-body{gap:12px;margin:0 8px 10px;padding:12px 10px 12px;background:linear-gradient(#34200f,#241508);border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(0,0,0,.4),inset 0 -2px 0 rgba(255,225,160,.08)}
+
+/* rows: a small label over each control */
+.nf{display:grid;gap:6px;min-width:0}
+.nl{display:block;font:400 9px/1.2 var(--head);color:#b39f7f;text-transform:uppercase;letter-spacing:.5px}
+.nl::after{display:none}
+#add #newname{flex:none;width:100%;min-width:0;min-height:46px;padding:8px 10px;font-size:22px;background:#f2e6bf;color:#2a1808;border:3px solid #1a0f06;box-shadow:inset 3px 3px 0 rgba(0,0,0,.14)}
+#add #newname::placeholder{color:#8a7a58;opacity:1}
+
+/* difficulty and repeats: dark segmented controls; the picked segment lights up (difficulty in its own colour, repeats in orange) */
+#add .diffs{gap:0}
+#add .diffs .dbtn,#add .diffs .sbtn{flex-direction:row;gap:6px;min-height:42px;margin:0;padding:3px 2px 0;background:#3a2412;color:#d9c38c;border:3px solid #1a0f06;box-shadow:inset 3px 3px 0 rgba(255,255,255,.07);font:400 19px/1 var(--body);transform:none}
+#add .diffs .dbtn+.dbtn,#add .diffs .sbtn+.sbtn{margin-left:-3px}
+#add .diffs.rep .sbtn{font-size:16px}
+#add .diffs .dbtn{--dc:#4a9ae0}
+#add .diffs .dbtn[data-v="20"]{--dc:#e8b93c}
+#add .diffs .dbtn[data-v="40"]{--dc:#d9473f}
+#add .diffs .dbtn .st{font:400 13px/1 var(--body);color:var(--dc);letter-spacing:0}
+#add .diffs .dbtn.on{position:relative;z-index:1;background:var(--dc);color:#fff;box-shadow:inset 3px 3px 0 rgba(255,255,255,.3),inset -3px -3px 0 rgba(0,0,0,.25)}
+#add .diffs .dbtn.on .st{color:inherit}
+#add .diffs .dbtn.on[data-v="20"]{color:#2a1d00}
+#add .diffs .sbtn.on{position:relative;z-index:1;background:var(--act);color:var(--acttxt);box-shadow:inset 3px 3px 0 rgba(255,255,255,.35),inset -3px -3px 0 rgba(0,0,0,.2)}
+
+/* weekday squares: green = the quest is on that day */
+#add .dayrow{gap:3px}
+#add .dbt{min-height:36px;margin:0;background:#3a2412;color:#d9c38c;border:3px solid #1a0f06;box-shadow:inset 3px 3px 0 rgba(255,255,255,.07);font:400 16px/1 var(--body)}
+#add .dbt+.dbt{margin-left:0}
+#add .dbt.on{background:#2f7d3e;color:#fff;text-shadow:1px 1px 0 #000;box-shadow:inset 3px 3px 0 rgba(255,255,255,.3),inset -3px -3px 0 rgba(0,0,0,.25)}
+#add .onehint{color:#d9c38c;background:rgba(0,0,0,.25);border:3px dotted rgba(255,225,160,.25)}
+
+/* reward chips on a dark ground */
+#add .npv{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:0;background:none;border:0}
+#add .npv .pc{padding:4px 8px 2px;background:#1a0f06;border:2px solid #3a2412;font:400 19px/1 var(--body);color:#b39f7f}
+#add .npv b{font-weight:400}
+#add .npv .dx{color:#8de08d}
+#add .npv .dg{color:#f2c64a}
+#add .npv .dh{color:#ff8a7a}
+#add .nsub{margin-top:0;min-height:50px;font-size:12px}
+
+/* ---------- hero showcase v2: gear arc with glowing links, armory mounts, try-on preview, rarity aura ---------- */
+:root{--good:#58b368;--bad:#e0584a}
+.stage .scol{gap:10px;align-self:stretch;align-content:space-evenly}
+.stage .scol .eslot{translate:0 0}
+#scol-l .eslot:nth-child(1){translate:8px 0}
+#scol-l .eslot:nth-child(2){translate:-3px 0}
+#scol-l .eslot:nth-child(3){translate:8px 0}
+#scol-r .eslot:nth-child(1){translate:-8px 0}
+#scol-r .eslot:nth-child(2){translate:3px 0}
+#scol-r .eslot:nth-child(3){translate:-8px 0}
+.slotrow:empty{display:none}
+/* wall mount: wood plank, iron hook, item hanging from it, LED strip in the rarity colour */
+.stage .eslot{min-height:84px;padding:12px 3px 9px;overflow:visible;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 40%),repeating-linear-gradient(90deg,#5a3d28 0 6px,#4e3322 6px 7px);
+  box-shadow:3px 3px 0 var(--ink),inset 0 0 0 2px rgba(0,0,0,.25)}
+:root[data-theme="light"] .stage .eslot{background:linear-gradient(180deg,rgba(255,255,255,.18),transparent 40%),repeating-linear-gradient(90deg,#b08a5a 0 6px,#a37f50 6px 7px)}
+.stage .eslot .ek{color:#f0e2c0;text-shadow:1px 1px 0 var(--ink)}
+.stage .eslot small{color:#f0e2c0;font-size:15px;text-shadow:1px 1px 0 var(--ink)}
+.stage .eslot::after{content:'';position:absolute;left:6px;right:6px;bottom:3px;height:3px;background:var(--rar);box-shadow:0 0 6px var(--rar);z-index:1}
+.stage .eslot.base::after{background:rgba(255,255,255,.18);box-shadow:none}
+.eslot>.hook{position:absolute;top:-5px;left:50%;width:10px;height:10px;margin-left:-5px;border:3px solid #9aa3ad;border-bottom-color:transparent;border-radius:50%;background:none;z-index:2}
+.eslot .ei{transform-origin:50% -6px;animation:mountsway 3.2s ease-in-out infinite}
+.eslot.base .ei{animation:none}
+.eslot:nth-child(2) .ei{animation-delay:-1s}.eslot:nth-child(3) .ei{animation-delay:-2s}
+@keyframes mountsway{0%,100%{rotate:-2.5deg}50%{rotate:2.5deg}}
+.eslot.try{border-style:dashed;outline:3px dashed var(--gold);outline-offset:2px}
+.eslot .tryb{position:absolute;top:-10px;left:-6px;z-index:3;background:var(--gold);color:var(--goldtxt);font:400 8px var(--head);font-style:normal;padding:3px 4px;border:3px solid var(--ink)}
+.eslot.flash{animation:slotflash .8s ease-out}
+@keyframes slotflash{0%{filter:brightness(2.4);scale:1.1}100%{filter:none;scale:1}}
+/* links: one curve per slot to the part of the hero it belongs to */
+.stage .links{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible}
+.lk{fill:none;stroke:var(--c);stroke-width:2;opacity:.6;filter:drop-shadow(0 0 3px var(--c))}
+.lk.off{stroke:rgba(255,255,255,.75);stroke-dasharray:3 5;stroke-width:1.5;opacity:.5;filter:drop-shadow(0 0 1px rgba(0,0,0,.6))}
+.lk.try{stroke-dasharray:6 4}
+.lk.fl{stroke:#fff;stroke-width:1.5;stroke-dasharray:3 16;opacity:.85;filter:none;animation:lkflow 1.4s linear infinite}
+.ld{fill:var(--c);filter:drop-shadow(0 0 4px var(--c))}
+.ld.off{opacity:.45;filter:none}
+@keyframes lkflow{to{stroke-dashoffset:-19}}
+/* rarity aura */
+.stage .aura{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.stage:not([data-at="0"]):not([data-at=""]){--gl:color-mix(in srgb,var(--aura) 50%,transparent);border-color:color-mix(in srgb,var(--aura) 65%,var(--ink))}
+.stage:not([data-at="0"]):not([data-at=""]) .figure::after{border-color:color-mix(in srgb,var(--aura) 80%,#fff);box-shadow:0 0 16px var(--aura),inset 0 0 14px var(--aura)}
+.stage[data-at="3"],.stage[data-at="4"]{box-shadow:0 0 14px color-mix(in srgb,var(--aura) 60%,transparent)}
+.stage[data-at="4"]{animation:uniqborder 3s linear infinite}
+@keyframes uniqborder{0%{border-color:#ff4fd8}25%{border-color:#ffd75a}50%{border-color:#4affb0}75%{border-color:#4a9aff}100%{border-color:#ff4fd8}}
+.ap{position:absolute;bottom:-6px;width:4px;height:4px;background:var(--aura);box-shadow:0 0 6px var(--aura);opacity:0;animation:aprise var(--t,3s) var(--d,0s) linear infinite}
+.ap.em{background:#ffb04a;box-shadow:0 0 6px #ff6a1a}
+@keyframes aprise{0%{opacity:0;translate:0 0}15%{opacity:1}100%{opacity:0;translate:var(--x,0) -220px}}
+/* try-on */
+.figure.tryon .px{opacity:.82;filter:drop-shadow(0 0 5px var(--gold))}
+.figure.wfx .px{animation:wearflash .85s ease-out}
+@keyframes wearflash{0%{filter:brightness(3) drop-shadow(0 0 12px #fff)}100%{filter:none}}
+.stage .trytag{position:absolute;bottom:5px;left:50%;translate:-50% 0;z-index:3;max-width:60%;padding:3px 7px;background:var(--gold);color:var(--goldtxt);border:3px solid var(--ink);font:400 8px var(--head);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stage .trytag[hidden]{display:none}
+.tdelta{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.dc{font:400 17px/1 var(--body);padding:2px 5px;border:2px solid var(--ink);background:var(--panel)}
+.dc.up{color:var(--good)}.dc.dn{color:var(--bad)}
+.stat{position:relative}
+.stat .dl{position:absolute;top:-9px;right:-4px;padding:2px 4px;border:2px solid var(--ink);font:400 8px var(--head);font-style:normal;color:#fff}
+.stat .dl.up{background:#2f7d3e}.stat .dl.dn{background:#b8283a}
+
+
+/* ---- one shared ground line: hero feet, floor ring, contact shadow and companion paws all stand on it ---- */
+.stage{--g:16px}   /* height of the ground line above the stage's bottom padding */
+
+/* hero: the canvas ends exactly at its feet, and sits on the ground line */
+.stage .figure{align-self:end;padding:8px 0 0;margin-bottom:var(--g)}
+.stage .figure::before{bottom:-11px;height:22px}   /* contact shadow centred on the feet */
+.stage .figure::after{bottom:-16px;height:32px}    /* floor ring centred on the feet (your avatar's ring) */
+
+/* companion: paws on the same line, whatever its size (8px = the stage's bottom padding) */
+.stage .fpet,
+.stage .fpet.big{bottom:calc(8px + var(--g) - 4px)}   /* these sprites have a few transparent rows under the feet */
+/* small companions (Fire Wolf Cub) stand IN FRONT of the hero: their paws are 14px lower on the floor than the hero's feet, so they read as closer to the viewer */
+.stage .fpet.solid{bottom:calc(8px + var(--g) - 18px);   /* hero feet are at 8px + --g; raise the 18px to bring the pup further forward, lower it to bring it back */
+  left:max(calc(var(--cw) - 16px),calc(50% - .5 * var(--S) - .5 * var(--hw)))}   /* a little left of centre, so it overlaps the hero's legs but doesn't hide them */
+.sprite.pet.solid{left:calc(10% + 45px - .5 * var(--aw) - 42px);bottom:12px}   /* same in the Realm arena: lower on the ground than the hero (hero bottom is 32px) */
+
+/* Fire Wolf Cub: a dark, tight contact shadow BEHIND the sprite (z-index:-1), so the paws overlap it and read as touching the ground */
+.stage .fpet.solid::after{z-index:-1;left:12%;right:4%;bottom:-5px;height:15px;
+  background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,.8) 0,rgba(0,0,0,.5) 42%,transparent 72%)}   /* plain dark shadow, no orange glow (that was the ring) */
+
+/* remove the dotted / glowing link lines between the gear boxes and the hero */
+.stage .links{display:none}
+
+/* ---- check-in: "did you finish these?" ---- */
+.card.rv{text-align:left;max-height:88vh;display:flex;flex-direction:column;gap:10px}
+.card.rv h2{margin:0;text-align:center}
+.card.rv p{margin:0;text-align:center;font-size:.85em;opacity:.85}
+.rvlist{overflow-y:auto;display:flex;flex-direction:column;gap:6px;min-height:0;padding:2px}
+.rvday{margin-top:6px;font-size:.78em;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+.rvrow{display:flex;align-items:center;gap:10px;width:100%;padding:10px;text-align:left;font:inherit;color:inherit;
+  background:rgba(0,0,0,.28);border:2px solid var(--ink);cursor:pointer}
+.rvrow.on{border-color:var(--act);background:rgba(255,255,255,.1)}
+.rvchk{flex:none;width:22px;height:22px;display:grid;place-items:center;border:2px solid var(--ink);background:rgba(0,0,0,.35);font-weight:700}
+.rvrow.on .rvchk{background:var(--act);color:var(--ink)}
+.rvname{flex:1;min-width:0;overflow-wrap:anywhere}
+.rvrow.on .rvname{text-decoration:line-through;opacity:.7}
+.rvhp{flex:none;font-size:.8em;color:#ff7a7a}
+.rvrow.on .rvhp{visibility:hidden}
+.card.rv .stack{margin-top:4px}
