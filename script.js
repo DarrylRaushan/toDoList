@@ -4,17 +4,80 @@ let synced=false,dirty=false,cloudOff=false,retryT=null,saveSeq=0;   /* synced =
 const BONUS=25;
 const RANKS=[['Peasant','🌾'],['Commoner','🧺'],['Wayfarer','🥾'],['Journeyman','🎒'],['Adventurer','🧭']];   /* ranks 1-5 are the same for every future class; at level 5 you are an Adventurer until you pick a class */
 const rk=lv=>RANKS[Math.min(lv-1,4)];
+/* ---- honours: c = category, t = tier (0 bronze, 1 silver, 2 gold, 3 legend), m = the stat it counts, v = the goal for that stat ---- */
+const HCATS=[['q','Quests','📜'],['s','Streaks','🔥'],['l','Levels','🏆'],['h','Hero','🛡️'],['b','Battle','⚔️']];
+const HTIER=['Bronze','Silver','Gold','Legend'];
 const BADGES=[
-  {id:'first',e:'🌱',n:'First step',d:'Finish a quest'},
-  {id:'perfect',e:'⭐',n:'Perfect day',d:'Finish all quests'},
-  {id:'s3',e:'🔥',n:'On fire',d:'3-day streak'},
-  {id:'s7',e:'⚡',n:'Unstoppable',d:'7-day streak'},
-  {id:'s30',e:'👑',n:'Legend',d:'30-day streak'},
-  {id:'l5',e:'🛡️',n:'Veteran',d:'Reach level 5'},
-  {id:'l10',e:'🐉',n:'Dragon slayer',d:'Reach level 10'},
-  {id:'l25',e:'🏆',n:'Champion',d:'Reach level 25'},
-  {id:'l50',e:'🌟',n:'Mythic',d:'Reach level 50'},
-  {id:'l100',e:'💫',n:'Eternal',d:'Reach level 100'}
+  /* quests */
+  {id:'first',c:'q',t:0,e:'🌱',n:'First step',d:'Finish a quest',m:'done',v:1},
+  {id:'dn10',c:'q',t:0,e:'📜',n:'Task taker',d:'Finish 10 quests',m:'done',v:10},
+  {id:'dn50',c:'q',t:1,e:'🗒️',n:'Diligent',d:'Finish 50 quests',m:'done',v:50},
+  {id:'dn100',c:'q',t:1,e:'💯',n:'Centurion',d:'Finish 100 quests',m:'done',v:100},
+  {id:'dn250',c:'q',t:2,e:'🏹',n:'Quest hunter',d:'Finish 250 quests',m:'done',v:250},
+  {id:'dn500',c:'q',t:2,e:'🎯',n:'Relentless',d:'Finish 500 quests',m:'done',v:500},
+  {id:'dn1000',c:'q',t:3,e:'🏛️',n:'Living legend',d:'Finish 1000 quests',m:'done',v:1000},
+  {id:'perfect',c:'q',t:0,e:'⭐',n:'Perfect day',d:'Finish all quests in a day',m:'perf',v:1},
+  {id:'pf5',c:'q',t:0,e:'✨',n:'Five flawless',d:'5 perfect days',m:'perf',v:5},
+  {id:'pf10',c:'q',t:1,e:'🎖️',n:'Spotless',d:'10 perfect days',m:'perf',v:10},
+  {id:'pf25',c:'q',t:2,e:'🏅',n:'Immaculate',d:'25 perfect days',m:'perf',v:25},
+  {id:'pf50',c:'q',t:3,e:'🥇',n:'Flawless victor',d:'50 perfect days',m:'perf',v:50},
+  {id:'tk5',c:'q',t:0,e:'📋',n:'Planner',d:'Have 5 quests on your board',m:'tasks',v:5},
+  {id:'tk10',c:'q',t:1,e:'🗂️',n:'Taskmaster',d:'Have 10 quests on your board',m:'tasks',v:10},
+  {id:'hd25',c:'q',t:1,e:'💪',n:'Heavy lifter',d:'Finish 25 hard quests',m:'hard',v:25},
+  {id:'hd100',c:'q',t:2,e:'🏋️',n:'Titan',d:'Finish 100 hard quests',m:'hard',v:100},
+  /* streaks */
+  {id:'s3',c:'s',t:0,e:'🔥',n:'On fire',d:'3-day streak',m:'str',v:3},
+  {id:'s7',c:'s',t:1,e:'⚡',n:'Unstoppable',d:'7-day streak',m:'str',v:7},
+  {id:'s14',c:'s',t:1,e:'🌪️',n:'Fortnight',d:'14-day streak',m:'str',v:14},
+  {id:'s30',c:'s',t:2,e:'👑',n:'Legend',d:'30-day streak',m:'str',v:30},
+  {id:'s60',c:'s',t:2,e:'🌋',n:'Eruption',d:'60-day streak',m:'str',v:60},
+  {id:'s100',c:'s',t:3,e:'☄️',n:'Comet',d:'100-day streak',m:'str',v:100},
+  {id:'s365',c:'s',t:3,e:'🌞',n:'Year of glory',d:'365-day streak',m:'str',v:365},
+  {id:'qs7',c:'s',t:0,e:'🔁',n:'Creature of habit',d:'Finish one quest 7 days in a row',m:'qs',v:7},
+  {id:'qs30',c:'s',t:2,e:'⛓️',n:'Iron habit',d:'Finish one quest 30 days in a row',m:'qs',v:30},
+  {id:'fz1',c:'s',t:0,e:'🧊',n:'Safety net',d:'Hold a Streak Freeze',m:'frz',v:1},
+  {id:'fz3',c:'s',t:1,e:'❄️',n:'Cold storage',d:'Hold 3 Streak Freezes',m:'frz',v:3},
+  /* levels */
+  {id:'l3',c:'l',t:0,e:'🧭',n:'Getting started',d:'Reach level 3',m:'lv',v:3},
+  {id:'l5',c:'l',t:0,e:'🛡️',n:'Veteran',d:'Reach level 5',m:'lv',v:5},
+  {id:'l10',c:'l',t:1,e:'🐉',n:'Dragon slayer',d:'Reach level 10',m:'lv',v:10},
+  {id:'l15',c:'l',t:1,e:'🗡️',n:'Seasoned',d:'Reach level 15',m:'lv',v:15},
+  {id:'l25',c:'l',t:2,e:'🏆',n:'Champion',d:'Reach level 25',m:'lv',v:25},
+  {id:'l50',c:'l',t:3,e:'🌟',n:'Mythic',d:'Reach level 50',m:'lv',v:50},
+  {id:'l75',c:'l',t:3,e:'🌠',n:'Ascendant',d:'Reach level 75',m:'lv',v:75},
+  {id:'l100',c:'l',t:3,e:'💫',n:'Eternal',d:'Reach level 100',m:'lv',v:100},
+  /* hero */
+  {id:'cls',c:'h',t:0,e:'🎓',n:'Chosen path',d:'Pick a class',m:'cls',v:1},
+  {id:'sub',c:'h',t:1,e:'🔱',n:'Specialist',d:'Pick a subclass',m:'sub',v:1},
+  {id:'wn3',c:'h',t:0,e:'🧥',n:'Dressed for it',d:'Wear 3 pieces of gear',m:'wn',v:3},
+  {id:'wn6',c:'h',t:2,e:'🎽',n:'Fully kitted',d:'Fill all 6 gear slots',m:'wn',v:6},
+  {id:'pt1',c:'h',t:0,e:'🐾',n:'Not alone',d:'Own a companion',m:'pets',v:1},
+  {id:'pt3',c:'h',t:1,e:'🦊',n:'Menagerie',d:'Own 3 companions',m:'pets',v:3},
+  {id:'pl5',c:'h',t:1,e:'🐣',n:'Growing bond',d:'Raise a companion to level 10',m:'plv',v:10},
+  {id:'pr3',c:'h',t:1,e:'🐺',n:'Fine company',d:'Own a Rare or better companion',m:'prar',v:3},
+  {id:'pl10',c:'h',t:2,e:'🦅',n:'Best friends',d:'Raise a companion to level 30',m:'plv',v:30},
+  {id:'pr5',c:'h',t:2,e:'🐲',n:'Mythic mount',d:'Own a Legendary companion',m:'prar',v:6},
+  {id:'iv10',c:'h',t:0,e:'🎒',n:'Pack rat',d:'Own 10 items',m:'inv',v:10},
+  {id:'iv25',c:'h',t:1,e:'📦',n:'Collector',d:'Own 25 items',m:'inv',v:25},
+  {id:'gd100',c:'h',t:1,e:'💰',n:'Well off',d:'Hold 100 gold',m:'gold',v:10000},
+  {id:'gd1000',c:'h',t:2,e:'🏦',n:'Dragon hoard',d:'Hold 1000 gold',m:'gold',v:100000},
+  {id:'gm10',c:'h',t:1,e:'💎',n:'Gem keeper',d:'Hold 10 gems',m:'gems',v:10},
+  {id:'gm25',c:'h',t:2,e:'🔮',n:'Gem hoarder',d:'Hold 25 gems',m:'gems',v:25},
+  /* battle and loot */
+  {id:'bk1',c:'b',t:0,e:'⚔️',n:'Boss slayer',d:'Defeat a weekly boss',m:'kills',v:1},
+  {id:'bk5',c:'b',t:1,e:'🩸',n:'Bane of bosses',d:'Defeat 5 bosses',m:'kills',v:5},
+  {id:'bk10',c:'b',t:2,e:'👹',n:'Giant killer',d:'Defeat 10 bosses',m:'kills',v:10},
+  {id:'bk25',c:'b',t:3,e:'🏰',n:'Realm warden',d:'Defeat 25 bosses',m:'kills',v:25},
+  {id:'ch1',c:'b',t:0,e:'🎁',n:'Treasure hunter',d:'Open a chest',m:'chs',v:1},
+  {id:'ch10',c:'b',t:1,e:'🗝️',n:'Locksmith',d:'Open 10 chests',m:'chs',v:10},
+  {id:'ch50',c:'b',t:2,e:'🏴',n:'Plunderer',d:'Open 50 chests',m:'chs',v:50},
+  {id:'rr2',c:'b',t:0,e:'🔷',n:'Rare find',d:'Own loot of Rare quality or better',m:'rar',v:3},
+  {id:'rr4',c:'b',t:1,e:'🟣',n:'Epic find',d:'Own loot of Epic quality or better',m:'rar',v:5},
+  {id:'rr5',c:'b',t:2,e:'🟠',n:'Legendary find',d:'Own Legendary loot',m:'rar',v:6},
+  {id:'rr6',c:'b',t:3,e:'🌌',n:'Mythical find',d:'Own Mythical loot',m:'rar',v:7},
+  {id:'uq1',c:'b',t:2,e:'🏺',n:'One of a kind',d:'Own a unique item',m:'uniq',v:1},
+  {id:'fl1',c:'b',t:0,e:'💀',n:'Fell in battle',d:'Be knocked out once',m:'fell',v:1},
+  {id:'fl5',c:'b',t:1,e:'☠️',n:'Stubborn',d:'Be knocked out 5 times',m:'fell',v:5}
 ];
 const need=l=>Math.round(50*l*(l-1)*(1+.04*Math.max(0,l-2)));   /* total XP for level l: each level takes longer than the last */
 let TR=0,QT='any',ADDOPEN=false,addTouched=false;   /* ADDOPEN = the new-quest note on the board is expanded */   /* QT = selected tab on the quest board */
@@ -28,8 +91,10 @@ const PEN={10:1,20:3,40:5};                          /* HP lost per missed quest
 const penBase=xp=>PEN[xp]||Math.max(1,Math.round(xp/8));
 const penalty=xp=>Math.max(1,Math.round(penBase(xp)*lscale(levelOf(S.xp))*dmgMult()*(hasSub('berserker')?1.25:1)));
 const firstMult=first=>first&&hasSub('shadowblade')?1+.6*cm():1;   /* Shadowblade: first quest of the day */
-const xpGain=(xp,first,t)=>Math.round(xp*lscale(levelOf(S.xp))*mult()*firstMult(first)*masteryMult(t));   /* t = the quest (optional): adds its weekly mastery bonus */
-const goldGain=(t,first)=>Math.round(t.xp/2*goldMult()*firstMult(first)*masteryMult(t));
+const pathMult=t=>hasSub('pathfinder')&&t&&tabOf(t)!=='all'?1+.3*cm():1;   /* Pathfinder: quests that are not every-day */
+const shotMult=t=>hasSub('sharpshooter')&&t.xp>=40?1+.4*cm():1;   /* Sharpshooter: coins from hard quests */
+const xpGain=(xp,first,t)=>Math.round(xp*lscale(levelOf(S.xp))*mult()*firstMult(first)*masteryMult(t)*pathMult(t));   /* t = the quest (optional): adds its weekly mastery bonus */
+const goldGain=(t,first)=>Math.round(t.xp/2*goldMult()*firstMult(first)*masteryMult(t)*pathMult(t)*shotMult(t));
 const lvBonus=()=>levelOf(S.xp)-1;                   /* levels above 1: every level adds +2% XP, +2% gold, -1% damage taken */
 function levelOf(xp){let l=1;while(xp>=need(l+1))l++;return l}
 const pad=n=>String(n).padStart(2,'0');
@@ -1081,7 +1146,6 @@ function initDevAvatar(){
 }
 function initCreator(){
   initDevAvatar();
-  $('editchar').onclick=()=>openCreator(false);
   $('ccancel').onclick=closeCreator;
   $('crand').onclick=()=>{const rids=Object.keys(RACES),rc=rids[Math.floor(Math.random()*rids.length)],R0=RACES[rc];applyRace(CK,rc);Object.keys(OPT).forEach(k=>{
     if(k==='sex'||k==='race')return;
@@ -1103,10 +1167,13 @@ const OLD2NEW=[0,1,2,4,5,6];                 /* old 6-tier saves -> new rarity i
 const PETS={wolfpup:{e:'pet:wolfpup',n:'Fire Wolf Cub',sm:1,px:49,fire:1},sprite:{e:'🧚',n:'Sprite'},imp:{e:'😈',n:'Imp'},goblin:{e:'👺',n:'Goblin'},unicorn:{e:'🦄',n:'Unicorn'},golem:{e:'🗿',n:'Golem'},genie:{e:'🧞',n:'Genie'},troll:{e:'🧌',n:'Troll'},drake:{e:'🐲',n:'Drake'},dragon:{e:'🐉',n:'Dragon'},wendigo:{e:'pet:wendigo',n:'Wendigo',still:1}};
 const PETMAP={cat:'imp',frog:'goblin',bunny:'sprite',turtle:'golem',bat:'wolfpup',wisp:'wolfpup',cinderpup:'wolfpup',owl:'genie',fox:'drake',wolf:'troll',duck:'sprite'};   /* old real-animal companions in saves become fantasy ones */
 /* companion levels: a worn companion earns XP from every quest you finish (and loses it if you undo the quest); stronger and bigger each level */
-const PMAX=20,BIG_LV=8;                                   /* from BIG_LV on it is big enough to stand behind the hero instead of beside it */
+const PMAX=60,BIG_LV=8;                                   /* from BIG_LV on it is big enough to stand behind the hero instead of beside it */
 const pneed=l=>40*(l-1)*l;                                /* total companion XP for level l */
-const plv=it=>{const x=it&&it.ce||0;let l=1;while(l<PMAX&&x>=pneed(l+1))l++;return l};
-const psize=l=>l<BIG_LV?34+7.5*(l-1):130+10*(l-BIG_LV);   /* sprite size in px: Lv 1 = 34, Lv 7 = 79, Lv 8 = 130, Lv 20 = 250 (taller than the hero) */
+const PBASE=[1,5,10,15,20,25,35,45];                         /* a companion starts at a level set by its rarity (Common 1 ... Legendary 25 ... Unique 45) and still levels up from quests */
+const pbase=it=>PBASE[Math.min(7,Math.max(0,it&&it.r|0))];
+const ptot=it=>(it&&it.ce||0)+pneed(pbase(it));            /* total companion XP, counting the starting level */
+const plv=it=>{const x=ptot(it);let l=1;while(l<PMAX&&x>=pneed(l+1))l++;return l};
+const psize=l=>l<BIG_LV?34+7.5*(l-1):Math.min(250,130+10*(l-BIG_LV));   /* sprite size in px: Lv 1 = 34, Lv 7 = 79, Lv 8 = 130, Lv 20 = 250 (taller than the hero) */
 const vlv=(k,l)=>PETS[k]&&PETS[k].sm?Math.min(l,BIG_LV-1):l;   /* look level: small companions (sm) stay in their small form forever; their bonuses still grow */
 const psz=(k,l)=>{const p=PETS[k]&&PETS[k].px;return p?Math.max(2,Math.round(psize(l)/p))*p:psize(l)};   /* pixel-art companions (px = native size) only grow in whole-number zooms so their pixels stay sharp */
 const pres=l=>l>=14?64:l>=BIG_LV?48:32;                   /* sprite resolution: bigger companions get more detail */
@@ -1401,14 +1468,15 @@ const CLS={
   mage:{e:'🔮',n:['Mage','Wizard','Sorcerer','Magister','Archmage','Archon'],d:'+15% XP'},
   rogue:{e:'🗡️',n:['Rogue','Thief','Trickster','Assassin','Shadowblade','Phantom'],d:'+20% coins'},
   druid:{e:'🌿',n:['Druid','Warden','Shaman','Hierophant','Archdruid','Wildheart'],d:'Double healing on perfect days'},
-  bard:{e:'🎻',n:['Bard','Minstrel','Troubadour','Maestro','Virtuoso','Songweaver'],d:'Stronger streak bonus'}
+  bard:{e:'🎻',n:['Bard','Minstrel','Troubadour','Maestro','Virtuoso','Songweaver'],d:'Stronger streak bonus'},
+  ranger:{e:'🏹',n:['Ranger','Tracker','Forester','Huntsman','Stalker','Deadeye'],d:'Bonus boss damage'}
 };
 const BOSSES=[['Goblin King','👹'],['Bog Troll','👺'],['Shadow Wraith','👻'],['Stone Golem','🗿'],['Ember Drake','🐲'],['The Lich','💀']];
 const ctierAt=l=>Math.max(0,Math.min(5,Math.floor(l/5)-1));   /* a new class title every 5 levels: Lv 5, 10, 15, 20, 25, 30 */
 const ctier=()=>ctierAt(levelOf(S.xp));
 const cmAt=l=>.4+.07*Math.max(0,l-5);   /* class bonus strength: 40% of its base at Lv 5, +7% every level after (Lv 15 = 110%, Lv 25 = 180%) */
 const cm=()=>cmAt(levelOf(S.xp));
-const CB={warrior:[20,'% damage taken','-'],mage:[15,'% XP','+'],rogue:[20,'% coins','+'],bard:[50,'% streak bonus','+']};
+const CB={warrior:[20,'% damage taken','-'],mage:[15,'% XP','+'],rogue:[20,'% coins','+'],bard:[50,'% streak bonus','+'],ranger:[20,'% boss damage','+']};
 const clsBonusTxt=(k,l)=>{const m=cmAt(l);if(k==='druid')return 'Heals x'+(1+m).toFixed(2)+' on perfect days';const c=CB[k];return c[2]+(Math.round(c[0]*m*10)/10)+c[1]};
 const roman=n=>{let r='';[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']].forEach(([v,s])=>{while(n>=v){r+=s;n-=v}});return r};
 const clsName=()=>{const lv=levelOf(S.xp);return CLS[S.cls].n[ctier()]+(lv>=40?' '+roman(Math.floor(lv/10)-2):'')};   /* top title at Lv 30, then II at Lv 40, III at Lv 50... */
@@ -1417,9 +1485,9 @@ const dmgMult=()=>{const r=bsum('dmg')/100+.01*lvBonus()+(S.cls==='warrior'?.2*c
 function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 
 /* ---------- subclasses: unlock at level 15, permanent, chosen in the Forge ---------- */
-const SUBS={warrior:['guardian','berserker'],mage:['scholar','battlemage'],rogue:['treasure','shadowblade'],druid:['healer','beastmaster'],bard:['chronicler','herald']};
-const SUBD={guardian:{n:'Guardian',e:'🏰'},berserker:{n:'Berserker',e:'🔥'},scholar:{n:'Scholar',e:'📚'},battlemage:{n:'Battlemage',e:'⚡'},treasure:{n:'Treasure Hunter',e:'💎'},shadowblade:{n:'Shadowblade',e:'🌑'},healer:{n:'Healer',e:'💚'},beastmaster:{n:'Beastmaster',e:'🐾'},chronicler:{n:'Chronicler',e:'📜'},herald:{n:'Herald',e:'📯'}};
-const bossDmg=xp=>Math.round(xp*(S.boss&&S.boss.sc||1)*(1+bsum('bd')/100)*(1+(hasSub('berserker')?.3*cm():0)+(hasSub('battlemage')?.4*cm():0)));
+const SUBS={warrior:['guardian','berserker'],mage:['scholar','battlemage'],rogue:['treasure','shadowblade'],druid:['healer','beastmaster'],bard:['chronicler','herald'],ranger:['sharpshooter','pathfinder']};
+const SUBD={guardian:{n:'Guardian',e:'🏰'},berserker:{n:'Berserker',e:'🔥'},scholar:{n:'Scholar',e:'📚'},battlemage:{n:'Battlemage',e:'⚡'},treasure:{n:'Treasure Hunter',e:'💎'},shadowblade:{n:'Shadowblade',e:'🌑'},healer:{n:'Healer',e:'💚'},beastmaster:{n:'Beastmaster',e:'🐾'},chronicler:{n:'Chronicler',e:'📜'},herald:{n:'Herald',e:'📯'},sharpshooter:{n:'Sharpshooter',e:'🎯'},pathfinder:{n:'Pathfinder',e:'🧭'}};
+const bossDmg=xp=>Math.round(xp*(S.boss&&S.boss.sc||1)*(1+bsum('bd')/100)*(1+(hasSub('berserker')?.3*cm():0)+(hasSub('battlemage')?.4*cm():0)+(S.cls==='ranger'?.2*cm():0)));
 const seedR=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return ((h>>>0)%10000)/10000};   /* same day = same roll, so undo/redo can't reroll */
 function subTxt(id,l){
   const m=cmAt(l),r=x=>Math.round(x*m);
@@ -1433,25 +1501,192 @@ function subTxt(id,l){
     healer:'Heal '+Math.max(1,Math.round(hpBase(l)*.08*m))+' HP on every hard quest',
     beastmaster:'Companion XP doubled',
     chronicler:'One missed day will not break your streak',
-    herald:'+'+r(50)+'% perfect-day XP and a 35% chance of a bonus chest'
+    herald:'+'+r(50)+'% perfect-day XP and a 35% chance of a bonus chest',
+    sharpshooter:'+'+r(40)+'% coins from hard quests',
+    pathfinder:'+'+r(30)+'% XP and coins on custom-day and one-off quests'
   }[id];
 }
+/* subclass look + flavour: colours come from each subclass's plate under the rank, role is a one-word summary, fl is the tagline */
+const SUBX={
+  guardian:{c:'#4a5a78',c2:'#aab8d0',role:'Tank',fl:'A wall that walks. Little gets through.'},
+  berserker:{c:'#9a2424',c2:'#ff8a4a',role:'Glass cannon',fl:'Hit harder, and hurt harder.'},
+  scholar:{c:'#2a4a8a',c2:'#8fb8ff',role:'Streaker',fl:'Knowledge compounds, and so do streaks.'},
+  battlemage:{c:'#5a2aa8',c2:'#c9a8ff',role:'Boss slayer',fl:'Spellfire saved for the weekly boss.'},
+  treasure:{c:'#1f6a68',c2:'#ffd75a',role:'Looter',fl:'Every chest sings for you.'},
+  shadowblade:{c:'#3a1a5a',c2:'#d9b8ff',role:'Opener',fl:'Strike first, and strike rich.'},
+  healer:{c:'#2f8a4a',c2:'#c8ffd4',role:'Support',fl:'Hard days leave you stronger.'},
+  beastmaster:{c:'#7a4a22',c2:'#ffd9a8',role:'Companion',fl:'Your companion never stops growing.'},
+  chronicler:{c:'#8a6a3c',c2:'#f6dfae',role:'Safety net',fl:'Your story survives one bad day.'},
+  herald:{c:'#a8283a',c2:'#ffe9a0',role:'Showman',fl:'Perfect days deserve a fanfare.'},
+  sharpshooter:{c:'#2f5a2a',c2:'#ff8a7a',role:'Big game',fl:'One clean shot at the biggest target.'},
+  pathfinder:{c:'#7a5a2a',c2:'#f4e2b0',role:'Explorer',fl:'The road less taken pays the best.'}
+};
+function subPerks(id,l){   /* up = what you gain, dn = what it costs */
+  const m=cmAt(l),r=x=>Math.round(x*m);
+  return {
+    guardian:{up:['Extra '+r(10)+'% damage reduction','+'+Math.round(hpBase(l)*.2)+' max HP'],dn:[]},
+    berserker:{up:['+'+r(30)+'% boss damage'],dn:['Missed quests cost 25% more HP']},
+    scholar:{up:['+'+r(50)+'% streak bonus'],dn:[]},
+    battlemage:{up:['+'+r(40)+'% boss damage'],dn:[]},
+    treasure:{up:['+'+r(15)+'% coins','Chests drop gear more often, at better rarity'],dn:[]},
+    shadowblade:{up:['+'+r(60)+'% XP and coins on your first quest each day'],dn:[]},
+    healer:{up:['Heal '+Math.max(1,Math.round(hpBase(l)*.08*m))+' HP on every hard quest'],dn:[]},
+    beastmaster:{up:['Companion XP doubled'],dn:[]},
+    chronicler:{up:['One missed day will not break your streak'],dn:[]},
+    herald:{up:['+'+r(50)+'% perfect-day XP','35% chance of a bonus chest'],dn:[]},
+    sharpshooter:{up:['+'+r(40)+'% coins from hard quests'],dn:[]},
+    pathfinder:{up:['+'+r(30)+'% XP and coins on custom-day and one-off quests'],dn:[]}
+  }[id];
+}
+function subIconBig(st,id,k){const c=subIcon(st,id);c.classList.add('px');c.style.width=parseFloat(c.style.width)*(k||2)+'px';c.style.height=parseFloat(c.style.height)*(k||2)+'px';return c}
+function subPerkList(id,lv){
+  const p=subPerks(id,lv),w=el('div','spl');
+  p.up.forEach(t=>{const r=el('div','spp up');r.append(el('i','','+'),el('span','',t));w.appendChild(r)});
+  p.dn.forEach(t=>{const r=el('div','spp dn');r.append(el('i','','-'),el('span','',t));w.appendChild(r)});
+  return w;
+}
+function subTheme(n,id){const X=SUBX[id];n.style.setProperty('--sc',X.c);n.style.setProperty('--sd',X.c2);return n}
+let SUBSEL=null;   /* the path tapped in the picker (not chosen until you confirm) */
+function subCard(id,lv,mode){   /* mode: 'pick' (tappable), 'skip' (the path you did not take) */
+  const U=SUBD[id],X=SUBX[id],c=el(mode==='pick'?'button':'div','spc '+mode+(mode==='pick'&&lv<15?' lock':''));
+  if(mode==='pick'){c.type='button';c.dataset.id=id}
+  subTheme(c,id);
+  const ic=el('span','spi');ic.appendChild(subIconBig('on',id,3));
+  if(mode==='pick'&&lv<15){const pl=el('span','lockpad');pl.appendChild(px('🔒',16));ic.appendChild(pl)}
+  c.append(ic,el('b','spn',U.n),el('span','spr',X.role),el('span','spt',X.fl));
+  c.setAttribute('aria-label',U.n+', '+X.role+'. '+subPerks(id,Math.max(lv,15)).up.join(', ')+(lv<15?'. Locked until level 15':''));
+  return c;
+}
 function subBox(lv){
-  const box=el('div','subbox');
-  if(S.sub){box.appendChild(el('div','sub','Subclass: '+SUBD[S.sub].n+'. '+subTxt(S.sub,lv)+'.'));return box}
-  box.appendChild(el('div','sub',lv<15?'Subclass: unlocks at level 15. Two paths to choose from.':'Choose your subclass. It is permanent.'));
-  const g=el('div','subgrid');
-  (SUBS[S.cls]||[]).forEach(id=>{
-    const U=SUBD[id],c=el('button','btn subopt');c.type='button';c.disabled=lv<15;
-    c.append(px(U.e,16),el('b','',U.n),el('small','',subTxt(id,Math.max(lv,15))));
-    c.onclick=()=>{S.sub=id;const l=levelOf(S.xp);S.hp=Math.min(maxHp(l),S.hp+subHp(id,l));addLog('Became a '+U.n,'good');toast('You are now a '+U.n);save();render()};
-    g.appendChild(c);
-  });
-  box.appendChild(g);
+  const box=el('div','subbox'),ids=SUBS[S.cls]||[],st=S.sub?'on':lv>=15?'ready':'off';
+  const hd=el('div','sphd '+st);
+  hd.append(subIconBig(st,S.sub,2),el('b','','Subclass'),el('span','sptag',st==='on'?'Chosen':st==='ready'?'Choose now':'Unlocks at Lv 15'));
+  box.appendChild(hd);
+  /* chosen: an emblem card for your path, and the road you did not take */
+  if(S.sub){
+    const U=SUBD[S.sub],X=SUBX[S.sub],own=subTheme(el('div','spown'),S.sub),top=el('div','spot'),ii=el('span','spi big'),tx=el('div','spx');
+    ii.appendChild(subIconBig('on',S.sub,4));
+    tx.append(el('b','spn',U.n),el('span','spr',X.role));
+    top.append(ii,tx);
+    own.append(top,el('div','spt',X.fl),subPerkList(S.sub,lv),el('i','spstamp','Permanent'));
+    box.appendChild(own);
+    const other=ids.find(i=>i!==S.sub);
+    if(other){box.append(el('div','sub spskl','Path not taken'),subCard(other,lv,'skip'))}
+    return box;
+  }
+  box.appendChild(el('div','sub',lv<15?'Two paths wait for you at level 15. Tap one to see what it does.':'Choose your path. It is permanent, so read both first.'));
+  const g=el('div','spgrid'),det=el('div','spdet');
+  const show=id=>{
+    SUBSEL=id;g.querySelectorAll('.spc').forEach(x=>x.classList.toggle('on',x.dataset.id===id));
+    det.replaceChildren();det.classList.toggle('has',!!id);
+    if(!id){det.appendChild(el('div','sub','Tap a path to see exactly what it does.'));return}
+    const U=SUBD[id],X=SUBX[id],hb=el('div','spdh'),ok=el('button','btn wide','Become a '+U.n);
+    subTheme(det,id);hb.append(el('b','',U.n),el('span','spr',X.role));
+    ok.type='button';
+    if(lv<15){ok.textContent='Unlocks at level 15';ok.disabled=true}
+    ok.onclick=()=>{
+      if(levelOf(S.xp)<15)return;
+      const l=levelOf(S.xp);S.sub=id;SUBSEL=null;S.hp=Math.min(maxHp(l),S.hp+subHp(id,l));
+      addLog('Became a '+U.n,'good');buzz(40);
+      const p=subPerks(id,l);showModal(U.e,'You are now a '+U.n,X.fl+'\n'+p.up.concat(p.dn).join('\n'));
+      save();render();
+    };
+    det.append(hb,el('div','spt',X.fl),subPerkList(id,Math.max(lv,15)),el('div','spwarn','Permanent. You cannot change it later.'),ok);
+  };
+  ids.forEach(id=>{const c=subCard(id,lv,'pick');c.onclick=()=>show(SUBSEL===id?null:id);g.appendChild(c)});
+  box.append(g,det);
+  show(ids.includes(SUBSEL)?SUBSEL:null);
   if(lv<15){
     const pb=el('div','bar xp cbar'),pf=document.createElement('i');
     pf.style.width=Math.min(100,(lv-1+(S.xp-need(lv))/(need(lv+1)-need(lv)))/14*100)+'%';
-    pb.append(pf,el('em','','Lv '+lv+' / 15'));box.appendChild(pb);
+    pb.append(pf,el('em','','Lv '+lv+' / 15'));box.append(pb,el('div','sub spgo',(15-lv)+(15-lv===1?' level':' levels')+' to go'));
+  }
+  return box;
+}
+/* ---------- classes: unlock at level 5, permanent, chosen in the Forge ----------
+   same look as the subclass section: header plate, cards in each class's colours, a detail sheet (bonus, how it grows, title ladder, the subclasses it leads to),
+   an emblem card once chosen with a progress bar to your next title. role = one word, fl = tagline, best = who it suits. */
+const CLSX={
+  warrior:{c:'#8a3030',c2:'#ffb4a0',role:'Defender',fl:'Take less from every missed quest.',best:'When you sometimes miss quests'},
+  mage:{c:'#3a4a9a',c2:'#a8c0ff',role:'Fast learner',fl:'Turn every quest into more XP.',best:'Climbing levels fast'},
+  rogue:{c:'#2a6a52',c2:'#ffd75a',role:'Coin hunter',fl:'Pocket more coins from every quest.',best:'Buying chests and gear'},
+  druid:{c:'#2f7a45',c2:'#c8ffd4',role:'Healer',fl:'Perfect days restore far more HP.',best:'Chasing perfect days'},
+  bard:{c:'#8a4a7a',c2:'#ffd0f0',role:'Streaker',fl:'Streaks pay out much bigger.',best:'Keeping long streaks'},
+  ranger:{c:'#3a6a30',c2:'#c8e890',role:'Hunter',fl:'Every arrow finds the weekly boss.',best:'Taking down weekly bosses'}
+};
+const CLSL={warrior:'damage taken',mage:'XP',rogue:'coins',druid:'heal on perfect days',bard:'streak bonus',ranger:'boss damage'};
+const clsVal=(k,l)=>{const m=cmAt(l);if(k==='druid')return 'x'+(1+m).toFixed(2);const c=CB[k];return c[2]+(Math.round(c[0]*m*10)/10)+'%'};
+const clsPerk=(k,l)=>{const m=cmAt(l),v=k==='druid'?0:Math.round(CB[k][0]*m*10)/10;return k==='warrior'?'Take '+v+'% less damage':k==='druid'?'Heal x'+(1+m).toFixed(2)+' on perfect days':'+'+v+CB[k][1]};
+const clsTheme=(n,k)=>{n.style.setProperty('--sc',CLSX[k].c);n.style.setProperty('--sd',CLSX[k].c2);return n};
+function clsIcon(k,sz){const c=px(CLS[k].e,16);c.style.width=c.style.height=sz+'px';return c}
+let CLSSEL=null;   /* the class tapped in the picker (not chosen until you confirm) */
+function perkRow(t){const w=el('div','spl'),r=el('div','spp up');r.append(el('i','','+'),el('span','',t));w.appendChild(r);return w}
+function clsGrowth(k,lv){   /* [label, row]: the bonus at Lv 5, 15 and 25; the step you have reached is lit */
+  const w=el('div','clsg'),cur=[5,15,25].filter(L=>lv>=L).pop();
+  [5,15,25].forEach(L=>{const d=el('div',L===cur?'cur':'');d.append(el('small','','Lv '+L),el('b','',clsVal(k,L)));w.appendChild(d)});
+  return [el('div','spsl','Grows with level: '+CLSL[k]),w];
+}
+function clsLadder(k,lv){   /* the six titles, one every 5 levels, as a single wrapped line of chips */
+  const w=el('div','clst'),t=lv>=5?ctierAt(lv):-1;
+  CLS[k].n.forEach((n,i)=>{const d=el('span',lv<5?'':i<t?'done':i===t?'cur':'fut');d.title='Level '+(5+i*5);d.append(el('i','',String(5+i*5)),document.createTextNode(n));w.appendChild(d)});
+  return w;
+}
+function clsPaths(k){   /* the two subclasses this class leads to */
+  const w=el('div','clsp');w.appendChild(el('small','','Lv 15'));
+  (SUBS[k]||[]).forEach(id=>{const d=el('div'),ic=subIcon('on',id);ic.classList.add('px');d.append(ic,el('span','',SUBD[id].n));w.appendChild(d)});
+  return w;
+}
+function clsCard(k,lv){
+  const X=CLSX[k],c=el('button','spc cls'+(lv<5?' lock':'')),ic=el('span','spi');
+  c.type='button';c.dataset.id=k;clsTheme(c,k);
+  ic.appendChild(clsIcon(k,36));
+  if(lv<5){const pl=el('span','lockpad');pl.appendChild(px('🔒',16));ic.appendChild(pl)}
+  c.append(ic,el('b','spn',CLS[k].n[0]),el('span','spr',X.role));
+  c.setAttribute('aria-label',CLS[k].n[0]+', '+X.role+'. '+clsPerk(k,Math.max(lv,5))+(lv<5?'. Locked until level 5':''));
+  return c;
+}
+function classBox(lv){
+  const box=el('div','clsbox'),st=S.cls?'on':lv>=5?'ready':'off',hd=el('div','sphd '+st);
+  hd.append(st==='on'?clsIcon(S.cls,28):subIconBig(st,null,2),el('b','','Class'),el('span','sptag',st==='on'?'Chosen':st==='ready'?'Choose now':'Unlocks at Lv 5'));
+  box.appendChild(hd);
+  /* chosen: emblem card with your current title, the bonus now, how it grows, the ladder, and the road to the next title */
+  if(S.cls){
+    const k=S.cls,X=CLSX[k],own=clsTheme(el('div','spown'),k),top=el('div','spot'),ii=el('span','spi big'),tx=el('div','spx');
+    ii.appendChild(clsIcon(k,52));tx.append(el('b','spn',clsName()),el('span','spr',X.role));top.append(ii,tx);
+    own.append(top,el('div','spt',X.fl),perkRow(clsPerk(k,lv)),...clsGrowth(k,lv),el('div','spsl','Titles'),clsLadder(k,lv));
+    const prev=lv>=40?Math.floor(lv/10)*10:lv>=30?30:Math.floor(lv/5)*5,next=lv>=40?prev+10:lv>=30?40:prev+5;
+    const pos=lv-1+(S.xp-need(lv))/(need(lv+1)-need(lv)),fr=Math.max(0,Math.min(1,(pos-(prev-1))/(next-prev)));
+    const nt=lv>=30?CLS[k].n[5]+' '+roman(Math.floor(next/10)-2):CLS[k].n[ctierAt(next)];
+    const pb=el('div','bar xp cbar'),pf=document.createElement('i');pf.style.width=Math.round(fr*100)+'%';pb.append(pf,el('em','','Lv '+lv+' / '+next));
+    own.append(pb,el('div','sub spgo',nt+' at level '+next),el('i','spstamp','Permanent'));
+    box.appendChild(own);
+    return box;
+  }
+  box.appendChild(el('div','sub',lv<5?'Pick a class at level 5. Tap one to see what it does.':'Choose your class. It is permanent and only changes your bonuses, not your look.'));
+  const g=el('div','spgrid cls'),det=el('div','spdet');
+  const show=k=>{
+    CLSSEL=k;g.querySelectorAll('.spc').forEach(x=>x.classList.toggle('on',x.dataset.id===k));
+    det.replaceChildren();det.classList.toggle('has',!!k);
+    if(!k){det.appendChild(el('div','sub','Tap a class to see its bonus, titles and subclasses.'));return}
+    const X=CLSX[k],hb=el('div','spdh'),ok=el('button','btn wide','Become a '+CLS[k].n[0]);
+    clsTheme(det,k);hb.append(el('b','',CLS[k].n[0]),el('span','spr',X.role));
+    ok.type='button';
+    if(lv<5){ok.textContent='Unlocks at level 5';ok.disabled=true}
+    ok.onclick=()=>{
+      const l=levelOf(S.xp);if(l<5)return;
+      S.cls=k;CLSSEL=null;addLog('Became a '+CLS[k].n[0],'good');buzz(40);
+      showModal(CLS[k].e,'You are now a '+CLS[k].n[0],X.fl+'\n'+clsPerk(k,l)+'\nA subclass awaits at level 15.');
+      save();render();
+    };
+    det.append(hb,el('div','spt',X.fl),perkRow(clsPerk(k,Math.max(lv,5))),el('div','spbest','Best for: '+X.best),...clsGrowth(k,lv),el('div','spsl','Titles'),clsLadder(k,lv),el('div','spsl','Leads to'),clsPaths(k),el('div','spwarn','Permanent choice'),ok);
+  };
+  Object.keys(CLS).forEach(k=>{const c=clsCard(k,lv);c.onclick=()=>show(CLSSEL===k?null:k);g.appendChild(c)});
+  box.append(g,det);
+  show(CLSSEL&&CLS[CLSSEL]?CLSSEL:null);
+  if(lv<5){
+    const pb=el('div','bar xp cbar'),pf=document.createElement('i');
+    pf.style.width=Math.min(100,(lv-1+(S.xp-need(lv))/(need(lv+1)-need(lv)))/4*100)+'%';
+    pb.append(pf,el('em','','Lv '+lv+' / 5'));box.append(pb,el('div','sub spgo',(5-lv)+(5-lv===1?' level':' levels')+' to go'));
   }
   return box;
 }
@@ -1480,7 +1715,7 @@ function hitBoss(dmg){
   const b=S.boss;if(!b||b.hp<=0)return;
   b.hp=Math.max(0,b.hp-dmg);
   if(b.hp===0){
-    const rw=b.rw||{g:50,c:1};const gm=2+(b.tier||0);S.chests+=rw.c;S.gold+=rw.g;S.gems=(S.gems||0)+gm;addLog('Defeated '+bossOf(b)[0]+'! +'+coinText(rw.g)+', +'+rw.c+' chest'+(rw.c>1?'s':'')+', +'+gm+' gems','good',null);
+    const rw=b.rw||{g:50,c:1};const gm=2+(b.tier||0);S.chests+=rw.c;S.kills=(S.kills|0)+1;S.gold+=rw.g;S.gems=(S.gems||0)+gm;addLog('Defeated '+bossOf(b)[0]+'! +'+coinText(rw.g)+', +'+rw.c+' chest'+(rw.c>1?'s':'')+', +'+gm+' gems','good',null);
     showModal('🏆','Boss defeated!',bossOf(b)[0]+' has fallen.\n+'+coinText(rw.g)+', '+(rw.c>1?rw.c+' chests':'a chest')+' and '+gm+' gems.');confetti();
   }
 }
@@ -1489,6 +1724,7 @@ function hitBoss(dmg){
 const FREEZE_MAX=3;
 function healHp(f){const m=maxHp(levelOf(S.xp));S.hp=Math.min(m,S.hp+Math.max(1,Math.round(m*f)))}
 function epicChest(){
+  S.copened=(S.copened|0)+1;
   const it=rollLoot(3);S.inv.push(it);addLog('Found '+it.n,'good');
   showModal(iicon(it),RNAME[it.r]+' loot!',it.n+'\n'+bonusTxt(it)+(it.u&&UNIQ[it.u]?'\n'+UNIQ[it.u].d:'')+'\nFind it in the Hero tab.');
 }
@@ -1529,8 +1765,22 @@ function renderShop(){
     });
   };
   fill('shopgold','g');fill('shopgem','m');
+  const ds=$('dot-shop');if(ds)ds.hidden=!(S.chests>0);
+  renderChest();
 }
 const CHEST_COST=150;
+function renderChest(){   /* the chest stage, Open button and Buy row live in the Shop tab */
+  const f=$('chestbox');if(!f||CHEST_BUSY)return;f.innerHTML='';
+  const nc=S.chests,st=el('div','chestwrap'),fg=el('button','chestfig'+(nc>0?' ready':''));
+  fg.type='button';fg.setAttribute('aria-label',nc>0?'Open a chest':'No chests to open');fg.appendChild(chestPx(false));
+  fg.onclick=()=>{if(nc<1){toast('No chests yet. Perfect days and weekly bosses drop them.');return}openChestFx(fg,st)};
+  st.append(fg,el('div','chestcount','Chests: '+nc),el('div','sub',nc>0?'Tap the chest to open it.':'No chests yet. Earn them from perfect days and weekly bosses, or buy one below.'));
+  f.appendChild(st);
+  const ob=el('button','btn wide','Open chest');ob.type='button';ob.disabled=nc<1;ob.onclick=()=>openChestFx(fg,st);f.appendChild(ob);
+  const br=el('div','buyrow'),gb=el('div','bar gold gbar'+(S.gold>=CHEST_COST?' full':'')),gf=document.createElement('i');
+  gf.style.width=Math.min(100,S.gold/CHEST_COST*100)+'%';gb.append(gf,el('em','',coinText(S.gold)+' / '+coinText(CHEST_COST)));
+  const bc=el('button','ghost','Buy chest');bc.type='button';bc.disabled=S.gold<CHEST_COST;bc.onclick=buyChest;br.append(gb,bc);f.appendChild(br);
+}
 function buyChest(){if(S.gold<CHEST_COST)return;S.gold-=CHEST_COST;S.chests++;toast('Bought a chest');buzz(30);save();render()}
 /* drop weights per rarity: every rarity can drop at any level, but the odds slide toward the good stuff as you level.
    Lv 1 uses DROP_LO, Lv 40+ uses DROP_HI, levels in between blend the two (Lv 30 is about 20% Legendary).
@@ -1576,7 +1826,7 @@ const iicon=it=>it.slot==='trinket'?'\ud83d\udcff':it.slot==='companion'?(PETS[i
 const dicon=k=>k==='trinket'?'\ud83d\udcff':k==='companion'?'🐾':ICON[k][S.cls&&NOUN[k][S.cls]?S.cls:'warrior'];
 const sellVal=it=>it.u?120:10*(it.r+1)*(it.r+1);
 function openChest(){
-  if(S.chests<1)return;S.chests--;
+  if(S.chests<1)return;S.chests--;S.copened=(S.copened|0)+1;
   const r=Math.random();let e,t,m;
   const lp=hasSub('treasure')?.84:.72;if(r<lp){
     const it=rollLoot();S.inv.push(it);
@@ -1685,6 +1935,18 @@ function drawLinks(){
     const dot=mk('circle','ld'+(it?'':' off'),{cx:ax,cy:ay,r:it?3.5:2.5});dot.style.setProperty('--c',col);sv.appendChild(dot);
   });
 }
+/* docked workbench under the niches: clear any leftover absolute styles, then scroll it into view */
+function placePicker(pk){
+  if(!pk)return;
+  pk.hidden=false;
+  pk.style.left=pk.style.right=pk.style.top=pk.style.bottom=pk.style.width='';
+  requestAnimationFrame(()=>{
+    const pr=pk.getBoundingClientRect(),margin=12;
+    if(pr.top<margin||pr.bottom>window.innerHeight-margin){
+      pk.scrollIntoView({block:'nearest',behavior:'smooth'});
+    }
+  });
+}
 function renderGear(){
   const lv=levelOf(S.xp),R=rk(lv);applyScene();
   const cur=worn(SEL),items=S.inv.filter(i=>i.slot===SEL).sort((a,c)=>c.r-a.r||a.n.localeCompare(c.n));
@@ -1725,9 +1987,7 @@ function renderGear(){
     };
     return b;
   };
-  $('scol-l').replaceChildren(slot('helm'),slot('offhand'),slot('companion'));
-  $('scol-r').replaceChildren(slot('trinket'),slot('weapon'),slot('armor'));
-  $('slotrow').replaceChildren();
+  $('rack').replaceChildren(slot('helm'),slot('armor'),slot('weapon'),slot('offhand'),slot('trinket'),slot('companion'));
   setAura(sg,pv);
   const pk=$('picker'),hd=el('div','pkhead');
   hd.append(el('b','',SLOTN[SEL]),el('span','',(items.length?items.length+(items.length===1?' item':' items')+' · ':'')+coinText(S.gold)));
@@ -1751,7 +2011,7 @@ function renderGear(){
     const on=!!cur&&cur.id===sel.id,d=el('div','idet'),act=el('div','iact2');
     d.style.setProperty('--rar',RAR[sel.r]);
     d.append(el('b','',sel.n),el('small','',RNAME[sel.r]+': '+bonusTxt(sel)));
-    if(sel.slot==='companion'){const L=plv(sel);d.appendChild(el('small','',L>=PMAX?'Level '+L+' (max)':'Level '+L+': '+((sel.ce||0)-pneed(L))+' / '+(pneed(L+1)-pneed(L))+' XP. Grows as you finish quests.'))}
+    if(sel.slot==='companion'){const L=plv(sel);d.appendChild(el('small','',L>=PMAX?'Level '+L+' (max)':'Level '+L+': '+(ptot(sel)-pneed(L))+' / '+(pneed(L+1)-pneed(L))+' XP. Starts at Lv '+pbase(sel)+' for its rarity and grows as you finish quests. Bonuses grow with its level.'))}
     if(sel.u&&UNIQ[sel.u])d.appendChild(el('small','',UNIQ[sel.u].d));
     if(!on){
       const dl=el('div','tdelta');   /* what changes if you wear it instead of what you wear now */
@@ -1763,6 +2023,7 @@ function renderGear(){
     if(!on){const sb=el('button','ghost','Sell '+coinText(sellVal(sel)));sb.type='button';sb.onclick=()=>sell(sel.id);act.appendChild(sb)}
     d.appendChild(act);pk.appendChild(d);
   }
+  placePicker(pk);
   {   /* the four numbers at the bottom show how they would change with the item you are trying on */
     const sh=$('sheet');sh.querySelectorAll('.dl').forEach(n=>n.remove());
     if(pv){
@@ -1785,7 +2046,7 @@ addEventListener('resize',()=>requestAnimationFrame(drawLinks));
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>drawLinks());
 if(window.ResizeObserver){const sg0=document.querySelector('.stage');if(sg0)new ResizeObserver(()=>requestAnimationFrame(drawLinks)).observe(sg0)}
 /* ---------- chest stage: pixel chest that shakes, glows and bursts open ---------- */
-let CHEST_BUSY=false,LOCKSEL=null;   /* LOCKSEL = class tapped in the locked preview */
+let CHEST_BUSY=false;
 function chestPx(open){
   const W=20,H=20,G=Array.from({length:H},()=>Array(W).fill(null));
   const R=(x,y,w,h,c)=>{for(let j=0;j<h;j++)for(let k=0;k<w;k++)if(x+k>=0&&y+j>=0&&x+k<W&&y+j<H)G[y+j][x+k]=c};
@@ -1846,49 +2107,11 @@ function renderRPG(){
     bb.append(pf,info);
   }
   /* forge */
-  const f=$('forge');if(CHEST_BUSY)return;f.innerHTML='';
-  const cb=el('div','sub');
-  if(S.cls)cb.textContent='Class: '+clsName()+'. '+clsBonusTxt(S.cls,lv)+'.';
-  else if(lv<5){
-    cb.textContent='Class: unlocks at level 5.';
-    const lk=el('div','lockrow'),clsInfo=k=>CLS[k].n[0]+': '+clsBonusTxt(k,5)+'.',
-      info=el('div','lockinfo',LOCKSEL?clsInfo(LOCKSEL):'Tap a class to preview its bonus.');
-    Object.keys(CLS).forEach(k=>{
-      const b=el('button','lockitem'+(LOCKSEL===k?' on':'')),c=el('span','lockc'),pl=el('span','lockpad');
-      b.type='button';b.title=clsInfo(k);b.setAttribute('aria-label',CLS[k].n[0]+', locked until level 5. '+clsBonusTxt(k,5));
-      c.appendChild(px(CLS[k].e,16));pl.appendChild(px('🔒',16));c.appendChild(pl);
-      b.append(c,el('small','',CLS[k].n[0]));
-      b.onclick=()=>{LOCKSEL=k;lk.querySelectorAll('.lockitem').forEach(x=>x.classList.toggle('on',x===b));info.textContent=clsInfo(k)};
-      lk.appendChild(b);
-    });
-    const pb=el('div','bar xp cbar'),pf=document.createElement('i');
-    pf.style.width=Math.min(100,(lv-1+(S.xp-need(lv))/(need(lv+1)-need(lv)))/4*100)+'%';
-    pb.append(pf,el('em','','Lv '+lv+' / 5'));cb.append(lk,info,pb);
-  }
-  else{
-    cb.textContent='Choose your class. It is permanent and only changes your bonuses, not your look.';
-    const g=el('div','clsgrid');
-    Object.keys(CLS).forEach(k=>{
-      const c=el('button','btn');c.type='button';
-      c.append(px(CLS[k].e,16),el('b','',CLS[k].n[0]),el('small','',clsBonusTxt(k,lv)));
-      c.onclick=()=>{S.cls=k;addLog('Became a '+CLS[k].n[0],'good');toast('You are now a '+CLS[k].n[0]);save();render()};
-      g.appendChild(c);
-    });
-    cb.appendChild(g);
-  }
-  f.appendChild(cb);
+  const f=$('forge');f.innerHTML='';
+  f.appendChild(classBox(lv));
   if(S.cls)f.appendChild(subBox(lv));
-  const nc=S.chests,st=el('div','chestwrap'),fg=el('button','chestfig'+(nc>0?' ready':''));
-  fg.type='button';fg.setAttribute('aria-label',nc>0?'Open a chest':'No chests to open');fg.appendChild(chestPx(false));
-  fg.onclick=()=>{if(nc<1){toast('No chests yet. Perfect days and weekly bosses drop them.');return}openChestFx(fg,st)};
-  st.append(fg,el('div','chestcount','Chests: '+nc),el('div','sub',nc>0?'Tap the chest to open it.':'No chests yet. Earn them from perfect days and weekly bosses.'));
-  f.appendChild(st);
-  const ob=el('button','btn wide','Open chest');ob.type='button';ob.disabled=nc<1;ob.onclick=()=>openChestFx(fg,st);f.appendChild(ob);
-  const br=el('div','buyrow'),gb=el('div','bar gold gbar'+(S.gold>=CHEST_COST?' full':'')),gf=document.createElement('i');
-  gf.style.width=Math.min(100,S.gold/CHEST_COST*100)+'%';gb.append(gf,el('em','',coinText(S.gold)+' / '+coinText(CHEST_COST)));
-  const bc=el('button','ghost','Buy chest');bc.type='button';bc.disabled=S.gold<CHEST_COST;bc.onclick=buyChest;br.append(gb,bc);f.appendChild(br);
   const aff=S.inv.some(i=>i.isNew);
-  $('dot-hero').hidden=!(S.chests>0||aff||(lv>=5&&!S.cls)||(lv>=15&&S.cls&&!S.sub));
+  $('dot-hero').hidden=!(aff||(lv>=5&&!S.cls)||(lv>=15&&S.cls&&!S.sub));
 }
 
 /* ---------- arena, character sheet, tabs ---------- */
@@ -1917,15 +2140,22 @@ function attackFx(dmg){
 }
 function renderSheet(){
   const s=$('sheet');s.innerHTML='';
-  [['XP','x'+mult().toFixed(2)],['Coins','x'+goldMult().toFixed(2)],['Damage','x'+dmgMult().toFixed(2)],['Max HP',maxHp(levelOf(S.xp))]].forEach(([k,v])=>{
-    const d=el('div','stat');d.append(el('small','',k),el('b','',v));s.appendChild(d);
+  [['XP','x'+mult().toFixed(2),'\u2728'],['Coins','x'+goldMult().toFixed(2),'coin:g'],['Damage','x'+dmgMult().toFixed(2),'\ud83d\udee1\ufe0f'],['Max HP',maxHp(levelOf(S.xp)),'\u2764\ufe0f']].forEach(([k,v,ic])=>{
+    const d=el('div','stat'),i=el('span','sti');i.appendChild(px(ic,16));
+    d.append(i,el('small','',k),el('b','',v));s.appendChild(d);
   });
   const gb=$('gearbonus');
   if(gb){
     gb.replaceChildren();
     const ks=['xp','gold','dmg','hp','bd'].filter(k=>bsum(k));
-    if(!ks.length)gb.textContent='No gear bonuses yet. Wear some loot to gain them.';
-    else{const t=el('div','','Gear bonuses');t.style.color='var(--gold)';gb.appendChild(t);ks.forEach(k=>gb.appendChild(el('div','',STAT_TXT[k](bsum(k)))))}
+    gb.classList.toggle('none',!ks.length);
+    if(!ks.length)gb.appendChild(el('span','gbn','No gear bonuses yet. Wear some loot to gain them.'));
+    else{
+      gb.appendChild(el('span','gbt','Gear bonuses'));
+      const w=el('div','gbc');
+      ks.forEach(k=>w.appendChild(el('span','gbp g-'+k,STAT_TXT[k](bsum(k)))));
+      gb.appendChild(w);
+    }
   }
 }
 function tab(n){
@@ -1937,16 +2167,29 @@ function tab(n){
   fitCap();requestAnimationFrame(drawLinks);scrollTo(0,0);try{localStorage.setItem('dq.tab',n)}catch(e){}
 }
 function initNav(){
-  const ic={quests:'📜',hero:'🛡️',shop:'🛒',realm:'🏰'};
+  const ic={quests:'📜',hero:'🍺',shop:'⚖️',realm:'🚪'};
   document.querySelectorAll('.navbtn').forEach(b=>{b.querySelector('.ni').appendChild(px(ic[b.dataset.tab],16));b.onclick=()=>tab(b.dataset.tab)});
   let t='quests';try{t=localStorage.getItem('dq.tab')||t}catch(e){}
   tab(ic[t]?t:'quests');
 }
 
 /* ---------- render ---------- */
+function hstat(){   /* every number the honours count, in one place */
+  const lv=levelOf(S.xp),inv=S.inv||[],tk={};
+  S.tasks.forEach(t=>tk[t.id]=t);
+  let done=0,hard=0;
+  Object.keys(S.done||{}).forEach(d=>(S.done[d]||[]).forEach(id=>{done++;if(tk[id]&&tk[id].xp>=40)hard++}));
+  let qs=0;try{S.tasks.forEach(t=>{qs=Math.max(qs,qStreak(t))})}catch(e){}
+  const pets=inv.filter(i=>i.slot==='companion');
+  return {done,hard,perf:Object.keys(S.perfect||{}).length,str:streak(),lv,tasks:S.tasks.length,qs,
+    frz:S.freezes|0,cls:S.cls?1:0,sub:S.sub?1:0,wn:Object.keys(S.worn||{}).filter(k=>wornOf(S,k)).length,
+    pets:pets.length,plv:pets.reduce((m,i)=>Math.max(m,plv(i)),0),prar:pets.reduce((m,i)=>Math.max(m,(i.r|0)+1),0),inv:inv.length,gold:S.gold|0,gems:S.gems|0,
+    kills:S.kills|0,chs:S.copened|0,rar:inv.reduce((m,i)=>Math.max(m,(i.r|0)+1),0),uniq:inv.filter(i=>i.u).length,fell:S.defeats|0};
+}
 function earned(){
-  const s=streak(),lv=levelOf(S.xp);
-  return {first:Object.values(S.done).some(a=>a.length),perfect:Object.keys(S.perfect).length>0,s3:s>=3,s7:s>=7,s30:s>=30,l5:lv>=5,l10:lv>=10,l25:lv>=25,l50:lv>=50,l100:lv>=100};
+  const st=hstat(),E={};
+  BADGES.forEach(b=>E[b.id]=st[b.m]>=b.v);
+  return E;
 }
 function timer(){
   const n=new Date(),e=new Date(n);e.setHours(24,0,0,0);
@@ -1992,6 +2235,8 @@ const SUBPIX={
   healer:{p:{g:'#58b368',l:'#a8f0b8',d:'#2f7d3e',w:'#ffffff'},r:['.ggg.ggg.','glgggwggd','gggwwwggd','gggggwggd','.gggwgggd','..gggggd.','...gggd..','....d....']},
   beastmaster:{p:{b:'#c2682f',l:'#e8a060'},r:['..bb.bb..','..bb.bb..','bb.....bb','bb.....bb','...bbb...','..lbbbb..','.lbbbbbb.','.bbbbbbb.','..bbbbb..']},
   chronicler:{p:{p:'#f2d3a0',d:'#a97f4a',k:'#6a4a2a',r:'#a8283a'},r:['.ddddddd.','dpppppppd','.pkkkkkp.','.ppppppp.','.pkkkkkp.','.ppppppp.','.pkkkprp.','dpppppppd','.ddddddd.']},
+  sharpshooter:{p:{r:'#c9302c',w:'#f4efd0',y:'#ffc02a'},r:['..rrrrr..','.rwwwwwr.','rwwrrrwwr','rwrrwrrwr','rwrwywrwr','rwrrwrrwr','rwwrrrwwr','.rwwwwwr.','..rrrrr..']},
+  pathfinder:{p:{d:'#8a5a12',w:'#f4ecd6',r:'#d63a47',g:'#e8b93c',b:'#3a6ac0'},r:['..ddddd..','.dwwwwwd.','dwwwrwwwd','dwwrrrwwd','dwwwgwwwd','dwwbbbwwd','dwwwbwwwd','.dwwwwwd.','..ddddd..']},
   herald:{p:{g:'#e8b93c',l:'#fff1a8',d:'#a8761c'},r:['......ggd','.....glgd','..gggllgd','gllgglggd','ggdd.glgd','.gd...ggd','......ggd','.......dd']}
 };
 /* pixel-art icons for the subclass slot under the rank: a closed padlock (locked), an open padlock (ready to choose) and one custom icon per subclass (chosen) */
@@ -2063,25 +2308,67 @@ function render(){
   if(!S.log.length)lg.innerHTML='<div><small>Nothing yet.</small>Your wins and losses will show up here.</div>';
   S.log.forEach(l=>{const r=document.createElement('div');const s=document.createElement('small');s.textContent=l.d.slice(5);const m=document.createElement('span');m.className=l.c||'';m.textContent=l.m;r.append(s,m);lg.appendChild(r)});
 
-  const E=earned(),bx=$('badges');bx.innerHTML='';
+  renderHonours();
+  maybeCreator();
+}
+
+/* ---------- honours: one row per "track" (e.g. Quests finished) showing its tier pips and the next goal. Category tabs keep each page short; tap a row to see all its tiers. ---------- */
+let HC='q',HX=null;   /* selected category / expanded track */
+const TRACKN={done:'Quests finished',perf:'Perfect days',tasks:'Quests on your board',hard:'Hard quests',str:'Streak',qs:'Single-quest streak',frz:'Streak Freezes',lv:'Level',cls:'Class',sub:'Subclass',wn:'Gear worn',pets:'Companions',plv:'Companion level',prar:'Best companion',inv:'Items owned',gold:'Gold held',gems:'Gems held',kills:'Bosses defeated',chs:'Chests opened',rar:'Best loot',uniq:'Unique items',fell:'Knockouts'};
+function renderHonours(){
+  const st=hstat(),E={};BADGES.forEach(b=>E[b.id]=st[b.m]>=b.v);
+  const fresh=[];
   BADGES.forEach(b=>{
     if(S.bSkip&&S.bSkip.includes(b.id)&&!E[b.id]){S.bSkip=S.bSkip.filter(x=>x!==b.id);save()}
-    if(E[b.id]&&!S.badges[b.id]&&!(S.bSkip&&S.bSkip.includes(b.id))){S.badges[b.id]=1;(S.bDay=S.bDay||{})[b.id]=today();save();setTimeout(()=>toast('Badge unlocked: '+b.n),900)}
-    const kind=/^s\d/.test(b.id)?'s':/^l\d/.test(b.id)?'l':'x',got=!!S.badges[b.id];   /* s = streak, l = level, x = other */
-    const el=document.createElement('div');el.className='b k-'+kind+(got?' got':' lock');
-    el.innerHTML='<span class="e"></span><b></b><span class="bd"></span>';
-    el.children[0].appendChild(px(b.e,20));el.children[1].textContent=b.n;el.children[2].textContent=b.d;
-    if(!got){   /* locked: padlock on the medal, and a progress bar toward streak / level goals */
-      const pl=document.createElement('i');pl.className='bl';pl.appendChild(px('🔒',16));el.children[0].appendChild(pl);
-      if(kind!=='x'){
-        const tg=+b.id.slice(1),cur=Math.min(kind==='s'?sk:lv,tg),p=document.createElement('div');
-        p.className='bp';p.innerHTML='<i></i><em></em>';p.firstChild.style.width=(cur/tg*100)+'%';p.lastChild.textContent=cur+' / '+tg;
-        el.appendChild(p);
-      }
-    }
-    bx.appendChild(el);
+    if(E[b.id]&&!S.badges[b.id]&&!(S.bSkip&&S.bSkip.includes(b.id))){S.badges[b.id]=1;(S.bDay=S.bDay||{})[b.id]=today();fresh.push(b.n)}
   });
-  maybeCreator();
+  if(fresh.length){save();setTimeout(()=>toast(fresh.length===1?'Honour unlocked: '+fresh[0]:fresh.length+' honours unlocked: '+fresh.slice(0,3).join(', ')+(fresh.length>3?'...':'')),900)}
+  const got=b=>!!S.badges[b.id];
+  const have=BADGES.filter(got).length,tot=BADGES.length;
+  const sh=(m,v)=>m==='gold'?Math.floor(v/100):v;
+  /* summary: a single slim row */
+  const sm=$('hsum');sm.replaceChildren();
+  const ic=el('span','hn-big');ic.appendChild(px('🏅',20));
+  const bar=el('div','hn-bar'),fi=document.createElement('i');fi.style.width=(have/tot*100)+'%';bar.appendChild(fi);
+  const tiers=el('div','hn-tiers');
+  HTIER.forEach((n,i)=>{const L=BADGES.filter(b=>b.t===i),r=el('span','hn-tr t'+i);r.title=n+' honours';r.append(el('i'),el('b','',L.filter(got).length+'/'+L.length));tiers.appendChild(r)});
+  sm.append(ic,el('b','hn-n',have+'/'+tot),bar,tiers);
+  /* tabs */
+  const tb=$('htabs');tb.replaceChildren();
+  HCATS.forEach(([k,n,i2])=>{
+    const L=BADGES.filter(b=>b.c===k),b=el('button','htab'+(HC===k?' on':''));
+    b.type='button';b.setAttribute('role','tab');b.setAttribute('aria-selected',HC===k);
+    const i=el('span','hi');i.appendChild(px(i2,14));b.append(i,el('span','hl',n),el('em','',L.filter(got).length+'/'+L.length));
+    b.onclick=()=>{HC=k;HX=null;renderHonours()};tb.appendChild(b)});
+  /* tracks of this category */
+  const bx=$('badges');bx.replaceChildren();
+  const keys=[];BADGES.filter(b=>b.c===HC).forEach(b=>{if(!keys.includes(b.m))keys.push(b.m)});
+  keys.forEach(m=>{
+    const L=BADGES.filter(b=>b.m===m).sort((x,y)=>x.v-y.v),nx=L.find(b=>!got(b)),done=L.filter(got),top=done[done.length-1]||L[0];
+    const cur=st[m],open=HX===m,t=nx?nx.t:top.t;
+    const r=el('div','tk t'+t+(nx?'':' full')+(open?' open':'')),hd=el('button','tk-h');
+    hd.type='button';hd.setAttribute('aria-expanded',open);
+    const me=el('span','tk-m'+(done.length?' got':' lock'));me.appendChild(px(top.e,20));
+    if(!done.length){const pl=document.createElement('i');pl.className='bl';pl.appendChild(px('🔒',16));me.appendChild(pl)}
+    const tx=el('span','tk-t'),h=el('b','',TRACKN[m]||m);
+    tx.append(h,el('small','',nx?'Next: '+nx.n+' ('+nx.d+')':'All done: '+top.n));
+    const pips=el('span','tk-p');L.forEach(b=>{const p=el('i','t'+b.t+(got(b)?' on':''));p.title=b.n;pips.appendChild(p)});
+    hd.append(me,tx,pips);
+    const pb=el('div','bp'),pf=document.createElement('i');pf.style.width=(nx?Math.min(1,cur/nx.v)*100:100)+'%';pb.appendChild(pf);
+    if(nx&&nx.v>1){pb.appendChild(el('em','',sh(m,Math.min(cur,nx.v))+' / '+sh(m,nx.v)))}
+    else if(!nx)pb.appendChild(el('em','','Complete'));
+    r.append(hd,pb);
+    if(open){
+      const ls=el('div','tk-l');
+      L.forEach(b=>{
+        const g=got(b),row=el('div','tk-r t'+b.t+(g?' got':' lock')),i=el('span','tk-ri');i.appendChild(px(b.e,16));
+        const d=S.bDay&&S.bDay[b.id],t2=el('span','tk-rt');t2.append(el('b','',b.n),el('small','',b.d));
+        row.append(i,t2,el('em','',g?(d?d.slice(5):'Earned'):HTIER[b.t]));ls.appendChild(row)});
+      r.appendChild(ls);
+    }
+    hd.onclick=()=>{HX=open?null:m;renderHonours()};
+    bx.appendChild(r);
+  });
 }
 
 /* ---------- quest board: pending first, 7-day history, per-quest streaks, inline edit, undo delete ---------- */
@@ -2846,116 +3133,4 @@ initCloud();
     setTimeout(tick,3500+Math.random()*4000);
   };
   setTimeout(tick,2500);
-})();
-
-/* ---------- idle: Wendigo (extra pixel-level touches drawn straight onto the companion canvas) ----------
-   Works alongside the drool effect in script.js: both share the canvas flag c._dr, so only one effect runs at a time.
-   Every few seconds the Wendigo picks one at random: blink, eyes flare,
-   an ear twitch, or a puff of frosty breath. Each effect puts the original pixels back when it ends. */
-(function(){
-  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  const wens=()=>[...document.querySelectorAll('#fpet canvas,#apet canvas')].filter(c=>c.offsetParent&&c.parentNode&&String(c.parentNode.dataset.k||'').indexOf('pet:wendigo')===0);
-  const near=(d,i,r,g,b,t)=>d[i+3]>150&&Math.abs(d[i]-r)<t&&Math.abs(d[i+1]-g)<t&&Math.abs(d[i+2]-b)<t;
-
-  /* finds the burning eye pixels (orange + pale highlight) inside the eye area */
-  function eyes(c,x){
-    const S=c.width/96,x0=Math.round(20*S),y0=Math.round(38*S),
-      w=Math.min(c.width-x0,Math.round(26*S)),h=Math.min(c.height-y0,Math.round(14*S)),
-      saved=x.getImageData(x0,y0,w,h),d=saved.data,p=[];
-    for(let r=0;r<h;r++)for(let q=0;q<w;q++){
-      const i=(r*w+q)*4;
-      if(near(d,i,255,90,42,34)||near(d,i,255,230,168,34))p.push([q,r]);
-    }
-    return {x0,y0,w,h,saved,p};
-  }
-
-  const FX={
-    blink(c,x,done){   /* the eyes go dark for a moment (sometimes twice) */
-      const e=eyes(c,x);if(!e.p.length)return done();
-      const dark=()=>{x.fillStyle='#2a1214';e.p.forEach(p=>x.fillRect(e.x0+p[0],e.y0+p[1],1,1))},
-        open=()=>x.putImageData(e.saved,e.x0,e.y0),twice=Math.random()<.3;
-      dark();
-      setTimeout(()=>{
-        open();
-        if(!twice)return done();
-        setTimeout(()=>{dark();setTimeout(()=>{open();done()},130)},140);
-      },150);
-    },
-    flare(c,x,done){   /* the eyes flare bright and the sockets glow orange around them */
-      const e=eyes(c,x);if(!e.p.length)return done();
-      const d=e.saved.data,set=new Set(e.p.map(p=>p[1]*e.w+p[0]));
-      x.fillStyle='#ff5a2a';
-      e.p.forEach(p=>[[1,0],[-1,0],[0,1],[0,-1]].forEach(o=>{
-        const q=p[0]+o[0],r=p[1]+o[1];
-        if(q<0||r<0||q>=e.w||r>=e.h||set.has(r*e.w+q))return;
-        if(near(d,(r*e.w+q)*4,42,18,20,50))x.fillRect(e.x0+q,e.y0+r,1,1);
-      }));
-      x.fillStyle='#ffe6a8';e.p.forEach(p=>x.fillRect(e.x0+p[0],e.y0+p[1],1,1));
-      setTimeout(()=>{x.putImageData(e.saved,e.x0,e.y0);done()},650);
-    },
-    ear(c,x,done){   /* one ear (picked at random) twitches outward a pixel or two and back; only the ear's own pixels move */
-      const S=c.width/96,left=Math.random()<.5,dir=left?-1:1,
-        b=(left?[14,29,10,13]:[43,27,9,14]).map(v=>Math.round(v*S)),
-        x0=b[0],y0=b[1],w=Math.min(c.width-x0,b[2]),h=Math.min(c.height-y0,b[3]);
-      if(w<2||h<2)return done();
-      const orig=x.getImageData(x0,y0,w,h),d=orig.data,mask=new Uint8Array(w*h);
-      /* ear skin is a low-saturation grey; antlers, bone and fur are warmer or brighter, so they are left alone */
-      for(let k=0;k<w*h;k++){
-        const i=k*4;if(d[i+3]<150)continue;
-        const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]),av=(d[i]+d[i+1]+d[i+2])/3;
-        if(mx-mn<32&&av>85&&av<225)mask[k]=1;
-      }
-      /* the dark outline touching the ear moves with it */
-      const ring=[];
-      for(let r=0;r<h;r++)for(let q=0;q<w;q++){
-        const k=r*w+q,i=k*4;if(mask[k]||d[i+3]<150||d[i]+d[i+1]+d[i+2]>135)continue;
-        if([[1,0],[-1,0],[0,1],[0,-1]].some(o=>{const qq=q+o[0],rr=r+o[1];return qq>=0&&rr>=0&&qq<w&&rr<h&&mask[rr*w+qq]===1}))ring.push(k);
-      }
-      ring.forEach(k=>{mask[k]=1});
-      let n=0;for(let k=0;k<mask.length;k++)n+=mask[k];
-      if(n<6)return done();
-      const rowShift=(r,dx)=>r<h*.4?dx:r<h*.7?(dx>1?1:0):0;   /* the tip moves most, the base stays put */
-      const frame=dx=>{
-        const out=x.createImageData(w,h),o=out.data;o.set(d);
-        const mv=[];
-        for(let r=0;r<h;r++){const sh=rowShift(r,dx);if(!sh)continue;for(let q=0;q<w;q++){const k=r*w+q;if(mask[k]){mv.push([q,r,sh]);o[k*4+3]=0}}}
-        mv.forEach(m=>{const nq=m[0]+dir*m[2];if(nq<0||nq>=w)return;const s=(m[1]*w+m[0])*4,t=(m[1]*w+nq)*4;for(let j=0;j<4;j++)o[t+j]=d[s+j]});
-        x.putImageData(out,x0,y0);
-      };
-      const seq=[1,2,0,2,1,0];let i=0;
-      const step=()=>{
-        if(i>=seq.length){x.putImageData(orig,x0,y0);return done()}
-        frame(seq[i++]);setTimeout(step,95);
-      };step();
-    },
-    breath(c,x,done){   /* a puff of frosty breath leaves the snout, grows and fades (only drawn over empty space) */
-      const S=c.width/96,u=Math.max(1,Math.round(S)),sx=Math.round(29*S),sy=Math.round(62*S),
-        cols=['#dff4fa','#bfe6f2','#bfe6f2','#8fb8c8','#6f8fa0'];
-      let i=0,drawn=[];
-      const clear=()=>{drawn.forEach(p=>x.clearRect(p[0],p[1],1,1));drawn=[]};
-      const step=()=>{
-        clear();
-        if(i>=cols.length)return done();
-        const sz=(1+(i>>1))*u,bx=sx-Math.round(i*.6*u),by=sy+Math.round(i*1.4*u);
-        x.fillStyle=cols[i];
-        for(let a=0;a<sz;a++)for(let b=0;b<sz;b++){
-          const px=bx+a,py=by+b;
-          if(px<0||py<0||px>=c.width||py>=c.height)continue;
-          if(x.getImageData(px,py,1,1).data[3]===0){x.fillRect(px,py,1,1);drawn.push([px,py])}
-        }
-        i++;setTimeout(step,170);
-      };step();
-    }
-  };
-  const WT=[['blink',30],['flare',15],['ear',20],['breath',20]];
-  const pick=()=>{let n=Math.random()*WT.reduce((a,t)=>a+t[1],0);for(const [k,w] of WT){if((n-=w)<0)return k}return 'blink'};
-  const tick=()=>{
-    wens().forEach(c=>{
-      if(c._dr)return;   /* busy: drool or another idle effect is running */
-      c._dr=1;const done=()=>{c._dr=0};
-      try{FX[pick()](c,c.getContext('2d'),done)}catch(e){done()}
-    });
-    setTimeout(tick,2000+Math.random()*3000);
-  };
-  setTimeout(tick,3000);
 })();

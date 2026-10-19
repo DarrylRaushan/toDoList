@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=76">
+<link rel="stylesheet" href="style.css?v=81">
 </head>
 <body class="wait">
 <div id="tavern" aria-hidden="true">
@@ -116,21 +116,38 @@
 
   <section class="tab" id="tab-hero">
     <div class="panel showcase" aria-label="Equipment">
-      <div class="stage">
-        <div class="scol" id="scol-l"></div>
-        <div class="figure" id="figure" role="img" aria-label="Your hero"></div>
-        <div class="scol" id="scol-r"></div>
-        <div class="fpet" id="fpet" hidden></div>
-        <div class="aura" id="aura" aria-hidden="true"></div>
-        <svg class="links" id="links" aria-hidden="true"></svg>
-        <div class="trytag" id="trytag" hidden></div>
+      <div class="beam" aria-hidden="true"><span>The Armoury</span></div>
+      <i class="banner l" aria-hidden="true"></i><i class="banner r" aria-hidden="true"></i>
+      <div class="alcove">
+        <i class="torch" aria-hidden="true"></i>
+        <div class="stage">
+          <div class="rune" aria-hidden="true"><i></i></div>
+          <div class="figure" id="figure" role="img" aria-label="Your hero"></div>
+          <div class="fpet" id="fpet" hidden></div>
+          <div class="aura" id="aura" aria-hidden="true"></div>
+          <svg class="links" id="links" aria-hidden="true"></svg>
+          <div class="trytag" id="trytag" hidden></div>
+        </div>
+        <i class="torch" aria-hidden="true"></i>
+        <svg class="crest" viewBox="0 0 22 24" shape-rendering="crispEdges" aria-hidden="true">
+          <path d="M1 1h20v12l-10 10L1 13z" fill="#1a0f06"/>
+          <path d="M3 3h16v9.2l-8 8-8-8z" fill="#a8283a"/>
+          <path d="M3 3h16v3H3z" fill="#c9404f"/>
+          <path d="M5 6l12 11M17 6L5 17" stroke="#e6ebf3" stroke-width="2"/>
+          <path d="M4 9l4-4M18 9l-4-4" stroke="#e8b93c" stroke-width="2"/>
+          <path d="M9 8h4v4H9z" fill="#ffd75a"/>
+          <path d="M10 9h2v2h-2z" fill="#fff6c8"/>
+        </svg>
       </div>
       <div class="figname" id="figname"></div>
-      <div class="slotrow" id="slotrow"></div>
+      <div class="rack">
+        <div class="racksign">Armoury</div>
+        <div class="rackgrid" id="rack"></div>
+      </div>
+      <div class="panel picker" id="picker"></div>
       <div class="stats4" id="sheet"></div>
       <div class="sub" id="gearbonus"></div>
     </div>
-    <div class="panel picker" id="picker"></div>
     <div class="panel dev" id="devpet" hidden>
       <div class="devrow">
         <button class="ghost" id="dpprev" type="button" aria-label="Previous companion">&lt;</button>
@@ -140,32 +157,41 @@
       <div class="sub">Dev: preview companions next to your hero. Your save is not changed.</div>
       <button class="ghost" id="dpreset" type="button">Back to my companion</button>
     </div>
-    <button class="ghost wide" id="editchar" type="button">Edit character</button>
-    <h3>Class &amp; chests</h3>
+    <h3>Class &amp; subclass</h3>
     <div class="panel" id="forge"></div>
-    <h3>Honors</h3>
+    <h3>Honours</h3>
+    <div class="panel hn-sum" id="hsum"></div>
+    <div class="htabs" id="htabs" role="tablist" aria-label="Honour categories"></div>
     <div class="badges" id="badges"></div>
   </section>
 
   <section class="tab" id="tab-shop">
-    <h3>Wallet</h3>
+    <div class="storefront" aria-hidden="true">
+      <div class="awning"></div>
+      <div class="shopsign"><b>The Guild Store</b><small>Honest coin for honest goods</small></div>
+    </div>
+    <h3>Strongbox</h3>
     <div class="panel wallet" id="wallet"></div>
     <div class="sub shopnote">Streak Freezes are used automatically when you miss a day and have a streak to save (you still lose HP). Gems drop from the weekly boss and on every 7th day of a perfect streak.</div>
-    <h3>Coin shop</h3>
+    <h3>Treasure chests</h3>
+    <div class="panel chestshop" id="chestbox"></div>
+    <h3>Provisions</h3>
     <div class="shopgrid" id="shopgold"></div>
-    <h3>Gem shop</h3>
+    <h3>Jeweller's case</h3>
     <div class="shopgrid" id="shopgem"></div>
   </section>
 
   <section class="tab" id="tab-realm">
     <div class="arenaframe">
-    <div class="aftitle" aria-hidden="true">BOSS FIGHT</div>
+    <div class="aftitle" aria-hidden="true">THE WORLD BEYOND</div>
     <div class="fhud" aria-hidden="true">
       <div class="fl"><div class="atag" id="atag"></div>
       <div class="ahp"><div class="bar hp" id="ahbar"><i id="ahfill"></i><em id="ahtxt"></em></div></div></div>
       <div class="vsb">VS</div>
       <div class="abinfo"><b id="abname"></b><div class="bar hp"><i id="abghost"></i><i id="abfill"></i><em id="abtxt"></em></div></div>
     </div>
+    <div class="doorway">
+    <i class="leaf l" aria-hidden="true"></i>
     <div class="arena" id="arena" aria-hidden="true">
       <div class="stars"></div><div class="orb"></div><div class="castle"></div><div class="mist"></div>
       <div class="ground"></div>
@@ -174,6 +200,8 @@
       <div class="sprite boss" id="aboss"></div>
       <div class="afx"></div>
       <div class="victory">VICTORY</div>
+    </div>
+    <i class="leaf r" aria-hidden="true"></i>
     </div>
     </div>
     <div class="panel dev" id="dev" hidden>
@@ -200,7 +228,7 @@
   <nav class="nav" aria-label="Main">
     <button class="navbtn on" data-tab="quests" type="button"><span class="ni"></span>Quests</button>
     <button class="navbtn" data-tab="hero" type="button"><span class="ni"></span>Hero<span class="dot" id="dot-hero" hidden>!</span></button>
-    <button class="navbtn" data-tab="shop" type="button"><span class="ni"></span>Shop</button>
+    <button class="navbtn" data-tab="shop" type="button"><span class="ni"></span>Shop<span class="dot" id="dot-shop" hidden>!</span></button>
     <button class="navbtn" data-tab="realm" type="button"><span class="ni"></span>Realm</button>
   </nav>
 </main>
@@ -232,7 +260,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=6"></script>
-<script src="script.js?v=60"></script>
+<script src="script.js?v=63"></script>
 <script src="wendigo-idle.js?v=1"></script>
 </body>
 </html>

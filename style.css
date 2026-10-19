@@ -127,10 +127,6 @@ body.shake{animation:shake .5s steps(6)}
 .boss b{font:400 12px/1.4 var(--head);color:var(--text);display:block;margin-bottom:8px}
 #forge{padding:14px}
 #forge>.sub{margin:0 0 14px;color:var(--text)}
-.clsgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.clsgrid .btn{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:96px;padding:10px 6px}
-.clsgrid .px{width:32px;height:32px}
-.clsgrid small{font:400 18px/1 var(--body)}
 .chestrow{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:23px}
 .chestrow .px{width:32px;height:32px}
 .chestrow .btn{margin-left:auto;padding:8px 14px;min-height:42px}
@@ -433,7 +429,7 @@ body.creating{overflow:hidden}
 .eslot:active{transform:translate(2px,2px)}
 .eslot .up{position:absolute;top:-10px;right:-6px;z-index:2;background:var(--hp);color:#fff;font:400 9px var(--head);font-style:normal;padding:3px 5px;border:3px solid var(--ink)}
 
-.picker{margin-top:14px;padding:12px}
+.picker{margin:0;padding:12px}
 .pkhead{display:flex;justify-content:space-between;align-items:center;font:400 12px var(--head);color:var(--gold)}
 .pkhead span{font:400 21px var(--body);color:var(--text)}
 .picker>.sub{margin:4px 0 6px}
@@ -468,9 +464,6 @@ body.creating{overflow:hidden}
 
 
 /* ---- class preview + chest stage ---- */
-.lockrow{display:flex;justify-content:center;gap:14px;margin:14px 0 4px}
-.lockc{width:48px;height:48px;display:grid;place-items:center;background:var(--panel2);border:3px solid var(--ink);box-shadow:inset 3px 3px 0 rgba(0,0,0,.25)}
-.lockc .px{width:26px;height:26px;filter:brightness(0) opacity(.5)}
 .cbar{height:22px;margin-top:10px}
 .cbar em{font-size:17px}
 
@@ -494,23 +487,10 @@ body.creating{overflow:hidden}
 
 
 /* ---- locked class preview: labels, padlocks, tap for bonus ---- */
-.lockrow{gap:8px;margin:14px 0 0}
-.lockitem{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:64px;padding:0;background:none;border:0;color:var(--muted);cursor:pointer}
-.lockitem small{font:400 8px var(--head)}
-.lockitem:active .lockc{transform:translate(2px,2px)}
-.lockitem.on small{color:var(--gold)}
-.lockitem.on .lockc{border-color:var(--act)}
-.lockc{position:relative}
-.lockc .px{filter:grayscale(1) brightness(.95) opacity(.75)}
 .lockpad{position:absolute;right:-8px;bottom:-8px;width:24px;height:24px;display:grid;place-items:center;background:var(--panel);border:3px solid var(--ink)}
-.lockc .lockpad .px{width:14px;height:14px;filter:none}
-.lockinfo{text-align:center;font-size:20px;color:var(--text);margin-top:12px;min-height:22px}
 
 
 /* ---- 5 classes: keep the rows from overflowing on phones ---- */
-.lockrow{gap:4px}
-.lockitem{min-width:0;flex:1;max-width:72px}
-.clsgrid .btn:last-child:nth-child(odd){grid-column:1/-1}
 
 /* ---- off-hand + companion slots ---- */
 .slotrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
@@ -557,8 +537,7 @@ body.creating{overflow:hidden}
 .fpet:not(.big){left:calc(18px + var(--cw));bottom:40px;z-index:0;translate:calc(var(--tx) * 12px) 0}
 .fpet .px{width:var(--pw);height:var(--pw)}
 .fpet:not(.big)::after{bottom:-16px}
-.stage:has(.fpet.big:not([hidden])){padding-top:calc(12px + max(0px, var(--pw) - 196px))}   /* sky grows so a big companion can rise above the hero's head */
-.fpet.big{left:calc(50% - var(--pw) * .8);bottom:40px;z-index:0;filter:drop-shadow(0 0 12px var(--gl));translate:calc(var(--tx) * 3px) 0}   /* big and to the left, hero in front, most of it in view */
+/* big-pet sizing / position is handled later via --S / --hw (see "companion placement") */
 .fpet.big::after{left:6%;right:6%;bottom:-6px;height:14px}
 
 /* ---- selectable backgrounds (data-bg on .stage, cycled with the arrows under the hero) ---- */
@@ -591,14 +570,18 @@ body.creating{overflow:hidden}
    Small companions (Lv 1-7) stand left of the hero, head touching the hero's edge.
    Big companions (Lv 8+) tower behind the hero, much larger than it: the hero stands in front, the head looms out past the hero's shoulder. */
 .stage{--W:min(calc(100vw - 32px),528px);--hw:min(190px,calc(var(--W) - 2 * var(--cw) - 42px));--S:var(--pw)}
-.stage:has(.fpet.big:not([hidden])){--S:min(max(calc(var(--pw) * 1.3),calc(var(--hw) * 2.1)),calc(var(--W) * 1.1))}
-.stage .fpet{left:calc(50% - .26 * var(--hw) - .94 * var(--S) + .035 * var(--S));bottom:30px;z-index:0;filter:none}
-.stage .fpet.big{left:calc(50% - .5 * var(--S) + .08 * var(--hw) + .035 * var(--S));bottom:30px;z-index:0;filter:drop-shadow(0 0 14px var(--gl))}
+.stage:has(.fpet.big:not([hidden])){
+  --hw:min(105px,calc(var(--W) - 2 * var(--cw) - 42px));
+  --S:min(max(calc(var(--pw) * 1.55),calc(var(--hw) * 3.3)),calc(var(--W) - 10px),350px);
+}
+.stage .fpet{left:calc(50% - .26 * var(--hw) - .94 * var(--S) + .035 * var(--S) + .25 * var(--hw));bottom:30px;z-index:0;filter:none}
+.stage .fpet.big{left:calc(50% - .5 * var(--S) + .04 * var(--hw));bottom:30px;z-index:0;filter:drop-shadow(0 0 14px var(--gl))}
 .stage .fpet .px{width:var(--S);height:var(--S)}
 .stage .figure{transform:none;z-index:2}
-.stage:has(.fpet:not([hidden])) .figure{transform:translateX(calc(var(--hw) * .14))}
-.stage:has(.fpet.big:not([hidden])) .figure{transform:translateX(calc(var(--hw) * .05))}
-.stage:has(.fpet.big:not([hidden])){padding-top:calc(12px + max(0px,calc(var(--S) - 1.3 * var(--hw) - 6px)))}
+.stage:has(.fpet:not([hidden])) .figure{transform:translateX(calc(var(--hw) * .24))}
+.stage:has(.fpet.big:not([hidden])) .figure{transform:translateX(calc(var(--hw) * .03))}
+.stage:has(.fpet.big:not([hidden])){padding-top:calc(12px + max(0px,calc(var(--S) - 1.45 * var(--hw) - 6px)))}
+.stage:has(.fpet.big:not([hidden])) .figure .px{max-width:105px}
 
 /* Realm arena: big companions are far bigger than the hero and stand behind it, head looming past it */
 .sprite.pet.big{--aw:189px;left:calc(10% + 47.7px - .465 * var(--aw));bottom:34px;z-index:1}
@@ -617,7 +600,7 @@ body.creating{overflow:hidden}
 
 /* ---- small companions (Cinder Pup) stand in FRONT of the hero, just left of centre at its feet ---- */
 .stage .fpet.solid{left:calc(50% - .5 * var(--S) - .24 * var(--hw));bottom:18px;z-index:3}
-.stage:has(.fpet.solid:not([hidden])) .figure{transform:none}   /* the hero no longer needs to step aside */
+.stage:has(.fpet.solid:not([hidden])) .figure{transform:translateX(calc(var(--hw) * .12))}   /* the hero no longer needs to step aside */
 .sprite.pet.solid{left:calc(10% + 45px - .5 * var(--aw) - 18px);bottom:24px;z-index:3}
 
 /* ---- companions flagged "still" (Wendigo) do not bob up and down ---- */
@@ -627,38 +610,62 @@ body.creating{overflow:hidden}
 
 
 
-/* ---- honors: medal plaques ----
-   each badge is a plaque with a coloured ribbon and a round medal (streak = orange, level = purple, other = green).
-   Earned ones glow and sparkle; locked ones are dim with a padlock and, for streak/level goals, a progress bar. */
-.badges{grid-template-columns:repeat(2,1fr);gap:16px}
-.b{--bc:var(--xp);position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px 8px 12px;overflow:hidden;
-  background:radial-gradient(ellipse at 50% 0,color-mix(in srgb,var(--bc) 26%,transparent),transparent 72%),var(--panel)}
-.b.k-s{--bc:#e8803a}
-.b.k-l{--bc:#a56be0}
-.b.k-x{--bc:#58b368}
-.b::before{content:'';position:absolute;top:0;left:0;right:0;height:9px;background:var(--bc);border-bottom:3px solid var(--ink)}
-.b .e{position:relative;width:68px;height:68px;margin:0 0 4px;border:4px solid var(--bc);
-  background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.28),transparent 65%),var(--panel2);
-  box-shadow:0 0 0 3px var(--ink),inset 3px 3px 0 rgba(255,255,255,.12),inset -3px -3px 0 rgba(0,0,0,.25)}
-.b .e .px{width:40px;height:40px}
-.b b{display:block;font:400 9px/1.5 var(--head);color:var(--text);min-height:27px;display:grid;place-items:center}
-.b .bd{font-size:19px;line-height:1.05;color:var(--muted)}
+/* ---- honours v4: tracks. A slim summary row, category tabs, and one row per track (its medal, next goal, tier pips and a progress bar). Tap a row to list its tiers. ---- */
+.hn-sum.panel{padding:8px 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hn-big{flex:none;width:30px;height:30px;display:grid;place-items:center;background:var(--panel2);border:3px solid var(--gold);box-shadow:0 0 0 2px var(--ink)}
+.hn-big .px{width:18px;height:18px}
+.hn-n{font:400 12px var(--head);color:var(--gold);white-space:nowrap}
+.hn-bar{flex:1;min-width:50px;height:12px;background:var(--ink);border:3px solid var(--ink);overflow:hidden}
+.hn-bar i{display:block;height:100%;background:linear-gradient(var(--gold),color-mix(in srgb,var(--gold) 70%,#000))}
+.hn-tiers{flex:1 0 100%;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.hn-tr{--tc:#e0905a;display:flex;align-items:center;justify-content:center;gap:6px;padding:4px 2px;background:var(--panel2);border:3px solid var(--ink)}
+.hn-tr.t1{--tc:#d3dae8}.hn-tr.t2{--tc:#f2c64a}.hn-tr.t3{--tc:#ff7ae0}
+.hn-tr i{flex:none;width:10px;height:10px;background:var(--tc);border:2px solid var(--ink);box-shadow:0 0 6px color-mix(in srgb,var(--tc) 70%,transparent)}
+.hn-tr b{font:400 9px var(--head);color:var(--tc)}
+.htabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0}
+.htab{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:7px 2px 5px;font:400 7px var(--head);color:var(--muted);background:var(--panel2);border:3px solid var(--ink);box-shadow:2px 2px 0 var(--ink);cursor:pointer}
+.htab .hi{display:grid;place-items:center}.htab .hi .px{width:16px;height:16px}
+.htab .hl{max-width:100%;overflow:hidden;text-overflow:clip;white-space:nowrap}
+.htab em{font:normal 400 15px/1 var(--body)}
+.htab.on{color:var(--goldtxt);background:var(--gold)}
+.htab:active{transform:translate(2px,2px);box-shadow:none}
+.htab:focus-visible,.tk-h:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 
-.b.got .e{box-shadow:0 0 0 3px var(--ink),0 0 14px color-mix(in srgb,var(--bc) 75%,transparent),inset 3px 3px 0 rgba(255,255,255,.18),inset -3px -3px 0 rgba(0,0,0,.25)}
-.b.got .e::after{content:'';position:absolute;top:-10px;right:-10px;width:4px;height:4px;background:#fff;
-  box-shadow:4px 0 #fff,-4px 0 #fff,0 4px #fff,0 -4px #fff;animation:blink 1.6s steps(2) infinite}
-.b.got b{color:var(--gold)}
-
-.b.lock{opacity:1}
-.b.lock::before{background:#4a3c34}
-.b.lock .e{border-color:#7a6a58;border-style:dashed;box-shadow:0 0 0 3px var(--ink)}
-.b.lock .e .px{filter:grayscale(1) brightness(.75);opacity:.5}
-.b.lock b{color:var(--muted)}
-.bl{position:absolute;right:-12px;bottom:-12px;width:26px;height:26px;display:grid;place-items:center;background:var(--panel);border:3px solid var(--ink)}
-.b.lock .e .bl .px{width:14px;height:14px;filter:none;opacity:1}
-.bp{position:relative;width:100%;height:20px;margin-top:4px;background:var(--ink);border:3px solid var(--ink);overflow:hidden}
-.bp i{display:block;height:100%;background:var(--bc)}
-.bp em{position:absolute;inset:0;display:grid;place-items:center;font:400 17px var(--body);font-style:normal;color:#fff;text-shadow:1px 1px 0 #000}
+.badges{display:flex;flex-direction:column;gap:8px}
+.tk{--bc:#e0905a;padding:8px 10px;display:flex;flex-direction:column;gap:6px;background:var(--panel);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink),inset 3px 3px 0 rgba(255,255,255,.12),inset -3px -3px 0 rgba(0,0,0,.22)}
+.tk.t1{--bc:#d3dae8}.tk.t2{--bc:#f2c64a}.tk.t3{--bc:#ff7ae0}
+.tk-h{display:flex;align-items:center;gap:10px;width:100%;padding:0;margin:0;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.tk-m{position:relative;flex:none;width:40px;height:40px;display:grid;place-items:center;background:var(--panel2);border:3px solid var(--bc);box-shadow:0 0 0 2px var(--ink)}
+.tk-m .px{width:24px;height:24px}
+.tk-m.got{box-shadow:0 0 0 2px var(--ink),0 0 10px color-mix(in srgb,var(--bc) 70%,transparent)}
+.tk-m.lock{border-style:dashed;border-color:#7a6a58}.tk-m.lock .px{filter:grayscale(1) brightness(.8);opacity:.55}
+.tk-m .bl{right:-6px;bottom:-6px;width:16px;height:16px}.tk-m .bl .px{width:10px;height:10px;filter:none;opacity:1}
+.bl{position:absolute;display:grid;place-items:center;background:var(--panel);border:2px solid var(--ink)}
+.tk-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tk-t b{font:400 9px/1.4 var(--head);color:var(--text)}
+.tk.full .tk-t b{color:var(--gold)}
+.tk-t small{font-size:18px;line-height:1;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tk-p{flex:none;display:flex;gap:3px}
+.tk-p i{width:10px;height:10px;background:var(--ink);border:2px solid var(--ink);box-shadow:inset 0 0 0 2px #3a302a}
+.tk-p i.on{--pc:#e0905a;background:var(--pc);box-shadow:0 0 6px color-mix(in srgb,var(--pc) 70%,transparent)}
+.tk-p i.t1{--pc:#d3dae8}.tk-p i.t2{--pc:#f2c64a}.tk-p i.t3{--pc:#ff7ae0}
+.bp{position:relative;width:100%;height:14px;background:var(--ink);border:3px solid var(--ink);overflow:hidden}
+.bp i{display:block;height:100%;background:var(--bc,var(--gold))}
+.bp em{position:absolute;inset:0;display:grid;place-items:center;font:400 14px/1 var(--body);font-style:normal;color:#fff;text-shadow:1px 1px 0 #000}
+.tk-l{display:flex;flex-direction:column;gap:4px;padding-top:2px}
+.tk-r{--bc:#e0905a;display:flex;align-items:center;gap:8px;padding:5px 6px;background:var(--panel2);border:2px solid var(--ink)}
+.tk-r.t1{--bc:#d3dae8}.tk-r.t2{--bc:#f2c64a}.tk-r.t3{--bc:#ff7ae0}
+.tk-ri{flex:none;display:grid;place-items:center;width:26px;height:26px;border:2px solid var(--bc);background:var(--panel)}
+.tk-ri .px{width:16px;height:16px}
+.tk-r.lock .tk-ri{border-style:dashed;border-color:#7a6a58}.tk-r.lock .tk-ri .px{filter:grayscale(1) brightness(.8);opacity:.55}
+.tk-rt{flex:1;min-width:0;display:flex;flex-direction:column}
+.tk-rt b{font:400 8px/1.4 var(--head);color:var(--text)}.tk-r.got .tk-rt b{color:var(--gold)}
+.tk-rt small{font-size:17px;line-height:1;color:var(--muted)}
+.tk-r em{flex:none;font:normal 400 7px var(--head);color:var(--bc);text-transform:uppercase;letter-spacing:1px}
+.tk-r.got em{font:normal 400 16px var(--body);color:var(--muted);letter-spacing:0}
+@media (min-width:640px){.badges{display:grid;grid-template-columns:1fr 1fr}}
+@media (max-width:360px){.tk-p{display:none}.htab .hl{font-size:6px}}
+@media (prefers-reduced-motion:reduce){.htab:active{transform:none}}
 
 /* ---- hero tab: compact inventory picker (grid of item tiles + one detail card) ---- */
 .pkempty{display:flex;align-items:center;gap:10px;margin-top:8px;padding:8px 10px;background:var(--panel2);border:3px dashed var(--ink);color:var(--muted);font-size:20px;line-height:1.05}
@@ -812,13 +819,78 @@ body.critical::after{box-shadow:inset 0 0 110px 22px rgba(214,58,71,.5);animatio
 .rank .rk-sub{display:flex;align-items:center;justify-content:center;gap:8px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);text-shadow:2px 2px 0 var(--ink)}
 .rk-sub::before,.rk-sub::after{content:'';flex:1;min-width:6px;height:3px;background:repeating-linear-gradient(90deg,var(--gold) 0 6px,transparent 6px 9px);opacity:.6}
 
-/* ---- subclasses (Forge) ---- */
+/* ---- subclasses (Forge) ----
+   header plate (padlock / open padlock / gem), two path cards in each subclass's own colours, a detail sheet with perks and costs,
+   an emblem card once chosen, and the path you did not take shown faded. --sc = the path's main colour, --sd = its light accent. */
 .subbox{margin-top:14px;padding-top:14px;border-top:3px dotted var(--ink)}
-.subgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.subopt{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:124px;padding:10px 6px;text-align:center}
-.subopt .px{width:32px;height:32px}
-.subopt b{font:400 10px/1.4 var(--head)}
-.subopt small{font:400 18px/1.05 var(--body)}
+.sphd{display:flex;align-items:center;gap:10px;min-width:0;margin:0 0 10px;padding:7px 10px 6px;background:linear-gradient(rgba(0,0,0,.42),rgba(0,0,0,.2));border:3px solid var(--ink);box-shadow:inset 0 3px 0 rgba(0,0,0,.28)}
+.sphd .px{flex:none}
+.sphd b{flex:1;min-width:0;font:400 11px/1.3 var(--head);letter-spacing:1px;text-transform:uppercase;color:var(--text)}
+.sptag{flex:none;padding:3px 6px 1px;font:400 18px/1 var(--body);color:var(--muted);background:rgba(0,0,0,.35);border:2px solid rgba(0,0,0,.5)}
+.sphd.off{border-style:dashed}
+.sphd.ready{animation:subglow 1.8s ease-in-out infinite}
+.sphd.ready .sptag{color:var(--acttxt);background:var(--act);border-color:var(--ink)}
+.sphd.on b{color:var(--gold)}
+.sphd.on .sptag{color:#ffe08a}
+.spgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.spc{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:12px 6px 10px;text-align:center;color:var(--text);cursor:pointer;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--sc) 55%,#150f12),color-mix(in srgb,var(--sc) 24%,#150f12));
+  border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink),inset 0 0 0 2px color-mix(in srgb,var(--sd) 40%,transparent),inset 3px 3px 0 rgba(255,255,255,.1)}
+.spc:active{transform:translate(2px,2px)}
+div.spc{cursor:default}
+.spc.on{outline:4px solid var(--act);outline-offset:2px;box-shadow:3px 3px 0 var(--ink),inset 0 0 0 2px var(--sd),0 0 16px color-mix(in srgb,var(--sc) 70%,transparent)}
+.spi{position:relative;display:grid;place-items:center;width:64px;height:64px;background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--sd) 30%,transparent),transparent 70%),rgba(0,0,0,.4);border:3px solid color-mix(in srgb,var(--sd) 60%,#0d0a09);box-shadow:inset 3px 3px 0 rgba(0,0,0,.35)}
+.spi .lockpad{right:-8px;bottom:-8px}
+.spi .lockpad .px{width:14px;height:14px;filter:none}
+.spn{font:400 10px/1.4 var(--head);text-shadow:2px 2px 0 #000;overflow-wrap:anywhere}
+.spr{display:inline-block;padding:3px 6px 1px;font:400 18px/1 var(--body);color:#1b0a02;background:var(--sd);border:2px solid var(--ink);text-shadow:none}
+.spt{font:400 19px/1.05 var(--body);color:#e6d8b8;text-shadow:1px 1px 0 rgba(0,0,0,.6);overflow-wrap:anywhere}
+.spc.lock .spi canvas.px:not(.coin){filter:grayscale(1) brightness(.85);opacity:.75}
+.spc.lock{background:linear-gradient(180deg,color-mix(in srgb,var(--sc) 30%,#1a1416),color-mix(in srgb,var(--sc) 14%,#1a1416))}
+.spc.skip{opacity:.5;filter:grayscale(.8);box-shadow:3px 3px 0 var(--ink)}
+.spc.skip{flex-direction:row;text-align:left;align-items:center;gap:10px;padding:8px 10px}
+.spc.skip .spi{flex:none;width:48px;height:48px}
+.spc.skip .spi canvas{transform:scale(.7)}
+.spc.skip .spn,.spc.skip .spr,.spc.skip .spt{text-align:left}
+.spskl{margin:12px 0 6px;font-size:19px}
+
+/* the sheet under the cards: perks in green, costs in red, then the confirm button */
+.spdet{margin-top:12px;padding:12px;background:var(--panel2);border:3px solid var(--ink);box-shadow:inset 3px 3px 0 rgba(0,0,0,.22)}
+.spdet.has{border-left:8px solid var(--sc);background:linear-gradient(90deg,color-mix(in srgb,var(--sc) 22%,transparent),transparent 60%),var(--panel2)}
+.spdet>.sub{margin:0;text-align:center}
+.spdh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.spdh b{font:400 11px/1.4 var(--head);color:var(--gold);overflow-wrap:anywhere}
+.spdet .spt{margin-bottom:8px;color:var(--muted)}
+.spl{display:grid;gap:6px;margin:8px 0}
+.spp{display:flex;align-items:flex-start;gap:8px;padding:4px 8px 3px 4px;font:400 21px/1.05 var(--body);color:var(--text);background:rgba(0,0,0,.28);border:2px solid rgba(0,0,0,.45)}
+.spp i{flex:none;display:grid;place-items:center;width:20px;height:20px;margin-top:1px;font:400 18px/1 var(--body);font-style:normal;color:#fff;border:2px solid var(--ink)}
+.spp.up i{background:#2f7d3e}
+.spp.dn i{background:#b8283a}
+.spp.dn{color:#ffb4aa}
+.spwarn{margin:4px 0 10px;font:400 19px/1.05 var(--body);color:var(--muted);text-align:center}
+.spdet .btn.wide{margin-top:0}
+.spgo{margin-top:6px;text-align:center;font-size:19px}
+
+/* chosen: an emblem card in the path's colours with a Permanent stamp */
+.spown{position:relative;overflow:hidden;padding:12px;color:#f0e2c0;
+  background:radial-gradient(ellipse 80% 70% at 15% 0,color-mix(in srgb,var(--sd) 28%,transparent),transparent 70%),linear-gradient(135deg,color-mix(in srgb,var(--sc) 85%,#120d10),color-mix(in srgb,var(--sc) 40%,#120d10));
+  border:3px solid var(--ink);box-shadow:3px 4px 0 var(--ink),inset 0 0 0 2px var(--sd),inset 0 0 22px rgba(0,0,0,.35)}
+.spown::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.14) 50%,transparent 58%) 150% 0/250% 100% no-repeat;animation:sbglint 5s ease-in-out infinite}
+.spot{display:flex;align-items:center;gap:12px;margin-bottom:8px;padding-right:74px}
+.spi.big{flex:none;width:76px;height:76px}
+.spx{display:grid;gap:6px;min-width:0;justify-items:start}
+.spown .spn{font-size:13px;color:#fff}
+.spown .spt{margin-bottom:6px}
+.spstamp{position:absolute;top:10px;right:8px;padding:3px 6px 1px;font:400 8px/1.3 var(--head);font-style:normal;letter-spacing:1px;text-transform:uppercase;color:var(--sd);border:3px solid var(--sd);transform:rotate(8deg);opacity:.9;box-shadow:inset 0 0 0 2px rgba(0,0,0,.25)}
+@media (max-width:380px){.spot{padding-right:0;padding-top:22px}.spi.big{width:64px;height:64px}}
+@media (prefers-reduced-motion:reduce){.spown::after,.sphd.ready{animation:none}}
+
+/* chest: lives in the Shop tab now, on the same dark counter as the strongbox */
+#tab-shop .chestshop.panel{padding:14px;border-top:10px solid #8a5a2a;
+  background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(0,0,0,.28) 30px 32px),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 2px,transparent 2px 7px),linear-gradient(#5a3a1a,#3e2713);
+  box-shadow:4px 4px 0 var(--ink),inset 0 4px 0 rgba(255,220,160,.2),inset 0 0 0 3px #1a0f06}
+#tab-shop .chestshop .chestwrap{background:radial-gradient(ellipse at 50% 55%,rgba(255,200,120,.14),transparent 65%),linear-gradient(#34200f,#241508)}
+#tab-shop .chestshop .btn.wide{margin-top:12px}
 
 /* ---- pixel-art bosses (Direwolf Pack): bigger, planted on the ground, no bobbing (the hit flash still plays) ---- */
 .sprite.boss.art .px{width:160px;height:160px}
@@ -1509,6 +1581,22 @@ body.dragmode,body.dragmode *{cursor:grabbing!important}
 .hero .rank .rk-subc.on[data-sub="herald"] .s3{left:80%;background:#ff7a8a;animation-delay:-1.7s}
 .hero .rank .rk-subc.on[data-sub="herald"] .s4{left:17px;top:50%;width:6px;height:6px;margin-top:-3px;border:2px solid #ffe9a0;border-radius:50%;animation:sbring 1.6s ease-out infinite}
 
+/* ---- Sharpshooter: forest-green plate, a red laser dot sweeps across, the scope glints ---- */
+.hero .rank .rk-subc.on[data-sub="sharpshooter"]{color:#ffd9d0;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 40%),linear-gradient(180deg,#2f5a2a,#142a14);border-color:#c9302c}
+.hero .rank .rk-subc.on[data-sub="sharpshooter"]::after{inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.3) 50%,transparent 60%) 150% 0/250% 100% no-repeat;animation:sbglint 5s ease-in-out infinite}
+@keyframes sbscan{0%{left:8%;opacity:0}10%{opacity:1}50%{left:88%;opacity:1}60%{opacity:0}100%{left:8%;opacity:0}}
+.hero .rank .rk-subc.on[data-sub="sharpshooter"] .s1{top:50%;width:3px;height:3px;margin-top:-1px;border-radius:50%;background:#ff3a30;box-shadow:0 0 4px 1px #ff3a30;animation:sbscan 3.6s ease-in-out infinite}
+.hero .rank .rk-subc.on[data-sub="sharpshooter"] .s2{left:90%;top:3px;width:2px;height:2px;background:#fff;animation:sbtwink 3s linear infinite}
+.hero .rank .rk-subc.on[data-sub="sharpshooter"] .s3,.hero .rank .rk-subc.on[data-sub="sharpshooter"] .s4{width:0;height:0}
+
+/* ---- Pathfinder: earthy parchment-brown plate, a dotted trail marches along the bottom, the compass needle sways ---- */
+.hero .rank .rk-subc.on[data-sub="pathfinder"]{color:#f4e2b0;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 40%),linear-gradient(180deg,#7a5a2a,#3a2a12);border-color:#e8b93c}
+.hero .rank .rk-subc.on[data-sub="pathfinder"]::after{left:4px;right:4px;bottom:2px;top:auto;height:2px;background:repeating-linear-gradient(90deg,#f4e2b0 0 2px,transparent 2px 5px);opacity:.7;animation:sbmarchx 1s linear infinite}
+@keyframes sbmarchx{0%{background-position:0 0}100%{background-position:5px 0}}
+.hero .rank .rk-subc.on[data-sub="pathfinder"] canvas{transform-origin:50% 50%;animation:sbsway 3s ease-in-out infinite}
+.hero .rank .rk-subc.on[data-sub="pathfinder"] .s1{left:85%;top:4px;width:2px;height:2px;background:#ffe9a0;animation:sbtwink 3.4s linear infinite}
+.hero .rank .rk-subc.on[data-sub="pathfinder"] .s2,.hero .rank .rk-subc.on[data-sub="pathfinder"] .s3,.hero .rank .rk-subc.on[data-sub="pathfinder"] .s4{width:0;height:0}
+
 /* every moving part stops when the device asks for reduced motion (the global rule above cannot reach pseudo-elements) */
 @media (prefers-reduced-motion:reduce){.hero .rank .rk-subc,.hero .rank .rk-subc *,.hero .rank .rk-subc::before,.hero .rank .rk-subc::after{animation:none!important}}
 
@@ -2159,7 +2247,7 @@ body[data-tab="quests"] .board,.board{box-shadow:4px 4px 0 var(--ink),0 18px 46p
 .stage .fpet.big{bottom:calc(8px + var(--g) - 4px)}   /* these sprites have a few transparent rows under the feet */
 /* small companions (Fire Wolf Cub) stand IN FRONT of the hero: their paws are 14px lower on the floor than the hero's feet, so they read as closer to the viewer */
 .stage .fpet.solid{bottom:calc(8px + var(--g) - 18px);   /* hero feet are at 8px + --g; raise the 18px to bring the pup further forward, lower it to bring it back */
-  left:max(calc(var(--cw) - 16px),calc(50% - .5 * var(--S) - .5 * var(--hw)))}   /* a little left of centre, so it overlaps the hero's legs but doesn't hide them */
+  left:max(calc(var(--cw) - 16px),calc(50% - .5 * var(--S) - .5 * var(--hw) + .17 * var(--hw)))}   /* a little left of centre, so it overlaps the hero's legs but doesn't hide them */
 .sprite.pet.solid{left:calc(10% + 45px - .5 * var(--aw) - 42px);bottom:12px}   /* same in the Realm arena: lower on the ground than the hero (hero bottom is 32px) */
 
 /* Fire Wolf Cub: a dark, tight contact shadow BEHIND the sprite (z-index:-1), so the paws overlap it and read as touching the ground */
@@ -2185,3 +2273,462 @@ body[data-tab="quests"] .board,.board{box-shadow:4px 4px 0 var(--ink),0 18px 46p
 .rvhp{flex:none;font-size:.8em;color:#ff7a7a}
 .rvrow.on .rvhp{visibility:hidden}
 .card.rv .stack{margin-top:4px}
+
+
+/* =====================================================================
+   THE GUILD HALL, ROOM BY ROOM
+   Quests = the notice board · Hero = the mead hall · Shop = the guild store · Realm = the open door out into the world
+   ===================================================================== */
+
+/* section titles on the Hero tab: oak signs nailed to the wall */
+#tab-hero h3{display:inline-block;margin:30px 4px 14px;padding:8px 14px 6px;color:var(--gold);text-shadow:2px 2px 0 #000;
+  background:radial-gradient(circle 3px at 8px 50%,#b9c2d0 92%,transparent),radial-gradient(circle 3px at calc(100% - 8px) 50%,#b9c2d0 92%,transparent),repeating-linear-gradient(90deg,transparent 0 22px,rgba(0,0,0,.25) 22px 24px),linear-gradient(#7a5028,#563518);
+  border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.24),3px 4px 0 rgba(0,0,0,.45);padding-left:22px;padding-right:22px}
+#tab-hero h3::before{content:none}
+
+/* ---------- SHOP TAB: the guild store ---------- */
+.storefront{position:relative;margin:24px 0 8px}
+.awning{position:relative;height:40px;margin:0 -2px;border:3px solid #1a0f06;border-bottom:0;
+  background:repeating-linear-gradient(90deg,#b02a3c 0 30px,#f0e2c0 30px 60px);
+  box-shadow:inset 0 5px 0 rgba(255,255,255,.22),inset 0 -8px 0 rgba(0,0,0,.16);filter:drop-shadow(0 4px 0 rgba(0,0,0,.45))}
+.awning::after{content:'';position:absolute;left:-3px;right:-3px;top:100%;height:15px;background:inherit;
+  -webkit-mask:radial-gradient(circle 15px at 15px 0,#000 14px,transparent 15px) 0 0/30px 100% repeat-x;mask:radial-gradient(circle 15px at 15px 0,#000 14px,transparent 15px) 0 0/30px 100% repeat-x}
+.shopsign{position:relative;width:max-content;max-width:92%;margin:30px auto 0;padding:11px 20px 8px;text-align:center;
+  background:repeating-linear-gradient(90deg,transparent 0 26px,rgba(0,0,0,.25) 26px 28px),linear-gradient(#7a5028,#563518);
+  border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.24),3px 5px 0 rgba(0,0,0,.5)}
+.shopsign::before,.shopsign::after{content:'';position:absolute;top:-20px;width:5px;height:18px;background:#9aa3ad;border:2px solid #1a0f06}
+.shopsign::before{left:18%}.shopsign::after{right:18%}
+.shopsign b{display:block;font:400 14px/1.3 var(--head);color:var(--gold);text-shadow:2px 2px 0 #000;letter-spacing:1px;text-transform:uppercase}
+.shopsign small{display:block;margin-top:5px;padding-top:4px;border-top:3px double rgba(232,185,60,.5);font:400 19px/1 var(--body);color:#f0e2c0;text-shadow:1px 1px 0 #000}
+
+/* shelf labels */
+#tab-shop h3{display:inline-block;margin:30px 4px 14px;padding:8px 18px 6px;color:var(--gold);text-shadow:2px 2px 0 #000;
+  background:repeating-linear-gradient(90deg,transparent 0 22px,rgba(0,0,0,.25) 22px 24px),linear-gradient(#7a5028,#563518);
+  border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.24),3px 4px 0 rgba(0,0,0,.45)}
+#tab-shop h3::before{content:none}
+
+/* the counter: coins and goods you carry */
+#tab-shop .wallet.panel{border-top:10px solid #8a5a2a;
+  background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(0,0,0,.28) 30px 32px),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 2px,transparent 2px 7px),linear-gradient(#5a3a1a,#3e2713);
+  box-shadow:4px 4px 0 var(--ink),inset 0 4px 0 rgba(255,220,160,.2),inset 0 0 0 3px #1a0f06}
+#tab-shop .wtile{background:linear-gradient(#34200f,#241508)}
+/* the chalkboard */
+#tab-shop .shopnote{margin:14px 4px 0;padding:10px 12px 8px;font-size:21px;line-height:1.1;color:#e8efe4;text-shadow:1px 1px 0 rgba(0,0,0,.5);
+  background:radial-gradient(ellipse at 30% 20%,rgba(255,255,255,.07),transparent 60%),#25322d;
+  border:6px solid #6b4423;box-shadow:0 0 0 3px #1a0f06,inset 0 0 0 2px #1a0f06,inset 0 0 22px rgba(0,0,0,.4),3px 5px 0 3px rgba(0,0,0,.4)}
+
+/* goods on shelves: a crate, a parchment label, a hanging price tag, and the shelf plank underneath */
+#tab-shop .shopgrid{gap:22px}
+#tab-shop .sitem.panel{position:relative;gap:12px;padding:12px 12px 20px;border:3px solid #1a0f06;
+  background:repeating-linear-gradient(90deg,transparent 0 26px,rgba(0,0,0,.25) 26px 28px),linear-gradient(#2a190b,#1d1107);
+  box-shadow:inset 0 4px 0 rgba(0,0,0,.45),3px 4px 0 rgba(0,0,0,.5)}
+#tab-shop .sitem.panel::after{content:'';position:absolute;left:-3px;right:-3px;bottom:-3px;height:11px;border:3px solid #1a0f06;
+  background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(0,0,0,.28) 30px 32px),linear-gradient(#8a5a2a,#5a3a1a);box-shadow:inset 0 2px 0 rgba(255,220,160,.3)}
+#tab-shop .sitem .ei{width:52px;height:52px;background:repeating-linear-gradient(0deg,transparent 0 12px,rgba(0,0,0,.3) 12px 14px),linear-gradient(#7a5028,#563518);border:3px solid #1a0f06;box-shadow:inset 3px 3px 0 rgba(255,220,160,.2),inset -3px -3px 0 rgba(0,0,0,.3)}
+#tab-shop .sitem .itx{padding:6px 8px 4px;background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(130,80,20,.28)),#e6cf93;border:2px solid #2a1808;box-shadow:inset 0 0 0 2px rgba(110,66,18,.25),2px 2px 0 rgba(0,0,0,.4)}
+#tab-shop .sitem .itx b{color:#3a2410;text-shadow:none}
+#tab-shop .sitem .itx small{color:#6e5a3a}
+#shopgem .sitem.panel{background:radial-gradient(ellipse at 50% 0,rgba(90,160,255,.2),transparent 70%),repeating-linear-gradient(90deg,transparent 0 26px,rgba(0,0,0,.25) 26px 28px),linear-gradient(#18202f,#0f131d)}
+/* price tag */
+#tab-shop .sitem .btn{position:relative;isolation:isolate;min-width:84px;min-height:44px;padding:8px 8px 6px 20px;border:0;background:none;box-shadow:none;color:#2a1808;font-size:10px;line-height:1.2;text-shadow:none}
+#tab-shop .sitem .btn::before,#tab-shop .sitem .btn::after{content:'';position:absolute;z-index:-1;clip-path:polygon(14px 0,100% 0,100% 100%,14px 100%,0 50%)}
+#tab-shop .sitem .btn::before{inset:0;background:#1a0f06}
+#tab-shop .sitem .btn::after{inset:3px;background:radial-gradient(circle 3px at 14px 50%,#1a0f06 92%,transparent),radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(130,80,20,.25)),#f2e6bf}
+#tab-shop .sitem .btn:active{transform:translate(2px,2px);box-shadow:none}
+#tab-shop .sitem .btn:disabled{opacity:.5}
+
+/* ---------- REALM TAB: the open door out of the hall ---------- */
+/* a stone wall around an arched doorway; the weekly-boss scene is the world you see through it */
+.arenaframe{animation:none;margin-top:30px;padding:24px 14px 14px;border:4px solid var(--ink);
+  background:
+    radial-gradient(ellipse 60% 30% at 50% 0,rgba(255,150,50,.22),transparent 80%) 0 0/auto no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60' shape-rendering='crispEdges'%3E%3Crect width='60' height='60' fill='%234a4452'/%3E%3Crect x='0' y='0' width='60' height='30' fill='%23524c5a'/%3E%3Crect x='30' y='30' width='30' height='30' fill='%23544e5c'/%3E%3Cpath d='M0 1.5H60M0 31.5H60M1.5 0V30M31.5 30V60' stroke='%231c1820' stroke-width='3'/%3E%3Cpath d='M4 5H56M4 35H26M36 35H56' stroke='%23706a7c' stroke-width='2' opacity='.45'/%3E%3C/svg%3E");
+  box-shadow:4px 4px 0 var(--ink),inset 0 0 0 3px #1c1820,inset 0 0 40px rgba(0,0,0,.5),0 0 26px rgba(255,150,50,.18)}
+.arenaframe::before,.arenaframe::after{display:none}
+.arenaframe .aftitle{top:-16px;padding:6px 14px 4px;color:#e9d8a6;letter-spacing:2px;background:linear-gradient(#6a6474,#3e3a48);border:3px solid var(--ink);box-shadow:inset 0 0 0 2px #8a8494,0 4px 0 rgba(0,0,0,.45)}
+.arenaframe .fhud{background:linear-gradient(#2a2430,#1a1620);box-shadow:inset 0 0 0 2px #5a5664}
+
+.doorway{position:relative;perspective:560px;margin-top:6px}
+/* the arch: the scene is clipped to a round-topped opening, ringed in dressed stone */
+.arenaframe .arena{border-radius:76px 76px 0 0 / 86px 86px 0 0;border:4px solid var(--ink);
+  box-shadow:0 0 0 4px #8a8494,0 0 0 8px var(--ink),inset 0 0 44px 4px rgba(0,0,0,.5)}
+/* the threshold stone */
+.doorway::after{content:'';display:block;height:12px;margin:8px -4px 0;border:3px solid var(--ink);
+  background:repeating-linear-gradient(90deg,transparent 0 40px,rgba(0,0,0,.4) 40px 43px),linear-gradient(#8a8494,#5e5a6a);box-shadow:inset 0 3px 0 rgba(255,255,255,.2),3px 4px 0 rgba(0,0,0,.45)}
+/* two oak door leaves swung wide open, seen edge-on, with iron bands and a ring pull */
+.leaf{position:absolute;z-index:6;top:8px;bottom:0;width:27%;pointer-events:none;
+  background:
+    linear-gradient(#5a5664,#5a5664) 0 18%/100% 8px no-repeat,
+    linear-gradient(#5a5664,#5a5664) 0 70%/100% 8px no-repeat,
+    repeating-linear-gradient(90deg,transparent 0 20px,rgba(0,0,0,.35) 20px 22px),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 2px,transparent 2px 7px),
+    linear-gradient(#7a5028,#4a2f16);
+  border:3px solid var(--ink);box-shadow:inset 0 0 0 2px rgba(255,220,160,.18),inset 0 0 22px rgba(0,0,0,.45)}
+.leaf.l{left:-4px;transform-origin:0 50%;transform:rotateY(74deg);border-radius:48px 0 0 0}
+.leaf.r{right:-4px;transform-origin:100% 50%;transform:rotateY(-74deg);border-radius:0 48px 0 0}
+.leaf::after{content:'';position:absolute;top:48%;width:14px;height:14px;border-radius:50%;border:3px solid #aab3c2;background:none;box-shadow:0 0 0 2px var(--ink)}
+.leaf.l::after{right:10%}.leaf.r::after{left:10%}
+/* arriving at the Realm tab: the doors swing open */
+#tab-realm.on .leaf.l{animation:doorL .9s steps(9) both}
+#tab-realm.on .leaf.r{animation:doorR .9s steps(9) both}
+@keyframes doorL{from{transform:rotateY(4deg)}to{transform:rotateY(74deg)}}
+@keyframes doorR{from{transform:rotateY(-4deg)}to{transform:rotateY(-74deg)}}
+@media (prefers-reduced-motion:reduce){#tab-realm.on .leaf.l,#tab-realm.on .leaf.r{animation:none}}
+
+/* section titles on the Realm tab: wooden signposts pointing the way */
+#tab-realm h3{display:block;width:max-content;max-width:100%;margin:30px 4px 14px;padding:9px 30px 7px 16px;color:#f0e2c0;text-shadow:2px 2px 0 #000;
+  background:repeating-linear-gradient(90deg,transparent 0 22px,rgba(0,0,0,.25) 22px 24px),linear-gradient(#7a5028,#563518);
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%);filter:none;box-shadow:none;border:0;animation:none}
+#tab-realm h3::before,#tab-realm h3::after{content:none;animation:none}
+
+
+/* =====================================================================
+   HERO TAB v4: THE ARMOURY
+   A stone-vaulted guild armoury lit by wall torches. A timber beam carries the title and two guild banners; the hero stands in a stone arch
+   (heraldic keystone on top) on a glowing rune circle that takes the colour of your best gear. Below: the wall of niches, each one built for the
+   kind of kit it holds (helm on a pedestal, armour on a mannequin stand, weapon on a peg rail, shield on a chain, trinket under glass,
+   companion on a plinth), four hanging pennants for your numbers, and a forged iron ledger for gear bonuses. The picker below is the smith's workbench.
+   ===================================================================== */
+
+/* section titles on the Hero tab: oak signs nailed to the wall */
+#tab-hero h3{display:inline-block;margin:30px 4px 14px;padding:8px 22px 6px;color:var(--gold);text-shadow:2px 2px 0 #000;
+  background:radial-gradient(circle 3px at 8px 50%,#b9c2d0 92%,transparent),radial-gradient(circle 3px at calc(100% - 8px) 50%,#b9c2d0 92%,transparent),repeating-linear-gradient(90deg,transparent 0 22px,rgba(0,0,0,.25) 22px 24px),linear-gradient(#7a5028,#563518);
+  border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.24),3px 4px 0 rgba(0,0,0,.45)}
+#tab-hero h3::before{content:none}
+
+/* ---------- the hall: dressed stone, iron corners, a warm hearth glow from below ---------- */
+.showcase.panel{--stone:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='48' viewBox='0 0 72 48' shape-rendering='crispEdges'%3E%3Crect width='72' height='48' fill='%2331303a'/%3E%3Crect width='72' height='24' fill='%2336343f'/%3E%3Crect x='36' y='24' width='36' height='24' fill='%2338353f'/%3E%3Cpath d='M0 1.5H72M0 25.5H72M1.5 0V24M37.5 24V48' stroke='%2318141c' stroke-width='3'/%3E%3Cpath d='M4 5H32M40 29H68' stroke='%2350485a' stroke-width='2' opacity='.5'/%3E%3C/svg%3E");
+  --wd:repeating-linear-gradient(90deg,transparent 0 22px,rgba(0,0,0,.25) 22px 24px),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 2px,transparent 2px 7px),linear-gradient(#7a5028,#563518);
+  position:relative;margin-top:20px;padding:66px 14px 20px;
+  background:
+    linear-gradient(#b9c2d0,#b9c2d0) left 0 top 0/24px 6px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) left 0 top 0/6px 24px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) right 0 top 0/24px 6px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) right 0 top 0/6px 24px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) left 0 bottom 0/24px 6px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) left 0 bottom 0/6px 24px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) right 0 bottom 0/24px 6px no-repeat,
+    linear-gradient(#b9c2d0,#b9c2d0) right 0 bottom 0/6px 24px no-repeat,
+    radial-gradient(ellipse 80% 22% at 50% 100%,rgba(255,110,30,.3),transparent 75%) 0 0/auto no-repeat,
+    radial-gradient(ellipse 85% 60% at 50% 38%,transparent 35%,rgba(6,3,10,.62)) 0 0/auto no-repeat,
+    var(--stone);
+  background-size:24px 6px,6px 24px,24px 6px,6px 24px,24px 6px,6px 24px,24px 6px,6px 24px,auto,auto,72px 48px;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,repeat;
+  box-shadow:4px 4px 0 var(--ink),0 18px 44px -10px rgba(255,120,30,.35),inset 0 0 0 3px #1a0f06,inset 0 0 0 7px #6b4423,inset 0 0 0 10px #1a0f06,inset 0 0 60px rgba(0,0,0,.6)}
+/* torchlight flicker across the wall, and a few drifting motes of dust and sparks */
+.showcase::before{content:'';position:absolute;inset:10px;z-index:1;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(circle 130px at 2% 44%,rgba(255,150,50,.24),transparent 72%),radial-gradient(circle 130px at 98% 44%,rgba(255,150,50,.24),transparent 72%);animation:armflick 2.2s steps(7) infinite alternate}
+.showcase::after{content:'';position:absolute;left:12%;top:58%;z-index:1;width:2px;height:2px;pointer-events:none;background:#ffd9a0;
+  box-shadow:60px -34px #ffb04a,118px 12px #fff1c8,170px -62px #ffb04a,226px -8px #ffd9a0,284px -48px #fff1c8,330px 18px #ffb04a;animation:armmote 9s linear infinite}
+@keyframes armflick{0%{opacity:.65}40%{opacity:1}70%{opacity:.8}100%{opacity:.95}}
+@keyframes armmote{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-110px);opacity:0}}
+
+/* the beam: a timber crossbeam carrying the title, with iron end caps */
+.beam{position:absolute;top:12px;left:12px;right:12px;z-index:3;height:34px;display:grid;place-items:center;
+  background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(0,0,0,.3) 30px 32px),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 2px,transparent 2px 7px),linear-gradient(#6b4423,#3e2713);
+  border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.25),0 5px 0 rgba(0,0,0,.45)}
+.beam::before,.beam::after{content:'';position:absolute;top:-4px;bottom:-4px;width:14px;background:linear-gradient(90deg,#d6dde8,#6e7788);border:3px solid #1a0f06;box-shadow:inset 0 2px 0 rgba(255,255,255,.4)}
+.beam::before{left:-7px}.beam::after{right:-7px}
+.beam span{display:flex;align-items:center;gap:10px;font:400 11px/1 var(--head);letter-spacing:3px;text-transform:uppercase;color:#ffd75a;text-shadow:2px 2px 0 #000}
+.beam span::before,.beam span::after{content:'';flex:none;width:8px;height:8px;background:#e8b93c;border:2px solid #1a0f06;transform:rotate(45deg);box-shadow:inset 1px 1px 0 rgba(255,255,255,.5)}
+
+/* guild banners hang from the beam ends */
+.banner{position:absolute;top:44px;z-index:2;width:24px;height:84px;transform-origin:50% 0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(255,255,255,.14),transparent 30%,rgba(0,0,0,.25)),linear-gradient(#b02a3c,#6e1624);
+  clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%);animation:bansway 5.5s ease-in-out infinite alternate}
+.banner.l{left:14px}.banner.r{right:14px;animation-delay:-2.7s}
+.banner::before{content:'';position:absolute;left:3px;right:3px;top:3px;bottom:3px;border:2px solid #e8b93c;clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%);opacity:.85}
+.banner::after{content:'';position:absolute;left:50%;top:26px;width:9px;height:9px;margin-left:-4px;background:#ffd75a;transform:rotate(45deg);box-shadow:0 0 0 2px #6e1624,0 0 8px rgba(255,200,80,.7)}
+@keyframes bansway{from{transform:rotate(-2.2deg)}to{transform:rotate(2.2deg)}}
+
+/* ---------- the archway ---------- */
+.alcove{position:relative;margin:0 30px}
+.alcove::after{content:'';display:block;height:16px;margin:10px -8px 0;border:3px solid var(--ink);
+  background:linear-gradient(transparent 5px,#b8902e 5px 7px,transparent 7px),repeating-linear-gradient(90deg,transparent 0 40px,rgba(0,0,0,.4) 40px 43px),linear-gradient(#8a8494,#5e5a6a);
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.2),3px 4px 0 rgba(0,0,0,.45)}
+.crest{position:absolute;top:-26px;left:50%;z-index:5;width:44px;height:48px;margin-left:-22px;pointer-events:none;image-rendering:pixelated;
+  filter:drop-shadow(2px 3px 0 rgba(0,0,0,.55)) drop-shadow(0 0 8px rgba(255,140,40,.45))}
+.showcase .stage{--cw:0px;--W:min(calc(100vw - 136px),432px);grid-template-columns:minmax(0,1fr);min-height:330px;margin:0;padding:30px 8px 6px;
+  border:4px solid var(--ink);border-radius:84px 84px 0 0 / 96px 96px 0 0;
+  box-shadow:0 0 0 4px #8a8494,0 0 0 8px var(--ink),inset 0 0 40px rgba(0,0,0,.6),inset 22px 0 34px -18px rgba(255,130,40,.38),inset -22px 0 34px -18px rgba(255,130,40,.38)}
+.showcase .stage[data-at="3"],.showcase .stage[data-at="4"]{box-shadow:0 0 0 4px #8a8494,0 0 0 8px var(--ink),inset 0 0 40px rgba(0,0,0,.6),inset 22px 0 34px -18px rgba(255,130,40,.38),inset -22px 0 34px -18px rgba(255,130,40,.38),0 0 22px color-mix(in srgb,var(--aura) 60%,transparent)}
+.showcase .gearbtn{top:10px;min-height:26px;padding:4px 10px 2px;font-size:8px;color:#d9c38c;background:#2e1c0e;border:3px solid #1a0f06;box-shadow:inset 3px 3px 0 rgba(255,255,255,.08),2px 2px 0 rgba(0,0,0,.4)}
+.showcase .gearbtn:active{transform:translate(calc(-50% + 1px),1px)}
+.showcase:has(.stage.nogear) .rack{display:none}
+
+/* the rune circle under the hero: spins slowly, tinted by the best item you wear */
+.stage .rune{--rc:color-mix(in srgb,var(--aura,#e8b93c) 78%,#ffd75a);--rs:216px;position:absolute;left:50%;bottom:calc(22px - var(--rs) / 2);z-index:0;width:var(--rs);height:var(--rs);margin-left:calc(var(--rs) / -2);
+  border:3px solid var(--rc);border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,color-mix(in srgb,var(--rc) 26%,transparent),transparent 66%);
+  box-shadow:0 0 18px var(--rc),inset 0 0 18px color-mix(in srgb,var(--rc) 70%,transparent);
+  transform:perspective(700px) rotateX(72deg) rotate(0deg);animation:runespin 26s linear infinite,runeglow 3s ease-in-out infinite alternate}
+.stage .rune::before{content:'';position:absolute;inset:7%;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg,var(--rc) 0 2.5deg,transparent 2.5deg 15deg);
+  -webkit-mask:radial-gradient(circle,transparent 76%,#000 77% 100%);mask:radial-gradient(circle,transparent 76%,#000 77% 100%)}
+.stage .rune::after{content:'';position:absolute;inset:20%;border-radius:50%;border:2px dashed var(--rc);opacity:.85}
+.stage .rune i{position:absolute;inset:27%;border:2px solid var(--rc);transform:rotate(45deg);opacity:.9}
+.stage .rune i::before{content:'';position:absolute;inset:-2px;border:2px solid var(--rc);transform:rotate(45deg)}
+@keyframes runespin{to{transform:perspective(700px) rotateX(72deg) rotate(360deg)}}
+@keyframes runeglow{from{opacity:.6}to{opacity:1}}
+.showcase .stage .figure::after{display:none}
+
+/* wall torches either side of the arch */
+.torch{position:absolute;top:84px;display:block;width:26px;height:66px;filter:drop-shadow(0 0 10px rgba(255,140,40,.9))}
+.alcove .torch:first-child{left:-34px}
+.alcove .torch:last-of-type{right:-34px}
+.torch::before{content:'';position:absolute;left:50%;bottom:0;width:12px;height:36px;margin-left:-6px;background:linear-gradient(90deg,#4a2e14,#8a5a2a 45%,#3a2410);border:2px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.2)}
+.torch::after{content:'';position:absolute;left:50%;bottom:32px;width:18px;height:30px;margin-left:-9px;transform-origin:50% 100%;
+  clip-path:polygon(50% 0,66% 22%,82% 46%,100% 72%,80% 100%,20% 100%,0 72%,18% 46%,34% 22%);
+  background:linear-gradient(180deg,#fff3b0,#ffc02a 40%,#ff7a1a 72%,#c9302c);animation:tvflame .46s steps(2) infinite}
+.alcove .torch:last-of-type::after{animation-delay:-.23s}
+
+/* forge plate on the dais step: a riveted iron frame round a dark recess, the name glowing like hot metal, rank in steel; two chains tie it to the Armoury sign */
+.showcase .figname{position:relative;z-index:3;display:grid;gap:5px;width:78%;margin:6px auto 22px;padding:9px 16px 8px;text-align:center;
+  border:7px solid transparent;
+  background:
+    radial-gradient(circle 2px at 4px 4px,#e6ebf3 80%,transparent) border-box,radial-gradient(circle 2px at calc(100% - 4px) 4px,#e6ebf3 80%,transparent) border-box,radial-gradient(circle 2px at 4px calc(100% - 4px),#e6ebf3 80%,transparent) border-box,radial-gradient(circle 2px at calc(100% - 4px) calc(100% - 4px),#e6ebf3 80%,transparent) border-box,
+    radial-gradient(ellipse 60% 90% at 50% 120%,rgba(255,110,30,.22),transparent 70%) padding-box,
+    linear-gradient(#1c1612,#0f0b09) padding-box,
+    repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 3px) border-box,
+    linear-gradient(#6a7384,#3a4050 60%,#2a2e3a) border-box;
+  box-shadow:0 0 0 3px #1a0f06,inset 0 0 0 2px #0d0a05,inset 0 5px 12px rgba(0,0,0,.6),3px 5px 0 rgba(0,0,0,.5)}
+.showcase .figname:empty{display:none}
+.showcase .figname span{text-shadow:2px 2px 0 #000}
+.showcase .fn-name{color:#ffb347;text-shadow:2px 2px 0 #000,0 0 8px rgba(255,120,30,.75)}
+.showcase .fn-rank{padding-top:5px;color:#b9c2d0;text-shadow:1px 1px 0 #000;
+  background:linear-gradient(90deg,transparent,rgba(255,130,40,.7) 25%,rgba(255,130,40,.7) 75%,transparent) top/100% 1px no-repeat}
+
+/* ---------- the wall of niches ---------- */
+.rack{position:relative;margin-top:4px}
+.racksign{position:relative;z-index:3;width:max-content;margin:0 auto -17px;padding:7px 22px 5px;font:400 10px/1 var(--head);letter-spacing:3px;text-transform:uppercase;color:var(--gold);text-shadow:2px 2px 0 #000;
+  background:radial-gradient(circle 3px at 8px 50%,#b9c2d0 92%,transparent),radial-gradient(circle 3px at calc(100% - 8px) 50%,#b9c2d0 92%,transparent),var(--wd);
+  border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.24),3px 4px 0 rgba(0,0,0,.5)}
+.racksign::before,.racksign::after{content:'';position:absolute;box-sizing:border-box;top:-28px;width:8px;height:38px;
+  background:radial-gradient(circle 4px at 50% 4px,#ffe9a8 0 1px,#8a6a1a 2px,#1a0f06 3px,transparent 4px),repeating-linear-gradient(180deg,#b9c2d0 0 4px,#4a5060 4px 6px);
+  border:2px solid #1a0f06;border-top:0;border-bottom:0}   /* top:-28px = the 22px gap + the sign's 3px border + 3px tucked into the plaque's frame */
+.racksign::before{left:calc(50% - 100px)}.racksign::after{left:calc(50% + 92px)}   /* wide apart: they hang from the plaque's ends down to the wooden beam, either side of the sign */
+.rackgrid{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:148px 148px 88px;
+  grid-template-areas:"helm weapon weapon" "armor offhand trinket" "pet pet pet";gap:24px 14px;padding:36px 14px 20px;border:4px solid #1a0f06;
+  background:linear-gradient(rgba(8,4,10,.5),rgba(8,4,10,.62)),var(--stone);background-size:auto,72px 48px;
+  box-shadow:inset 0 6px 0 rgba(0,0,0,.45),inset 0 0 36px rgba(0,0,0,.65),3px 4px 0 rgba(0,0,0,.5)}
+.rackgrid::before{content:'';position:absolute;left:-4px;right:-4px;top:-4px;height:18px;border:3px solid #1a0f06;background:var(--wd);box-shadow:inset 0 3px 0 rgba(255,220,160,.25),0 4px 0 rgba(0,0,0,.4)}
+.rack .eslot[data-k="helm"]{grid-area:helm}
+.rack .eslot[data-k="weapon"]{grid-area:weapon}
+.rack .eslot[data-k="armor"]{grid-area:armor}
+.rack .eslot[data-k="offhand"]{grid-area:offhand}
+.rack .eslot[data-k="trinket"]{grid-area:trinket}
+.rack .eslot[data-k="companion"]{grid-area:pet}
+
+/* a niche cut into the wall, lit from behind in the colour of what hangs in it (--rar) */
+.rack .eslot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0;min-height:0;height:100%;padding:24px 6px 52px;
+  font:inherit;color:inherit;cursor:pointer;text-align:center;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 2px,transparent 2px 15px),linear-gradient(#15111a,#241d27);
+  border:3px solid #0d0a09;border-radius:3px;
+  box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--rar) 62%,#2a2228),inset 0 12px 20px rgba(0,0,0,.7),0 0 0 3px #4e4658,0 0 0 6px #0d0a09,4px 6px 0 6px rgba(0,0,0,.4);
+  transition:transform .12s,box-shadow .2s}
+.rack .eslot:hover{transform:translateY(-2px)}
+.rack .eslot:active{transform:translateY(1px)}
+.rack .eslot::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:inherit;
+  background:radial-gradient(ellipse 70% 58% at 50% 46%,color-mix(in srgb,var(--rar) 50%,transparent),transparent 74%);animation:nichepulse 3.4s ease-in-out infinite alternate}
+.rack .eslot.base::before{animation:none;opacity:.25}
+@keyframes nichepulse{from{opacity:.55}to{opacity:1}}
+.rack .eslot::after{content:none}
+.rack .eslot>*{z-index:1}
+.rack .eslot .ei{position:relative;display:grid;place-items:center;padding:0;background:none;border:0;box-shadow:none;transform-origin:50% 0;
+  filter:drop-shadow(0 4px 0 rgba(0,0,0,.55)) drop-shadow(0 0 9px color-mix(in srgb,var(--rar) 75%,transparent));animation:itemfloat 3.8s ease-in-out infinite alternate}
+.rack .eslot:nth-child(2) .ei{animation-delay:-.8s}.rack .eslot:nth-child(3) .ei{animation-delay:-1.6s}.rack .eslot:nth-child(4) .ei{animation-delay:-2.4s}.rack .eslot:nth-child(5) .ei{animation-delay:-3.1s}
+@keyframes itemfloat{from{transform:translateY(-2px) rotate(-1.5deg)}to{transform:translateY(2px) rotate(1.5deg)}}
+.rack .eslot.base .ei{animation:none;opacity:.4;filter:grayscale(1) drop-shadow(0 3px 0 rgba(0,0,0,.5))}
+.rack .eslot .ei .px{width:48px;height:48px}
+
+/* label tab nailed to the top edge, item name on a brass plaque at the foot */
+.rack .eslot .ek{position:absolute;top:-10px;left:50%;z-index:4;transform:translateX(-50%);padding:4px 9px 2px;font:400 7px/1.2 var(--head);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;color:#ffd75a;text-shadow:1px 1px 0 #000;
+  background:linear-gradient(#2a2430,#15111a);border:2px solid #5a5664;box-shadow:0 3px 0 rgba(0,0,0,.5)}
+.rack .eslot small{position:absolute;left:7px;right:7px;bottom:7px;z-index:3;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:22px;padding:5px 4px 3px;
+  font:400 15px/.95 var(--body);color:#2a1d00;text-shadow:1px 1px 0 rgba(255,240,180,.6);text-align:center;overflow-wrap:break-word;word-break:normal;hyphens:none;
+  background:linear-gradient(rgba(255,255,255,.35),transparent 45%),linear-gradient(#e8c970,#b8902e);border:2px solid #1a0f06;box-shadow:inset 0 0 0 1px rgba(90,58,8,.4),0 2px 0 rgba(0,0,0,.45)}
+.rack .eslot.base small{color:#8a8094;text-shadow:none;background:linear-gradient(#3a3440,#26222c);box-shadow:inset 0 2px 0 rgba(0,0,0,.4)}
+.rack .eslot .up{top:-8px;right:-6px;z-index:6}
+.rack .eslot .tryb{top:-10px;left:-6px;z-index:6}
+.rack .eslot.on{outline:3px solid var(--act);outline-offset:4px}
+.rack .eslot.try{outline:3px dashed var(--gold);outline-offset:4px}
+.rack .eslot .hook{position:absolute;display:block;z-index:0;pointer-events:none;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;width:auto;height:auto;top:auto;left:auto;right:auto;bottom:auto}
+.rack .eslot.base .hook{opacity:.55}
+
+/* HELM: stone pedestal; the arched niche echoes the hero's arch */
+.rack .eslot[data-k="helm"]{border-radius:46px 46px 3px 3px}
+.rack .eslot[data-k="helm"] .hook{left:20%;right:20%;bottom:54px;height:14px;background:linear-gradient(#9a94a4,#5e5a6a);border:2px solid #0d0a09;box-shadow:inset 0 2px 0 rgba(255,255,255,.35)}
+.rack .eslot[data-k="helm"] .hook::after{content:'';position:absolute;left:-5px;right:-5px;bottom:-6px;height:6px;background:#4a4654;border:2px solid #0d0a09}
+.rack .eslot[data-k="helm"] .ei{margin-bottom:6px}
+
+/* ARMOUR: wooden mannequin stand, a pole, a shoulder bar and a foot */
+.rack .eslot[data-k="armor"] .hook{left:50%;top:20px;bottom:56px;width:6px;margin-left:-3px;background:linear-gradient(90deg,#8a5a2a,#4e3019);border:2px solid #1a0f06}
+.rack .eslot[data-k="armor"] .hook::before{content:'';position:absolute;left:-30px;right:-30px;top:12px;height:6px;background:linear-gradient(#8a5a2a,#4e3019);border:2px solid #1a0f06}
+.rack .eslot[data-k="armor"] .hook::after{content:'';position:absolute;left:-18px;right:-18px;bottom:-6px;height:8px;background:linear-gradient(#8a5a2a,#4e3019);border:2px solid #1a0f06}
+.rack .eslot[data-k="armor"] .ei .px{width:64px;height:64px}
+
+/* WEAPON: a long peg rail across the niche, two iron brackets */
+.rack .eslot[data-k="weapon"] .hook{left:10%;right:10%;top:63%;height:9px;background:linear-gradient(#8a5a2a,#4e3019);border:2px solid #1a0f06;box-shadow:0 3px 0 rgba(0,0,0,.45)}
+.rack .eslot[data-k="weapon"] .hook::before,.rack .eslot[data-k="weapon"] .hook::after{content:'';position:absolute;top:-10px;width:8px;height:26px;background:linear-gradient(90deg,#d6dde8,#6e7788);border:2px solid #1a0f06}
+.rack .eslot[data-k="weapon"] .hook::before{left:-4px}.rack .eslot[data-k="weapon"] .hook::after{right:-4px}
+.rack .eslot[data-k="weapon"] .ei .px{width:64px;height:64px}
+
+/* OFF-HAND: an iron nail with a short chain; the shield hangs from it, the niche has a round shoulder */
+.rack .eslot[data-k="offhand"]{border-radius:50% 50% 3px 3px / 44px 44px 3px 3px}
+.rack .eslot[data-k="offhand"] .hook{left:50%;top:12px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#b9c2d0 45%,#4a5060);border:2px solid #0d0a09}
+.rack .eslot[data-k="offhand"] .hook::after{content:'';position:absolute;left:50%;top:8px;width:4px;height:20px;margin-left:-2px;background:repeating-linear-gradient(180deg,#b9c2d0 0 4px,#3a4050 4px 6px)}
+.rack .eslot[data-k="offhand"] .ei{margin-top:8px}
+
+/* TRINKET: velvet cushion under a glass dome with a moving sheen */
+.rack .eslot[data-k="trinket"]{border-radius:40px 40px 3px 3px}
+.rack .eslot[data-k="trinket"] .hook{left:20%;right:20%;bottom:54px;height:15px;border-radius:12px 12px 3px 3px;background:radial-gradient(ellipse at 50% 0,#9a3a5e,#4a1230);border:2px solid #0d0a09;box-shadow:inset 0 3px 0 rgba(255,255,255,.2)}
+.rack .eslot[data-k="trinket"] .ei{margin-bottom:6px}
+.rack .eslot[data-k="trinket"]::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(115deg,transparent 0 18%,rgba(255,255,255,.18) 18% 26%,transparent 26% 34%,rgba(255,255,255,.1) 34% 38%,transparent 38%) -60% 0/250% 100% no-repeat;animation:glassglint 6s ease-in-out infinite}
+@keyframes glassglint{0%,55%{background-position:-60% 0}100%{background-position:160% 0}}
+
+/* COMPANION: a stone plinth on a chain, name on the right */
+.rack .eslot[data-k="companion"]{flex-direction:row;justify-content:flex-start;gap:14px;padding:16px 12px 16px 18px;text-align:left}
+.rack .eslot[data-k="companion"] .hook{left:46px;top:-4px;width:4px;height:20px;background:repeating-linear-gradient(180deg,#b9c2d0 0 4px,#3a4050 4px 6px)}
+.rack .eslot[data-k="companion"] .ei{flex:none;width:62px;height:62px;margin-top:8px;border:3px solid #0d0a09;border-radius:4px;background:linear-gradient(#5e5a6a,#3a3644);box-shadow:inset 0 3px 0 rgba(255,255,255,.2),inset 0 -4px 0 rgba(0,0,0,.35);animation:none;filter:none}
+.rack .eslot[data-k="companion"] .ei .px{width:48px;height:48px;filter:drop-shadow(0 0 7px color-mix(in srgb,var(--rar) 70%,transparent))}
+.rack .eslot[data-k="companion"] small{position:static;flex:1;min-width:0;min-height:0;align-self:center;margin-top:8px;padding:7px 8px 5px;font-size:19px;text-align:left;-webkit-line-clamp:2}
+.rack .eslot[data-k="companion"] .ek{left:auto;right:12px;transform:none}
+
+/* ---------- four pennants on a rod: your numbers ---------- */
+.showcase .stats4{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:34px 8px 0;padding:0}
+.showcase .stats4::before{content:'';position:absolute;left:-10px;right:-10px;top:-6px;z-index:4;height:11px;border:3px solid #1a0f06;border-radius:6px;background:linear-gradient(#d6dde8,#6e7788 55%,#4a5060);box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.4)}
+.showcase .stat{--pc:#2f7d3e;position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:22px 2px 44px;background:none;border:0;box-shadow:none;
+  transform-origin:50% 0;animation:pensway 5s ease-in-out infinite alternate;
+  filter:drop-shadow(2px 0 0 #1a0f06) drop-shadow(-2px 0 0 #1a0f06) drop-shadow(0 2px 0 #1a0f06) drop-shadow(0 -2px 0 #1a0f06) drop-shadow(2px 5px 0 rgba(0,0,0,.45))}
+.showcase .stat:nth-child(2){animation-delay:-1.2s}.showcase .stat:nth-child(3){animation-delay:-2.4s}.showcase .stat:nth-child(4){animation-delay:-3.6s}
+@keyframes pensway{from{transform:rotate(-1.6deg)}to{transform:rotate(1.6deg)}}
+.showcase .stat::before,.showcase .stat::after{content:'';position:absolute;z-index:0;clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%)}
+.showcase .stat::before{inset:0;background:linear-gradient(#f6d56a,#b8902e)}
+.showcase .stat::after{inset:3px 3px 5px;background:linear-gradient(rgba(255,255,255,.2),transparent 42%),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 2px,transparent 2px 6px),var(--pc)}
+.showcase .stat>*{position:relative;z-index:1}
+.showcase .stat:nth-child(1){--pc:#2f7d3e}
+.showcase .stat:nth-child(2){--pc:#a8780f}
+.showcase .stat:nth-child(3){--pc:#34548f}
+.showcase .stat:nth-child(4){--pc:#a8283a}
+.showcase .stat .sti{display:grid;place-items:center;height:20px}
+.showcase .stat .sti .px,.showcase .stat .sti .px.coin{width:20px;height:20px}
+.showcase .stat small{font:400 8px/1 var(--head);color:#fff4d0;letter-spacing:.5px;text-shadow:1px 1px 0 #000}
+.showcase .stat b{font:400 19px/1 var(--body);letter-spacing:-.5px;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.6)}
+.showcase .stat .dl{top:14px;right:-2px;z-index:5}
+
+/* ---------- gear bonuses as one wide guild tapestry: plum cloth with gold trim and a swallowtail bottom, hung from an iron rod like the stat flags above; each bonus is a gold-stitched patch ---------- */
+.showcase #gearbonus{position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;gap:12px;margin:30px 8px 6px;padding:25px 30px 40px;border:0;box-shadow:none;text-align:center;color:#d9c9a8;
+  background:linear-gradient(#e6ebf3,#8a93a3 55%,#4a5060) 1px 1px/calc(100% - 2px) 7px no-repeat,linear-gradient(#1a0f06,#1a0f06) top/100% 9px no-repeat;   /* the iron rod */
+  filter:drop-shadow(3px 4px 0 rgba(0,0,0,.45))}
+.showcase #gearbonus::before,.showcase #gearbonus::after{content:'';position:absolute;clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 18px),0 100%)}
+.showcase #gearbonus::after{z-index:-2;inset:7px 12px 0;background:linear-gradient(#f6d56a,#b8902e)}   /* gold trim */
+.showcase #gearbonus::before{z-index:-1;inset:10px 15px 3px;background:radial-gradient(ellipse 70% 60% at 50% 0,rgba(255,255,255,.14),transparent),repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 2px,transparent 2px 6px),linear-gradient(#5a3470,#3c2150)}   /* the cloth */
+.gbt{display:flex;align-items:center;gap:8px;font:400 9px/1 var(--head);letter-spacing:2px;text-transform:uppercase;color:#ffd75a;text-shadow:2px 2px 0 #000}
+.gbt::before{content:'\2692\FE0E';font-size:13px;color:#ffb060}
+.gbc{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;align-self:stretch;padding-top:12px;border-top:2px dashed rgba(232,201,112,.55)}   /* a row of stitching */
+.gbp{--gc:#58b368;position:relative;padding:5px 11px 3px 26px;font:400 20px/1 var(--body);color:#c8f4cf;text-shadow:2px 2px 0 rgba(0,0,0,.6);background:rgba(0,0,0,.3);border:2px dashed #e8c970;box-shadow:inset 0 0 0 2px rgba(0,0,0,.25)}   /* a patch, stitched on */
+.gbp::before{content:'';position:absolute;left:9px;top:50%;width:8px;height:8px;margin-top:-5px;transform:rotate(45deg);background:var(--gc);border:2px solid #0d0a05;box-shadow:0 0 6px var(--gc)}
+.gbp.g-xp{--gc:#58b368;color:#c8f4cf}
+.gbp.g-gold{--gc:#e8b93c;color:#ffe9a0}
+.gbp.g-dmg{--gc:#4a9ae0;color:#c4e0ff}
+.gbp.g-hp{--gc:#d9473f;color:#ffc4bc}
+.gbp.g-bd{--gc:#ff7a4a;color:#ffd0b8}
+.gbn{font:400 20px/1.1 var(--body);color:#e6d8b8;text-shadow:2px 2px 0 rgba(0,0,0,.6)}
+
+/* ---------- the smith's workbench: docks right under the niches (same width as the Armoury) ---------- */
+.picker.panel{position:relative;z-index:5;width:auto;max-width:none;max-height:none;overflow:visible;margin:18px 0 0;padding:14px 12px 12px;
+  background:radial-gradient(circle 3px at 9px 9px,#b9c2d0 90%,transparent),radial-gradient(circle 3px at calc(100% - 9px) 9px,#b9c2d0 90%,transparent),radial-gradient(circle 3px at 9px calc(100% - 9px),#b9c2d0 90%,transparent),radial-gradient(circle 3px at calc(100% - 9px) calc(100% - 9px),#b9c2d0 90%,transparent),
+    repeating-linear-gradient(90deg,transparent 0 46px,rgba(0,0,0,.34) 46px 48px),repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 2px,transparent 2px 9px),linear-gradient(#6b4423,#4a2e16);
+  border:4px solid #1a0f06;box-shadow:4px 4px 0 var(--ink),inset 0 4px 0 rgba(255,220,160,.22),inset 0 0 0 3px #3a2410}
+/* iron hooks that visually hang the workbench from the wall of niches above */
+.picker.panel::before,.picker.panel::after{content:'';position:absolute;z-index:-1;box-sizing:border-box;top:-27px;width:9px;height:27px;
+  background:radial-gradient(circle 3px at 50% 4px,#e6ebf3 0 1.5px,#6a7384 2px,#1a0f06 3px,transparent 3.5px),repeating-linear-gradient(180deg,#b9c2d0 0 4px,#4a5060 4px 6px);
+  border:2px solid #1a0f06;border-top:0;border-bottom:0;box-shadow:2px 0 0 rgba(0,0,0,.35)}
+.picker.panel::before{left:18%}.picker.panel::after{right:18%}
+.pkhead{align-items:center;padding:7px 12px 5px;font:400 11px var(--head);letter-spacing:1px;text-transform:uppercase;color:#ffd75a;text-shadow:2px 2px 0 #000;
+  background:linear-gradient(#1f150b,#120a05);border:3px solid #0d0a05;box-shadow:inset 0 0 0 2px #5a3a1a,0 3px 0 rgba(0,0,0,.4)}
+.pkhead span{font:400 20px var(--body);letter-spacing:0;text-transform:none;color:#f0e2c0;text-shadow:1px 1px 0 #000}
+.pkempty{margin-top:12px;background:rgba(0,0,0,.38);border:3px dashed #8a6a3a;color:#d9c38c}
+.ig{gap:10px;margin-top:12px;padding:12px 10px;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));background:linear-gradient(#1a1410,#0f0b08);border:3px solid #0d0a05;box-shadow:inset 0 5px 10px rgba(0,0,0,.7),0 0 0 2px #5a3a1a}
+.itile{background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--rar) 34%,#2a2228),#15111a);border:3px solid #0d0a05;
+  box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--rar) 70%,#000),0 3px 0 rgba(0,0,0,.55);transition:transform .12s,box-shadow .2s}
+.itile:hover{transform:translateY(-2px)}
+.itile.sel{outline:3px solid #ffd75a;outline-offset:2px;transform:translateY(-3px);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--rar) 70%,#000),0 0 14px color-mix(in srgb,var(--rar) 85%,transparent),0 5px 0 rgba(0,0,0,.55)}
+.idet{position:relative;margin-top:18px;padding:14px 12px 12px 16px;color:#3a2410;
+  background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(130,80,20,.28)),repeating-linear-gradient(0deg,rgba(120,80,30,.06) 0 2px,transparent 2px 6px),#e6cf93;
+  border:3px solid #1a0f06;border-left:8px solid var(--rar);box-shadow:inset 0 0 0 2px rgba(110,66,18,.25),3px 5px 0 rgba(0,0,0,.5)}
+.idet::before{content:'';position:absolute;top:-11px;left:22px;width:12px;height:12px;border-radius:50%;background:#2a1808;border:3px solid #b8902e;box-shadow:0 0 0 2px #1a0f06}
+.idet b{color:#2a1808}
+.idet small{color:#6e5a3a}
+.idet .dc{background:rgba(58,36,16,.1);border-color:rgba(58,36,16,.4)}
+.idet .dc.up{color:#2a6a38}.idet .dc.dn{color:#a8283a}
+
+@media (max-width:380px){
+  .showcase.panel{padding-left:10px;padding-right:10px}
+  .rackgrid{gap:22px 10px;padding:36px 10px 18px}
+  .beam span{font-size:9px;letter-spacing:2px;gap:6px}
+  .showcase .stat b{font-size:17px}
+  .rack .eslot small{font-size:14px}
+}
+@media (max-width:480px){.rack .eslot small{left:5px;right:5px;padding:5px 2px 3px;font-size:13.5px;letter-spacing:-.3px}.rack .eslot[data-k="companion"] small{left:auto;right:auto;font-size:17px;padding:7px 8px 5px}}
+@media (prefers-reduced-motion:reduce){
+  .banner,.stage .rune,.showcase::before,.showcase::after,.rack .eslot::before,.rack .eslot .ei,.rack .eslot[data-k="trinket"]::after,.showcase .stat,.torch::after{animation:none!important}
+}
+
+@media (max-width:420px){.rack .eslot:not([data-k="companion"]):not([data-k="weapon"]) small{left:4px;right:4px;padding-left:1px;padding-right:1px;font-size:12px;letter-spacing:-.4px}}
+
+/* ---------- big companions (Lv 8+) in the Armoury: same hulking scale as the general rule ----------
+   Hero ~105px, companion up to ~3.3× that (capped so antlers still fit the arch). */
+.showcase .stage:has(.fpet.big:not([hidden])){
+  --hw:min(105px,calc(var(--W) - 2 * var(--cw) - 42px));
+  --S:min(max(calc(var(--pw) * 1.55),calc(var(--hw) * 3.3)),calc(var(--W) - 10px),350px);
+}
+.showcase .stage:has(.fpet.big:not([hidden])) .figure .px{
+  max-width:105px;
+}
+.showcase .stage .fpet.big{
+  left:calc(50% - .5 * var(--S) + .04 * var(--hw));
+}
+
+/* ---- classes (Forge): same card / sheet / emblem language as the subclasses, kept compact ---- */
+.clsbox{margin:0}
+.spgrid.cls{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.spgrid.cls>.spc{grid-column:span 2}
+.spc.cls{gap:5px;padding:10px 3px 8px}
+.spc.cls .spi{width:54px;height:54px}
+.spc.cls .spr{font-size:16px;text-align:center}
+.spc.lock .spi .lockpad canvas.px{filter:none;opacity:1}
+.spsl{margin:9px 0 4px;font:400 7px/1.3 var(--head);letter-spacing:1px;text-transform:uppercase;color:var(--gold)}
+.spbest{margin:3px 0 0;font:400 18px/1.05 var(--body);color:var(--muted)}
+.clsg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.clsg div{min-width:0;padding:3px 2px 2px;text-align:center;background:rgba(0,0,0,.28);border:2px solid rgba(0,0,0,.45)}
+.clsg small{display:block;font:400 7px/1 var(--head);color:var(--muted)}
+.clsg b{display:block;margin-top:3px;font:400 21px/1 var(--body);color:var(--sd)}
+.clsg .cur{border-color:var(--sd);background:color-mix(in srgb,var(--sc) 45%,rgba(0,0,0,.3))}
+.clsg .cur small{color:var(--text)}
+.clst{display:flex;flex-wrap:wrap;gap:4px}
+.clst span{display:inline-flex;align-items:baseline;gap:4px;padding:2px 6px 1px 4px;font:400 18px/1 var(--body);color:var(--text);background:rgba(0,0,0,.28);border:2px solid rgba(0,0,0,.45)}
+.clst i{font:400 7px/1 var(--head);font-style:normal;color:var(--muted)}
+.clst .done{color:var(--sd)}
+.clst .cur{border-color:var(--sd);background:color-mix(in srgb,var(--sc) 45%,rgba(0,0,0,.3))}
+.clst .cur i{color:var(--text)}
+.clst .fut{opacity:.55}
+.clsp{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.clsp small{font:400 7px/1 var(--head);color:var(--muted)}
+.clsp div{display:flex;align-items:center;gap:6px;padding:2px 7px 1px 5px;font:400 18px/1 var(--body);color:var(--text);background:rgba(0,0,0,.28);border:2px solid rgba(0,0,0,.45)}
+.clsp .px{flex:none;width:16px!important;height:auto!important}
+.spown .spsl{color:var(--sd)}
+.spown .spgo{margin:4px 0 0;font-size:18px}
+
+/* tighter detail sheet and emblem for classes and subclasses */
+.spdet{margin-top:10px;padding:10px}
+.spdet.has{border-left-width:6px}
+.spdh{margin-bottom:4px}
+.spdet .spt{margin-bottom:5px;font-size:18px}
+.spl{margin:5px 0}
+.spp{padding:2px 8px 1px 4px;font-size:20px}
+.spwarn{margin:7px 0 5px;font-size:17px}
+.spdet .btn.wide{min-height:40px;padding:8px 10px;font-size:10px}
+.spown{padding:10px}
+.spot{margin-bottom:6px}
