@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* phones render the same 640px-wide layout as the desktop version (scaled to fit), so no mobile-only breakpoints kick in */
+(function(){var w=Math.min(screen.width,screen.height);if(w<640){document.querySelector('meta[name=viewport]').setAttribute('content','width=640, viewport-fit=cover')}})();
+</script>
 <title>Daily Quests</title>
 <meta name="theme-color" content="#1e1b26">
 <meta name="mobile-web-app-capable" content="yes">
