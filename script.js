@@ -115,7 +115,27 @@ const expired=t=>!!t.once&&t.once<today();   /* a one-off from an earlier day: k
 const addDays=(k,n)=>{const d=new Date(k+'T12:00:00');d.setDate(d.getDate()+n);return dkey(d)};
 const $=id=>document.getElementById(id);
 /* draws an emoji tiny, then scales it up unsmoothed so it looks like pixel art */
-function px(e,n){if(typeof e==='string'&&e.slice(0,4)==='pet:')return petIcon(e.slice(4),n);if(typeof e==='string'&&e.slice(0,5)==='coin:')return coinIcon(e.slice(5));const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.font=Math.round(n*.78)+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,n/2,n/2+1);c.className='px';return c}
+function px(e,n){if(typeof e==='string'&&e.slice(0,4)==='pet:')return petIcon(e.slice(4),n);if(typeof e==='string'&&e.slice(0,5)==='coin:')return coinIcon(e.slice(5));return emojiPx(e,n)}
+/* emoji are drawn big (so no phone's emoji font can clip them), cropped to the glyph's real edges, centred and shrunk to n x n; the css then scales that up unsmoothed */
+const EMO={};
+function emojiPx(e,n){
+  const c=document.createElement('canvas');c.width=c.height=n;c.className='px';
+  let m=EMO[e];
+  if(!m){
+    const B=96,s=document.createElement('canvas');s.width=s.height=B;
+    const g=s.getContext('2d',{willReadFrequently:true});
+    const t=(e.length===1&&!/[\ud800-\udfff]/.test(e))?e+'\ufe0f':e;   /* force the colour emoji form of symbols like the heart, sword, skull */
+    g.font='56px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Twemoji Mozilla","EmojiOne Color",sans-serif';
+    g.textAlign='center';g.textBaseline='middle';g.fillText(t,B/2,B/2);
+    const d=g.getImageData(0,0,B,B).data;let x0=B,y0=B,x1=-1,y1=-1;
+    for(let y=0;y<B;y++)for(let x=0;x<B;x++)if(d[(y*B+x)*4+3]>16){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+    m=EMO[e]=x1<0?{s,x:0,y:0,w:B,h:B,empty:1}:{s,x:x0,y:y0,w:x1-x0+1,h:y1-y0+1};
+  }
+  if(!m.empty){
+    const x=c.getContext('2d'),f=n*.94/Math.max(m.w,m.h),w=m.w*f,h=m.h*f;
+    x.drawImage(m.s,m.x,m.y,m.w,m.h,(n-w)/2,(n-h)/2,w,h);
+  }
+  return c}
 /* ---------- currency: bronze, silver and gold ----------
    One number is saved (S.gold = the BRONZE count, so old saves keep working). 1 silver = 10 bronze, 1 gold = 100 bronze.
    Everything you see is just that number written as coins: 125 -> '1g 2s 5b'. */

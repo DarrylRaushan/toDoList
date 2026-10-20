@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* phones render the same 640px-wide layout as the desktop version (scaled to fit), so no mobile-only breakpoints kick in */
+(function(){var w=Math.min(screen.width,screen.height);if(w<640&&matchMedia('(pointer:coarse)').matches){document.querySelector('meta[name=viewport]').setAttribute('content','width=640, viewport-fit=cover')}})();
+</script>
 <title>Daily Quests</title>
 <meta name="theme-color" content="#1e1b26">
 <meta name="mobile-web-app-capable" content="yes">
@@ -260,7 +264,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=6"></script>
-<script src="script.js?v=63"></script>
+<script src="script.js?v=64"></script>
 <script src="wendigo-idle.js?v=1"></script>
 </body>
 </html>
