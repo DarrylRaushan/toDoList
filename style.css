@@ -2732,3 +2732,777 @@ body[data-tab="quests"] .board,.board{box-shadow:4px 4px 0 var(--ink),0 18px 46p
 .spdet .btn.wide{min-height:40px;padding:8px 10px;font-size:10px}
 .spown{padding:10px}
 .spot{margin-bottom:6px}
+
+/* ---- honours: tap the title to expand / collapse (the summary row stays visible) ---- */
+#tab-hero h3.hn-head{cursor:pointer;display:inline-flex;align-items:center;gap:12px;-webkit-user-select:none;user-select:none}
+#tab-hero h3.hn-head::after{content:'';flex:none;width:8px;height:8px;border-right:3px solid var(--gold);border-bottom:3px solid var(--gold);transform:rotate(45deg) translate(-2px,-2px);transition:transform .2s}
+#tab-hero.hn-closed h3.hn-head::after{transform:rotate(-45deg) translate(-2px,-2px)}
+#tab-hero h3.hn-head:active{transform:translate(2px,2px)}
+#tab-hero.hn-closed #htabs,#tab-hero.hn-closed #badges{display:none}
+@media (prefers-reduced-motion:reduce){#tab-hero h3.hn-head::after{transition:none}}
+
+
+/* =====================================================================
+   SHOP TAB v2: THE GUILD STORE, REVAMPED
+   No hero card on this tab. A stone shopfront with a striped canopy, two lit lanterns and a hanging sign; section titles are
+   gold rail headings; goods sit two to a shelf as hanging crates with a parchment label and a price tag.
+   ===================================================================== */
+body[data-tab="shop"] .hud{display:none}
+body[data-tab="shop"] main{padding-top:calc(16px + env(safe-area-inset-top,0px))}
+body[data-tab="shop"]::before{background:radial-gradient(ellipse 80% 38% at 50% 0,rgba(255,170,70,.22),transparent 72%),radial-gradient(ellipse 90% 40% at 50% 100%,rgba(255,110,30,.14),transparent 70%)}
+
+/* the shopfront: a timber-and-stone guild hall shop. Oak plank wall on a stone base; guild gear hung on the wall (shield and swords, helm and spears); open shelves of stock
+   down both sides; a serving hatch in the middle with its shutters thrown open, a striped canopy and two hanging lanterns; the keeper (blinking, pipe smoking) behind a
+   cloth-draped counter with a ledger, a service bell and a lantern; a barrel and a crate out front; warm light flickering over everything. Tap the keeper and he greets you. */
+.storefront{position:relative;height:340px;margin:4px 0 6px;padding:0;overflow:hidden;border:4px solid #1a0f06;-webkit-tap-highlight-color:transparent;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='40' viewBox='0 0 60 40' shape-rendering='crispEdges'%3E%3Crect width='60' height='40' fill='%2342393f'/%3E%3Crect width='60' height='20' fill='%2347404a'/%3E%3Crect x='30' y='20' width='30' height='20' fill='%2349424c'/%3E%3Cpath d='M0 1.5H60M0 21.5H60M1.5 0V20M31.5 20V40' stroke='%2318141c' stroke-width='3'/%3E%3Cpath d='M4 5H26M36 25H56' stroke='%2366607a' stroke-width='2' opacity='.45'/%3E%3C/svg%3E") 0 100%/60px 52px repeat-x,
+    linear-gradient(#2e1c0e,#2e1c0e) 0 calc(100% - 52px)/100% 8px no-repeat,
+    linear-gradient(#4a2e16,#2e1c0e) 0 0/100% 12px no-repeat,
+    radial-gradient(circle 2px at 8% 6px,#b9c2d0 90%,transparent) 0 0/100% 12px no-repeat,
+    radial-gradient(circle 2px at 92% 6px,#b9c2d0 90%,transparent) 0 0/100% 12px no-repeat,
+    linear-gradient(90deg,#4a2e16,#2e1c0e) 0 0/14px 100% no-repeat,
+    linear-gradient(90deg,#2e1c0e,#4a2e16) 100% 0/14px 100% no-repeat,
+    linear-gradient(90deg,#4a2e16,#2e1c0e) 16.5% 0/8px 100% no-repeat,
+    linear-gradient(90deg,#2e1c0e,#4a2e16) 83.5% 0/8px 100% no-repeat,
+    radial-gradient(ellipse 55% 60% at 50% 58%,rgba(255,176,74,.24),transparent 75%),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.3) 0 2px,transparent 2px 24px),
+    repeating-linear-gradient(0deg,rgba(255,200,140,.05) 0 2px,transparent 2px 7px),
+    linear-gradient(#6b4423,#4a2e16);
+  box-shadow:4px 4px 0 var(--ink),inset 0 0 0 3px #0d0a09,inset 0 0 60px rgba(0,0,0,.45),0 0 26px rgba(255,150,50,.22)}
+.storefront>*{position:absolute}
+/* firelight pooling on the floor and spilling up the wall, flickering */
+.sf-glow{z-index:2;left:6%;right:6%;bottom:0;height:150px;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(ellipse 60% 55% at 50% 100%,rgba(255,150,50,.38),transparent 72%),radial-gradient(ellipse 18% 40% at 20% 70%,rgba(255,170,60,.2),transparent),radial-gradient(ellipse 18% 40% at 80% 70%,rgba(255,170,60,.2),transparent);animation:sfglow 2.6s steps(7) infinite alternate}
+@keyframes sfglow{from{opacity:.65}to{opacity:1}}
+/* gear hung on the wall above the shelves */
+.sf-wall{z-index:2;top:88px;width:11.5%;height:auto;aspect-ratio:24/28;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+.sf-wall.l{left:4.6%}.sf-wall.r{right:4.6%}
+.sf-tag{z-index:4;top:148px;padding:5px 7px 3px;font:400 7px/1 var(--head);letter-spacing:1px;color:var(--gold);text-shadow:1px 1px 0 #000;background:repeating-linear-gradient(90deg,transparent 0 12px,rgba(0,0,0,.25) 12px 14px),linear-gradient(#7a5028,#563518);border:2px solid #1a0f06;box-shadow:inset 0 2px 0 rgba(255,220,160,.25),2px 3px 0 rgba(0,0,0,.5)}
+.sf-tag.l{left:4.6%}.sf-tag.r{right:4.6%}
+/* open shelves down both sides: two planks of bottles, a jar, a crate, a hooped barrel, a scroll case and a sack */
+.storefront::before,.storefront::after{content:'';position:absolute;top:176px;width:12.5%;height:92px;
+  background:
+    linear-gradient(#58b368,#58b368) 10% 20px/10% 22px no-repeat,linear-gradient(#4a9ae0,#4a9ae0) 30% 24px/10% 18px no-repeat,linear-gradient(#c9302c,#c9302c) 50% 22px/10% 20px no-repeat,linear-gradient(#e8b93c,#e8b93c) 72% 28px/16% 14px no-repeat,
+    linear-gradient(#a8283a,#a8283a) 14% 3px/10% 3px no-repeat,
+    linear-gradient(#8a5a2a,#8a5a2a) 8% 56px/34% 26px no-repeat,linear-gradient(#4a2e16,#4a2e16) 8% 66px/34% 3px no-repeat,
+    linear-gradient(#aab3c2,#aab3c2) 54% 62px/26% 2px no-repeat,linear-gradient(#aab3c2,#aab3c2) 54% 74px/26% 2px no-repeat,linear-gradient(#6b3a1c,#6b3a1c) 54% 54px/26% 28px no-repeat,
+    linear-gradient(#e6cf93,#e6cf93) 88% 62px/9% 20px no-repeat,
+    linear-gradient(#a8764a,#4a2e16) 0 42px/100% 5px no-repeat,linear-gradient(#a8764a,#4a2e16) 0 86px/100% 5px no-repeat,
+    linear-gradient(rgba(0,0,0,.38),rgba(0,0,0,.38))}
+.storefront::before{left:3.6%}
+.storefront::after{right:3.6%;transform:scaleX(-1)}
+/* sign: carved oak with iron studs and gold diamonds, swinging gently */
+.shopsign{z-index:6;top:12px;left:0;right:0;width:max-content;max-width:92%;margin:0 auto;padding:10px 30px 7px;
+  background:radial-gradient(circle 3px at 8px 8px,#b9c2d0 90%,transparent),radial-gradient(circle 3px at calc(100% - 8px) 8px,#b9c2d0 90%,transparent),radial-gradient(circle 3px at 8px calc(100% - 8px),#b9c2d0 90%,transparent),radial-gradient(circle 3px at calc(100% - 8px) calc(100% - 8px),#b9c2d0 90%,transparent),repeating-linear-gradient(90deg,transparent 0 26px,rgba(0,0,0,.25) 26px 28px),linear-gradient(#7a5028,#563518);
+  border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.26),inset 0 0 0 5px rgba(232,185,60,.28),0 5px 0 rgba(0,0,0,.5)}
+.shopsign::before,.shopsign::after{content:'';display:block;position:absolute;top:50%;width:8px;height:8px;margin-top:-4px;background:#e8b93c;border:2px solid #1a0f06;transform:rotate(45deg);box-shadow:inset 1px 1px 0 rgba(255,255,255,.5)}
+.shopsign::before{left:11px}.shopsign::after{right:11px}
+.shopsign b{font-size:14px}
+.shopsign small{font-size:18px}
+/* canopy over the hatch: red and cream stripes, scalloped edge */
+.sf-awn{z-index:3;left:17.5%;right:17.5%;top:86px;height:20px;border:3px solid #1a0f06;border-bottom:0;
+  background:repeating-linear-gradient(90deg,#b02a3c 0 22px,#f0e2c0 22px 44px);box-shadow:inset 0 5px 0 rgba(255,255,255,.2),inset 0 -6px 0 rgba(0,0,0,.16);filter:drop-shadow(0 4px 0 rgba(0,0,0,.45))}
+.sf-awn::after{content:'';position:absolute;left:-3px;right:-3px;top:100%;height:11px;background:repeating-linear-gradient(90deg,#b02a3c 0 22px,#f0e2c0 22px 44px);
+  -webkit-mask:radial-gradient(circle 11px at 11px 0,#000 10px,transparent 11px) 0 0/22px 100% repeat-x;mask:radial-gradient(circle 11px at 11px 0,#000 10px,transparent 11px) 0 0/22px 100% repeat-x}
+/* two lanterns on chains from the canopy corners */
+.sf-ln{z-index:4;top:106px;width:16px;height:38px;display:block;
+  background:linear-gradient(#8a93a3,#8a93a3) 50% 0/2px 10px no-repeat,linear-gradient(#4a5060,#4a5060) 50% 10px/14px 4px no-repeat,linear-gradient(#ffe9a8,#ffc860) 50% 14px/10px 18px no-repeat,linear-gradient(#4a5060,#4a5060) 50% 100%/14px 4px no-repeat;
+  filter:drop-shadow(0 0 7px rgba(255,170,60,.95));animation:lampflick 2.4s steps(6) infinite alternate}
+.sf-ln.l{left:19.2%}.sf-ln.r{right:19.2%;animation-delay:-1.2s}
+/* shutters, thrown open either side (a little narrower at the outer edge for depth) */
+.sf-sh{z-index:2;top:110px;bottom:76px;width:6.5%;display:block;border:3px solid #1a0f06;
+  background:linear-gradient(#b9c2d0,#b9c2d0) 0 22%/100% 5px no-repeat,linear-gradient(#b9c2d0,#b9c2d0) 0 74%/100% 5px no-repeat,repeating-linear-gradient(90deg,rgba(0,0,0,.35) 0 2px,transparent 2px 9px),linear-gradient(#7a5028,#4a2e16);box-shadow:inset 0 0 0 2px rgba(255,220,160,.16)}
+.sf-sh.l{left:10.5%;clip-path:polygon(0 5%,100% 0,100% 100%,0 95%)}
+.sf-sh.r{right:10.5%;clip-path:polygon(0 0,100% 5%,100% 95%,0 100%)}
+/* the hatch: a warm room behind a thick oak frame */
+.sf-hatch{z-index:2;left:24%;right:24%;top:106px;bottom:76px;overflow:hidden;border:7px solid #6b4423;border-top-width:0;border-bottom:0;box-shadow:inset 0 0 0 3px #1a0f06,0 0 0 3px #1a0f06,inset 0 0 40px rgba(0,0,0,.65);
+  background:radial-gradient(ellipse 70% 55% at 50% 8%,rgba(255,190,90,.38),transparent 75%),repeating-linear-gradient(90deg,rgba(0,0,0,.28) 0 2px,transparent 2px 18px),linear-gradient(#3a2a1c,#241810)}
+.sf-lamp{position:absolute;left:50%;top:6px;z-index:1;width:10px;height:12px;margin-left:-5px;background:#ffe9a8;border:2px solid #1a0f06;box-shadow:0 0 14px 6px rgba(255,176,74,.55);animation:lampflick 2.4s steps(6) infinite alternate}
+@keyframes lampflick{from{opacity:.72}to{opacity:1}}
+/* two back shelves of bottles and jars (kept to the sides so the keeper stands clear) */
+.sf-shelf{position:absolute;left:0;right:0;top:28px;height:82px;
+  background:
+    linear-gradient(#a8764a,#4a2e16) 0 28px/100% 5px no-repeat,linear-gradient(#a8764a,#4a2e16) 0 76px/100% 5px no-repeat,
+    linear-gradient(#4a9ae0,#4a9ae0) 5% 12px/6px 16px no-repeat,linear-gradient(#c9302c,#c9302c) 12% 16px/6px 12px no-repeat,linear-gradient(#58b368,#58b368) 19% 10px/7px 18px no-repeat,
+    linear-gradient(#e8b93c,#e8b93c) 79% 14px/8px 14px no-repeat,linear-gradient(#58b368,#58b368) 87% 12px/6px 16px no-repeat,linear-gradient(#a8283a,#a8283a) 94% 16px/5px 12px no-repeat,
+    linear-gradient(#e6cf93,#e6cf93) 6% 58px/10px 18px no-repeat,linear-gradient(#8a5a2a,#8a5a2a) 15% 62px/9px 14px no-repeat,linear-gradient(#9a5ac0,#9a5ac0) 22% 60px/6px 16px no-repeat,
+    linear-gradient(#e6cf93,#e6cf93) 78% 62px/9px 14px no-repeat,linear-gradient(#4a9ae0,#4a9ae0) 87% 58px/6px 18px no-repeat,linear-gradient(#d9a868,#d9a868) 94% 64px/7px 12px no-repeat}
+/* dust drifting through the lamplight */
+.sf-hatch::after{content:'';position:absolute;left:30%;bottom:20px;z-index:3;width:2px;height:2px;background:#ffe9c0;opacity:0;pointer-events:none;
+  box-shadow:34px -22px #ffe9c0,70px -4px #ffd9a0,98px -40px #ffe9c0,14px -50px #ffd9a0;animation:sfdust 9s linear infinite}
+@keyframes sfdust{0%{transform:translateY(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-70px);opacity:0}}
+/* pipe smoke curling up from the keeper */
+.sf-smoke{position:absolute;left:calc(50% + 34px);bottom:96px;z-index:3;width:5px;height:5px;background:rgba(235,228,215,.55);opacity:0;pointer-events:none;animation:sfsmoke 4.5s linear infinite}
+@keyframes sfsmoke{0%{transform:translate(0,0) scale(.6);opacity:0}15%{opacity:.7}60%{transform:translate(6px,-16px) scale(1.2)}100%{transform:translate(-2px,-34px) scale(1.8);opacity:0}}
+/* the keeper stands behind the counter, hands flat on it, breathing and blinking */
+.sf-keeper{position:absolute;left:0;right:0;bottom:-2px;z-index:2;width:min(120px,90%);height:auto;aspect-ratio:1;margin:0 auto;image-rendering:pixelated;animation:sfbreath 3.2s steps(1) infinite}
+@keyframes sfbreath{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+.sf-keeper,.sf-cat{cursor:pointer}
+.sf-keeper .blink{opacity:0;animation:sfblink 5.5s steps(1) infinite}
+@keyframes sfblink{0%,91%{opacity:0}92%,96%{opacity:1}97%,100%{opacity:0}}
+.sf-keeper .ember{animation:sfember 1.1s steps(2) infinite}
+@keyframes sfember{0%{fill:#ff7a1a}50%{fill:#ffc02a}}
+/* the counter: oak top, guild-red cloth with folds and a gold fringe */
+.sf-counter{z-index:3;left:19%;right:19%;bottom:50px;height:26px;border:3px solid #1a0f06;box-shadow:0 5px 0 rgba(0,0,0,.45);
+  background:repeating-linear-gradient(90deg,#e8b93c 0 4px,#b8902e 4px 6px) 0 100%/100% 3px no-repeat,repeating-linear-gradient(90deg,rgba(0,0,0,.2) 0 3px,transparent 3px 16px) 0 8px/100% 9px no-repeat,linear-gradient(#e6b878 0 2px,#d9a868 2px 6px,#6a431c 6px 8px,#b02a3c 8px)}
+.sf-it{position:absolute;bottom:100%;margin-bottom:-1px;display:block}
+.sf-it.a{left:7%;width:8px;height:14px;background:#c9302c;border:2px solid #1a0f06;border-top-width:5px;border-top-color:#8a6a3a}
+.sf-it.c{left:18%;width:8px;height:17px;background:linear-gradient(90deg,#f6ebc9 0 55%,#d8c392 55%),linear-gradient(#e9d9ae,#e9d9ae) 0 0/100% 100% no-repeat;border:2px solid #1a0f06;border-bottom:0;filter:drop-shadow(0 0 6px rgba(255,170,60,.85));animation:lampflick 2.4s steps(6) infinite alternate-reverse}
+/* a candle: wax stick on a brass dish, with a flickering flame */
+.sf-it.c::before{content:'';position:absolute;left:50%;bottom:100%;width:4px;height:7px;margin:0 0 1px -2px;background:linear-gradient(#fff6c0 0 35%,#ffc02a 35% 70%,#ff7a1a 70%);clip-path:polygon(50% 0,100% 55%,85% 100%,15% 100%,0 55%);transform-origin:50% 100%;animation:candleflame .9s steps(1) infinite}
+.sf-it.c::after{content:'';position:absolute;left:50%;bottom:0;width:10px;height:2px;margin-left:-5px;background:#c99a2c;box-shadow:0 0 0 2px #1a0f06}
+@keyframes candleflame{0%{transform:scale(1,1)}20%{transform:scale(.8,1.15) translateX(.5px)}40%{transform:scale(1,.9)}60%{transform:scale(.85,1.1) translateX(-.5px)}80%{transform:scale(1,1.05)}}
+.sf-it.d{left:47%;width:12px;height:9px;border:2px solid #1a0f06;border-radius:7px 7px 0 0;background:linear-gradient(90deg,#c99a2c,#ffd75a 45%,#b8861e);transform-origin:50% 100%}
+.sf-it.d::after{content:'';position:absolute;left:50%;top:-6px;width:4px;height:4px;margin-left:-2px;background:#ffd75a;border:1px solid #1a0f06}
+.storefront.ring .sf-it.d{animation:sfring .5s steps(5)}
+@keyframes sfring{20%{transform:rotate(-16deg)}40%{transform:rotate(14deg)}60%{transform:rotate(-9deg)}80%{transform:rotate(6deg)}}
+.sf-it.e{right:20%;width:22px;height:6px;border:2px solid #1a0f06;background:linear-gradient(90deg,#c9b27c 0 46%,#1a0f06 46% 54%,#efe4c4 54%)}
+.sf-it.b{right:7%;width:14px;height:6px;background:#e8b93c;border:2px solid #1a0f06;box-shadow:0 -6px 0 -2px #e8b93c,0 -6px 0 0 #1a0f06,8px -3px 0 -3px #ffd75a}
+/* props out front: a hooped barrel and a crate with a sack on it */
+.sf-barrel{z-index:4;left:4.4%;bottom:0;width:46px;height:58px;border:3px solid #1a0f06;border-radius:17px/10px;
+  background:linear-gradient(#aab3c2,#6a7384) 0 20%/100% 4px no-repeat,linear-gradient(#aab3c2,#6a7384) 0 72%/100% 4px no-repeat,repeating-linear-gradient(90deg,rgba(0,0,0,.3) 0 2px,transparent 2px 7px),linear-gradient(90deg,#5a3a1a,#8a5a2a 45%,#4a2e16);box-shadow:3px 4px 0 rgba(0,0,0,.5)}
+.sf-crate{z-index:4;right:4.4%;bottom:6px;width:60px;height:50px;border:3px solid #1a0f06;
+  background:linear-gradient(45deg,transparent 44%,#4a2e16 44% 56%,transparent 56%),linear-gradient(-45deg,transparent 44%,#4a2e16 44% 56%,transparent 56%),linear-gradient(#a8764a,#7a5028);box-shadow:3px 4px 0 rgba(0,0,0,.5)}
+/* the sack: a pinched, rope-tied neck over a round burlap body (::before is the dark outline, ::after the cloth; both use the same sack-shaped clip) */
+.sf-crate::before,.sf-crate::after{content:'';position:absolute;bottom:100%;clip-path:polygon(34% 0,44% 12%,56% 12%,66% 0,70% 15%,64% 24%,82% 34%,95% 56%,98% 78%,89% 95%,50% 100%,11% 95%,2% 78%,5% 56%,18% 34%,36% 24%,30% 15%)}
+.sf-crate::before{left:7px;width:46px;height:44px;margin-bottom:-6px;background:#1a0f06}
+.sf-crate::after{left:10px;width:40px;height:38px;margin-bottom:-3px;
+  background:
+    linear-gradient(#7a4a22,#7a4a22) 0 17%/100% 7% no-repeat,
+    linear-gradient(#c28a4a,#c28a4a) 0 17%/100% 2% no-repeat,
+    radial-gradient(ellipse 40% 34% at 36% 60%,rgba(255,235,185,.5),transparent 70%),
+    linear-gradient(100deg,transparent 56%,rgba(60,30,8,.3) 78%,rgba(60,30,8,.5)),
+    repeating-linear-gradient(90deg,rgba(90,55,20,.22) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(0deg,rgba(90,55,20,.22) 0 1px,transparent 1px 3px),
+    linear-gradient(#d9b87a,#b8905a)}
+
+/* section titles: gold diamond, the title, then a dashed gold rail */
+#tab-shop h3{display:flex;align-items:center;gap:10px;width:auto;max-width:none;margin:32px 2px 14px;padding:0;background:none;border:0;box-shadow:none;clip-path:none;
+  color:var(--gold);font-size:12px;text-shadow:2px 2px 0 #000}
+#tab-shop h3::before{content:'';flex:none;width:10px;height:10px;margin:0;background:var(--gold);border:2px solid #1a0f06;transform:rotate(45deg);box-shadow:0 0 8px rgba(232,185,60,.7)}
+#tab-shop h3::after{content:'';flex:1;height:3px;background:repeating-linear-gradient(90deg,rgba(232,185,60,.7) 0 6px,transparent 6px 9px)}
+
+/* the strongbox counter */
+#tab-shop .wtile.purse{background:radial-gradient(ellipse at 50% 0,rgba(232,185,60,.22),transparent 72%),linear-gradient(#34200f,#241508)}
+
+/* goods: two crates to a shelf */
+#tab-shop .shopgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 14px}
+#tab-shop .sitem.panel{flex-direction:column;align-items:center;gap:10px;height:100%;padding:16px 8px 26px;text-align:center}
+#tab-shop .sitem .ei{width:64px;height:64px}
+#tab-shop .sitem .ei .px{width:36px;height:36px}
+#tab-shop .sitem .itx{flex:1 1 auto;width:100%;display:flex;flex-direction:column;justify-content:center}
+#tab-shop .sitem .itx b{font-size:9px}
+#tab-shop .sitem .itx small{font-size:18px}
+#tab-shop .sitem .btn{width:100%;min-width:0;justify-content:center;text-align:center;padding-left:22px}
+/* the jeweller's case: glass front with a moving glint */
+#shopgem .sitem.panel::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 0 22%,rgba(255,255,255,.12) 22% 30%,transparent 30% 38%,rgba(255,255,255,.07) 38% 42%,transparent 42%) -60% 0/250% 100% no-repeat;animation:glassglint 7s ease-in-out infinite}
+@media (max-width:350px){#tab-shop .shopgrid{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){.sf-it.c::before,.sf-lamp,.sf-it.c,.sf-ln,.sf-glow,.sf-keeper,.sf-keeper .blink,.sf-keeper .ember,.sf-smoke,.sf-hatch::after,.shopsign,.storefront.ring .sf-it.d,#shopgem .sitem.panel::before{animation:none}}
+
+/* ---- shop front, round 2: bunting, a sleeping cat on the barrel, herbs and a ham hanging in the hatch, moths round the lanterns, a drumming hand, a banner on the counter ---- */
+.sf-bunt{z-index:1;left:2.5%;right:2.5%;top:13px;height:18px;opacity:.95;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.45));
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='18' viewBox='0 0 96 18' shape-rendering='crispEdges'%3E%3Cpath d='M0 1.5H96' stroke='%231a0f06' stroke-width='3'/%3E%3Cg stroke='%231a0f06' stroke-width='1.5'%3E%3Cpath d='M3 3h18l-9 12z' fill='%23b02a3c'/%3E%3Cpath d='M27 3h18l-9 12z' fill='%23e8b93c'/%3E%3Cpath d='M51 3h18l-9 12z' fill='%233a8fe0'/%3E%3Cpath d='M75 3h18l-9 12z' fill='%2358b368'/%3E%3C/g%3E%3C/svg%3E") 0 0/96px 18px repeat-x}
+.sf-hatch::before{content:'';position:absolute;left:0;right:0;top:0;height:36px;z-index:1;transform-origin:50% 0;animation:sfhang 4.2s ease-in-out infinite alternate;
+  background:
+    linear-gradient(#5a3a22,#5a3a22) 30% 0/1px 12px no-repeat,linear-gradient(#a8283a,#a8283a) 30% 11px/6px 2px no-repeat,linear-gradient(#3f8a4a,#58b368) 30% 13px/10px 14px no-repeat,linear-gradient(#8fd08a,#8fd08a) 31% 15px/2px 6px no-repeat,
+    linear-gradient(#5a3a22,#5a3a22) 67% 0/1px 10px no-repeat,linear-gradient(#8a3a28,#b0583a) 67% 10px/13px 12px no-repeat,linear-gradient(#e6dcc4,#e6dcc4) 67% 21px/5px 5px no-repeat,
+    linear-gradient(#5a3a22,#5a3a22) 76% 0/1px 8px no-repeat,linear-gradient(#efe4c4,#efe4c4) 76% 8px/5px 5px no-repeat,linear-gradient(#efe4c4,#efe4c4) 79% 12px/5px 5px no-repeat,linear-gradient(#efe4c4,#efe4c4) 74% 13px/5px 5px no-repeat}
+@keyframes sfhang{from{transform:rotate(-.9deg)}to{transform:rotate(.9deg)}}
+/* moths dancing round the lanterns */
+/* moths: three circle each hanging lantern; each flutters its wings and flies its own loop */
+.sf-ln::before,.sf-ln::after,.sf-ln b{content:'';position:absolute;left:50%;top:20px;width:2px;height:2px;margin:-1px 0 0 -1px;background:#fff8d8;pointer-events:none}
+.sf-ln::after{animation:sfmoth 2.8s steps(8) infinite,sfflap .36s steps(1) infinite}
+.sf-ln::before{animation:sfmoth2 3.6s steps(9) infinite,sfflap .3s steps(1) infinite}
+.sf-ln b{animation:sfmoth3 4.4s steps(8) infinite,sfflap .42s steps(1) infinite}
+.sf-ln.r::after{animation-delay:-1.4s,0s;animation-direction:reverse,normal}
+.sf-ln.r::before{animation-delay:-1.9s,0s}
+.sf-ln b{animation-delay:-1.1s,0s}.sf-ln.r b{animation-delay:-3s,0s}
+@keyframes sfflap{0%{box-shadow:-2px -1px 0 rgba(255,248,216,.75),2px -1px 0 rgba(255,248,216,.75)}50%{box-shadow:none}}
+@keyframes sfmoth{0%{transform:translate(10px,0)}25%{transform:translate(0,-9px)}50%{transform:translate(-10px,0)}75%{transform:translate(0,9px)}100%{transform:translate(10px,0)}}
+@keyframes sfmoth2{0%,100%{transform:translate(-8px,-4px)}20%{transform:translate(2px,9px)}40%{transform:translate(10px,-6px)}60%{transform:translate(4px,3px)}80%{transform:translate(-9px,5px)}}
+@keyframes sfmoth3{0%,100%{transform:translate(-6px,-7px)}25%{transform:translate(7px,-10px)}50%{transform:translate(8px,4px)}75%{transform:translate(-4px,9px)}}
+/* the keeper drums his fingers on the counter now and then */
+.sf-keeper .tap{animation:sftap 6s steps(1) infinite}
+@keyframes sftap{0%,70%,82%,100%{transform:translateY(0)}72%,76%,80%{transform:translateY(-.7px)}74%,78%{transform:translateY(0)}}
+/* the counter cloth is embroidered */
+.sf-counter::after{content:'TAP TO BROWSE';position:absolute;left:0;right:0;top:8px;height:9px;overflow:hidden;white-space:nowrap;text-align:center;font:400 6px/9px var(--head);letter-spacing:2px;color:#ffe9a8;text-shadow:1px 1px 0 rgba(0,0,0,.55)}
+.sfz-sf .sf-counter::after{content:'RESTOCK \00B7 GEAR'}
+/* a ginger cat asleep on the barrel */
+.sf-cat{z-index:5;left:calc(4.4% - 4px);bottom:56px;width:56px;height:38px}
+.sf-cat svg{display:block;width:100%;height:100%;image-rendering:pixelated;transform-origin:50% 100%;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.4));animation:catbreath 3.6s ease-in-out infinite alternate}
+@keyframes catbreath{to{transform:scaleY(1.06)}}
+.sf-cat .tail{transform-origin:2px 10px;animation:cattail 3.2s ease-in-out infinite alternate}
+@keyframes cattail{from{transform:rotate(-10deg)}to{transform:rotate(14deg)}}
+.sf-z{position:absolute;left:42px;top:-8px;font:400 9px/1 var(--head);color:#ffe9c0;text-shadow:1px 1px 0 #000;opacity:0;animation:sfz 3.6s linear infinite}
+.sf-z.two{animation-delay:-1.8s;left:34px}
+@keyframes sfz{0%{transform:translate(0,0);opacity:0}20%{opacity:1}100%{transform:translate(8px,-16px);opacity:0}}
+.sf-cat.wake svg{animation:catjump .4s steps(4)}
+@keyframes catjump{40%{transform:translateY(-6px)}}
+/* goods you can afford glint; ones you cannot are dulled; crates lift a little when pressed */
+#tab-shop .sitem.panel{transition:transform .12s}
+#tab-shop .sitem.panel:hover{transform:translateY(-2px)}
+#tab-shop .sitem .ei{position:relative;overflow:hidden}
+#tab-shop .sitem:has(.btn:not(:disabled)) .ei::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.4) 50%,transparent 60%) 160% 0/250% 100% no-repeat;animation:sfshine 4.8s ease-in-out infinite}
+@keyframes sfshine{0%,55%{background-position:160% 0}100%{background-position:-60% 0}}
+#tab-shop .sitem:has(.btn:disabled) .ei .px{filter:grayscale(.85) brightness(.75)}
+@media (prefers-reduced-motion:reduce){.sf-hatch::before,.sf-keeper .tap,.sf-cat svg,.sf-cat .tail,.sf-z,.sf-cat.wake svg,#tab-shop .sitem .ei::after{animation:none!important}.sf-z{display:none}}
+@media (prefers-reduced-motion:reduce){.sf-ln::before,.sf-ln::after,.sf-ln b{display:none}}
+
+/* ---- shop keeper speech: a small, slim sideways parchment scroll (rollers at the left and right ends) floating above his hatch, bobbing gently; it fades after a short while ---- */
+.sf-say{z-index:7;left:0;right:0;bottom:204px;width:min(94%,390px);margin:0 auto;visibility:hidden;opacity:0;transform:translateY(8px);pointer-events:none;
+  transition:opacity .2s steps(4),transform .2s steps(4),visibility 0s .2s;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+.sf-say.on{visibility:visible;opacity:1;transform:none;transition:opacity .2s steps(4),transform .2s steps(4);animation:sfsayfloat 2.6s ease-in-out infinite}
+@keyframes sfsayfloat{0%,100%{translate:0 0}50%{translate:0 -4px}}
+.sf-say-box{position:relative;margin:0 15px;padding:11px 12px 9px;text-align:center;
+  border-top:3px solid #1a0f06;border-bottom:3px solid #1a0f06;
+  background:linear-gradient(180deg,rgba(110,66,18,.3),transparent 18%,transparent 82%,rgba(110,66,18,.3)),radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(130,80,20,.22)),repeating-linear-gradient(90deg,rgba(120,80,30,.07) 0 2px,transparent 2px 6px),#f2d8a4}
+/* the two wooden rollers stand upright at the ends, just a little taller than the paper */
+.sf-say-box::before,.sf-say-box::after{content:'';position:absolute;top:-7px;bottom:-7px;width:18px;
+  background:
+    linear-gradient(90deg,#b26c64 0 26%,#7a3f3a 26% 70%,#371e22 70%) 0 0/100% 8px no-repeat,
+    linear-gradient(90deg,#b26c64 0 26%,#7a3f3a 26% 70%,#371e22 70%) 0 100%/100% 8px no-repeat,
+    linear-gradient(90deg,#fff0d4 0 22%,#f4d6a4 22% 55%,#dcb27c 55% 82%,#a57b65 82%) 0 8px/100% calc(100% - 16px) no-repeat;
+  border:3px solid #1a0f06;border-radius:2px}
+.sf-say-box::before{left:-15px}
+.sf-say-box::after{right:-15px}
+.sf-say-in{display:block;font:400 22px/1 var(--body);color:#2a1808;overflow-wrap:anywhere}
+@media (prefers-reduced-motion:reduce){.sf-say.on{animation:none}.sf-say,.sf-say.on{transition:none}}
+
+
+
+
+
+/* ---- up close: tap the shop front and it zooms in on the shelves; the keeper stays in view behind his counter ---- */
+.storefront{cursor:zoom-in}
+.sf-hint{z-index:6;left:0;right:0;bottom:12px;width:max-content;max-width:90%;margin:0 auto;padding:5px 12px 3px;font:400 8px/1 var(--head);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;color:#f0e2c0;background:rgba(26,15,6,.84);border:2px solid #e8b93c;box-shadow:2px 3px 0 rgba(0,0,0,.5);pointer-events:none;animation:sfhint 2.4s ease-in-out infinite}
+@keyframes sfhint{0%,100%{opacity:.65}50%{opacity:1}}
+body.sfz-open{overflow:hidden}
+body.sfz-open .toast{z-index:40}   /* purchase toasts stay readable above the zoomed shop */
+
+/* the zoomed shop: a copy of the real shop front, scaled up on the hatch, with the wares on its back shelves */
+.sfz{position:fixed;inset:0;z-index:15;overflow:hidden;background-color:transparent;transition:background-color .5s ease}
+.sfz.closing{pointer-events:none}
+.sfz-zoom{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform;transition:transform .5s cubic-bezier(.22,.7,.2,1)}
+.sfz-pg{pointer-events:none;animation:none!important;transition:none!important;margin:0!important}
+.sfz-pg .sfz-sf,.storefront.sfz-sf{pointer-events:auto;cursor:default}
+.sfz-sf .sf-shelf{transition:opacity .3s .1s}
+.sfz.in .sfz-sf .sf-shelf{opacity:0}
+/* the wares: three to a shelf, either side of the keeper, sized in the shop's own pixels so they scale with it */
+.zbs{position:absolute;top:5px;height:140px;width:38px;z-index:1;display:flex;flex-direction:column;justify-content:space-between;opacity:0;transition:opacity .3s .25s}
+.zbs.l{left:3px}
+.zbs.r{right:3px;background:radial-gradient(ellipse at 50% 0,rgba(90,160,255,.2),transparent 75%)}
+.sfz.in .zbs{opacity:1}
+.zslot{position:relative}
+.zi{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;width:100%;padding:0;background:none;border:0;color:#f0e2c0;font:inherit;cursor:pointer;transition:transform .12s}
+.zi:hover{transform:translateY(-1px)}
+.zi-ic{display:grid;place-items:center;width:28px;height:28px}
+.zi-ic .px{width:26px;height:26px;filter:drop-shadow(1px 1px 0 rgba(0,0,0,.55))}
+.zi-tag{padding:1px 2px 0;font:400 10px/1 var(--body);white-space:nowrap;color:#2a1808;background:#f2e6bf;border:1px solid #1a0f06;box-shadow:1px 1px 0 rgba(0,0,0,.45)}
+.zi-pl{display:block;height:4px;margin:0 -2px;border-top:1px solid #1a0f06;background:linear-gradient(#a8764a,#4a2e16);box-shadow:0 2px 0 rgba(0,0,0,.45)}
+.zi.sel{transform:translateY(-2px)}
+.zi.sel .zi-ic{filter:drop-shadow(0 0 3px #ffd75a) drop-shadow(0 0 6px rgba(255,215,90,.8))}
+.zi.poor .zi-ic{opacity:.55}
+.zi.poor .zi-tag{color:#a8283a}
+.zi.full{filter:grayscale(.6);opacity:.6}
+.zi:focus-visible{outline:1px dashed var(--act);outline-offset:1px}
+
+/* top: wallet and the keeper's line; bottom: the item card and a way back */
+.sfz-hud,.sfz-bot{position:absolute;left:0;right:0;z-index:2;max-width:560px;margin:0 auto;padding:0 12px;opacity:0;transition:opacity .3s .2s}
+.sfz.in .sfz-hud,.sfz.in .sfz-bot{opacity:1}
+.sfz.closing .sfz-hud,.sfz.closing .sfz-bot{opacity:0;transition:opacity .15s}
+.sfz-hud{top:0;padding-top:calc(10px + env(safe-area-inset-top,0px));max-width:none;padding-left:max(12px,calc(50% - 268px));padding-right:max(12px,calc(50% - 268px))}
+.sfz-bot{bottom:0;padding-top:14px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:none;padding-left:max(12px,calc(50% - 268px));padding-right:max(12px,calc(50% - 268px))}
+.sfz-sayrow{display:flex;align-items:center;min-height:58px;margin:6px 0 0}
+.sfz-say{width:100%;visibility:hidden;opacity:0;transform:translateY(4px);transition:opacity .2s steps(4),transform .2s steps(4),visibility 0s .2s;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+.sfz-say.on{visibility:visible;opacity:1;transform:none;transition:opacity .2s steps(4),transform .2s steps(4)}
+.sfz-wal{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.sfz-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 9px 3px;color:#f0e2c0;background:linear-gradient(#34200f,#241508);border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(0,0,0,.35)}
+.sfz-chip b{font:400 21px/1 var(--body)}
+.sfz-chip .px{width:16px;height:16px}
+.sfz-chip .px.coin{width:20px;height:20px}
+.sfz-det{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;margin:0 0 10px;padding:12px;color:#3a2410;
+  background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(130,80,20,.28)),repeating-linear-gradient(0deg,rgba(120,80,30,.06) 0 2px,transparent 2px 6px),#e6cf93;
+  border:3px solid #1a0f06;box-shadow:inset 0 0 0 2px rgba(110,66,18,.25),3px 5px 0 rgba(0,0,0,.5)}
+.sfz-dt b{display:block;font:400 11px/1.4 var(--head);color:#2a1808}
+.sfz-dt small{display:block;margin-top:4px;font:400 20px/1.05 var(--body);color:#6e5a3a}
+.sfz-det .btn{min-width:110px}
+.sfz-poor{grid-column:1/-1;text-align:center;font:400 19px/1 var(--body);color:#a8283a}
+@media (max-width:380px){.sfz-det{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){.sf-hint{animation:none!important}.sfz,.sfz-zoom,.sfz-hud,.sfz-bot,.zbs,.sfz-sf .sf-shelf{transition:none}.sfz-say,.sfz-say.on{transition:none}}
+
+/* zoomed shop: the stone wall runs on down past the counter to the bottom of the screen.
+   It lives inside the shop front, starts where the wooden rail would be (so no extra border) and
+   shares the same brick rows and warm firelight as the wall above. */
+.storefront.sfz-sf{overflow:visible;border-bottom-color:transparent;box-shadow:inset 0 0 60px rgba(0,0,0,.45)}
+.sfz-floor{position:absolute;left:-1200px;width:calc(100% + 2400px);top:calc(100% - 60px);height:3000px;cursor:pointer;
+  background:
+    linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.06) 90px,rgba(0,0,0,.06) 500px,rgba(0,0,0,.4)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='40' viewBox='0 0 60 40' shape-rendering='crispEdges'%3E%3Crect width='60' height='40' fill='%2342393f'/%3E%3Crect width='60' height='20' fill='%2347404a'/%3E%3Crect x='30' y='20' width='30' height='20' fill='%2349424c'/%3E%3Cpath d='M0 1.5H60M0 21.5H60M1.5 0V20M31.5 20V40' stroke='%2318141c' stroke-width='3'/%3E%3Cpath d='M4 5H26M36 25H56' stroke='%2366607a' stroke-width='2' opacity='.45'/%3E%3C/svg%3E") 0 0/60px 40px repeat #42393f}
+/* firelight: spans the full width of the shop front, strongest under the hatch, fading down and out like the wall above */
+.sfz-floor::before{content:'';position:absolute;top:0;bottom:0;left:1200px;width:calc(100% - 2400px);pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.4),transparent 22%,transparent 78%,rgba(0,0,0,.4)),
+    radial-gradient(ellipse 95% 620px at 50% 0,rgba(255,176,74,.34),rgba(255,176,74,.14) 55%,transparent)}
+.sfz-bot{padding-top:0}
+.sfz-bot[hidden]{display:none}
+
+/* zoomed shop: money shown big by denomination, holdings small beside it, plus shelf tabs along the bottom */
+.sfz-wal{align-items:center}
+.sfz-chip.cur{gap:8px;padding:6px 10px 4px;background:linear-gradient(#3d2812,#271609)}
+.sfz-chip.cur b{font-size:25px}
+.sfz-chip.cur .px,.sfz-chip.cur .px.coin{width:22px;height:22px}
+.sfz-chip.sfz-purse{gap:12px}
+.sfz-pc{display:inline-flex;align-items:center;gap:4px}
+.sfz-chip.act{border-color:#d9a93c;box-shadow:inset 0 3px 0 rgba(0,0,0,.35),0 0 0 2px rgba(255,215,90,.3),0 0 12px rgba(255,200,80,.5)}
+.sfz-chip.sm{gap:4px;padding:3px 7px 2px;opacity:.85}
+.sfz-chip.sm b{font-size:17px}
+.sfz-chip.sm .px{width:13px;height:13px}
+.sfz-det[hidden]{display:none}
+.zbs.few{justify-content:space-around}
+.sfz-bot{display:flex;flex-direction:column}
+.sfz-tabs{display:flex;gap:6px;justify-content:center}
+.sfz-tab{display:flex;align-items:center;justify-content:center;gap:5px;flex:1;max-width:160px;min-height:40px;padding:6px 4px 4px;font:400 9px/1.2 var(--head);color:#d9c38c;background:linear-gradient(#4a2e16,#2e1c0e);border:3px solid #1a0f06;box-shadow:inset 0 2px 0 rgba(255,220,160,.18),0 3px 0 rgba(0,0,0,.5);cursor:pointer}
+.sfz-tab .px{width:14px;height:14px}
+.sfz-tab[aria-selected=true]{color:#2a1808;background:linear-gradient(#f2e6bf,#d9c38c);transform:translateY(2px);box-shadow:inset 0 2px 0 rgba(255,255,255,.4)}
+.sfz-tab:focus-visible{outline:1px dashed var(--act);outline-offset:2px}
+
+
+
+
+
+/* =====================================================================
+   SHOP SHELVES v2: realistic wall shelving behind the keeper
+   Coin goods (left) stand on open oak shelves with iron brackets; gem goods (right) sit in a glass-fronted cabinet.
+   Both are recessed into the back wall: dark boarded back panel, a cornice that throws a shadow, thick planks with a lit top edge and a
+   cast shadow, items resting ON the plank with a contact shadow, and paper price tags hung from the plank edge on a nail.
+   Only look changes: every class the script uses is unchanged.
+   ===================================================================== */
+
+/* the shelving unit: recessed boarded panel, side posts, lit from the lamp on the inner side */
+.zbs{top:6px;height:142px;width:40px;box-sizing:border-box;padding:8px 2px 4px;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.55),transparent 20%,transparent 80%,rgba(0,0,0,.55)),
+    linear-gradient(rgba(0,0,0,.7),transparent 30px),
+    linear-gradient(0deg,rgba(0,0,0,.45),transparent 22px),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.38) 0 1px,transparent 1px 9px),
+    repeating-linear-gradient(0deg,rgba(255,200,140,.035) 0 1px,transparent 1px 4px),
+    linear-gradient(#3e2917,#2a1a0e);
+  border:2px solid #140b04;border-top:0;
+  box-shadow:inset 0 0 0 1px rgba(255,220,160,.12),inset -9px 0 12px -8px rgba(255,176,74,.22),2px 4px 0 rgba(0,0,0,.4)}
+.zbs.r{box-shadow:inset 0 0 0 1px rgba(255,220,160,.12),inset 9px 0 12px -8px rgba(255,176,74,.22),2px 4px 0 rgba(0,0,0,.4)}
+/* cornice on top, overhanging the unit */
+.zbs::before{content:'';position:absolute;left:-4px;right:-4px;top:-6px;height:8px;pointer-events:none;
+  background:linear-gradient(#cf9a5e 0 2px,#9a6834 2px 5px,#5a3a1a 5px);
+  border:2px solid #140b04;box-shadow:0 4px 5px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,235,190,.35)}
+/* gem cabinet: a glass front with a slow diagonal glint and a cool tint */
+.zbs.r::after{content:'';position:absolute;inset:0;z-index:4;pointer-events:none;
+  background:
+    linear-gradient(115deg,transparent 0 26%,rgba(255,255,255,.16) 26% 36%,transparent 36% 46%,rgba(255,255,255,.08) 46% 50%,transparent 50%),
+    linear-gradient(rgba(120,170,255,.1),rgba(60,110,200,.06));
+  box-shadow:inset 0 0 0 1px rgba(190,215,255,.3)}
+
+/* each slot: item, plank, then room underneath for the hanging price tag */
+.zslot{position:relative;padding-bottom:11px}
+.zi{position:relative}
+.zi-ic{position:relative;width:26px;height:26px;margin-bottom:-2px}
+.zi-ic .px{width:24px;height:24px}
+.zi-ic::after{content:'';position:absolute;left:10%;right:10%;bottom:1px;height:4px;border-radius:50%;z-index:-1;
+  background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,.65),transparent 72%)}
+
+/* the plank: lit top edge, wood front face, a cast shadow on the wall below, an iron bracket at each end */
+.zi-pl{position:relative;height:6px;margin:0 -3px;border:1px solid #140b04;border-radius:1px;
+  background:linear-gradient(#e0b070 0 1px,#b98448 1px 2px,#8a5a2a 2px 4px,#55351a 4px);
+  box-shadow:0 3px 4px rgba(0,0,0,.65),0 1px 0 rgba(0,0,0,.5)}
+.zi-pl::before,.zi-pl::after{content:'';position:absolute;top:100%;width:5px;height:6px;pointer-events:none;
+  background:linear-gradient(90deg,#8a93a3,#2c313b)}
+.zi-pl::before{left:3px;clip-path:polygon(0 0,100% 0,0 100%)}
+.zi-pl::after{right:3px;clip-path:polygon(0 0,100% 0,100% 100%);background:linear-gradient(90deg,#2c313b,#8a93a3)}
+
+/* paper price tag hanging from a nail in the plank edge */
+.zi-tag{position:absolute;left:50%;top:calc(100% + 6px);z-index:3;transform:translateX(-50%);padding:1px 3px 0;
+  background:linear-gradient(#f6ecc8,#e4d3a0);border:1px solid #1a0f06;box-shadow:1px 2px 0 rgba(0,0,0,.5)}
+.zi-tag::before{content:'';position:absolute;left:50%;top:-3px;width:2px;height:2px;margin-left:-1px;background:#b9c2d0;border:1px solid #1a0f06;border-radius:50%}
+.zi.sel .zi-tag{background:linear-gradient(#fff3c0,#f2d98a)}
+.zi.sel .zi-ic::after{background:radial-gradient(ellipse at 50% 50%,rgba(255,215,90,.55),transparent 72%)}
+
+/* the small back shelf in the hatch (shown before you zoom in): same idea in miniature, bottles with necks, corks and glints; planks lit on top, shadowed below */
+.sf-shelf{height:92px;
+  background:
+    /* top plank: lit top edge, face, cast shadow */
+    linear-gradient(#d9a868,#d9a868) 0 28px/100% 1px no-repeat,linear-gradient(#a8764a,#4a2e16) 0 29px/100% 4px no-repeat,linear-gradient(rgba(0,0,0,.5),transparent) 0 33px/100% 8px no-repeat,
+    /* bottom plank */
+    linear-gradient(#d9a868,#d9a868) 0 76px/100% 1px no-repeat,linear-gradient(#a8764a,#4a2e16) 0 77px/100% 4px no-repeat,linear-gradient(rgba(0,0,0,.5),transparent) 0 81px/100% 9px no-repeat,
+    /* top left: blue bottle, red flask, tall green bottle (body, neck, cork, glint) */
+    linear-gradient(#4a9ae0,#2a5a9a) 5% 16px/6px 12px no-repeat,linear-gradient(#4a9ae0,#4a9ae0) calc(5% + 2px) 11px/2px 5px no-repeat,linear-gradient(#c9a46a,#c9a46a) calc(5% + 2px) 9px/2px 2px no-repeat,linear-gradient(rgba(255,255,255,.55),rgba(255,255,255,.55)) calc(5% + 1px) 18px/1px 6px no-repeat,
+    linear-gradient(#e0483f,#8a1a1a) 12% 18px/6px 10px no-repeat,linear-gradient(#e0483f,#e0483f) calc(12% + 2px) 14px/2px 4px no-repeat,linear-gradient(#c9a46a,#c9a46a) calc(12% + 2px) 12px/2px 2px no-repeat,linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.5)) calc(12% + 1px) 20px/1px 5px no-repeat,
+    linear-gradient(#58b368,#2f7d3e) 19% 10px/7px 18px no-repeat,linear-gradient(#58b368,#58b368) calc(19% + 2px) 5px/3px 5px no-repeat,linear-gradient(#c9a46a,#c9a46a) calc(19% + 2px) 3px/3px 2px no-repeat,linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.5)) calc(19% + 1px) 12px/1px 12px no-repeat,
+    /* top right: honey jar with a lid, a green and a red vial */
+    linear-gradient(#f0c84a,#b8861e) 79% 14px/8px 14px no-repeat,linear-gradient(#8a5a2a,#5a3a1a) 79% 12px/8px 2px no-repeat,linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.5)) calc(79% + 1px) 16px/1px 8px no-repeat,
+    linear-gradient(#58b368,#2f7d3e) 87% 12px/6px 16px no-repeat,linear-gradient(#c9a46a,#c9a46a) calc(87% + 2px) 10px/2px 2px no-repeat,
+    linear-gradient(#c03a48,#7a1c2a) 94% 16px/5px 12px no-repeat,linear-gradient(#c9a46a,#c9a46a) calc(94% + 2px) 14px/2px 2px no-repeat,
+    /* bottom left: a book with a spine band, a sack, a violet vial */
+    linear-gradient(#e6cf93,#c2a468) 6% 58px/10px 18px no-repeat,linear-gradient(#8a5a2a,#8a5a2a) 6% 62px/10px 2px no-repeat,linear-gradient(#8a5a2a,#8a5a2a) 6% 69px/10px 2px no-repeat,
+    linear-gradient(#d9a868,#8a5a2a) 15% 62px/9px 14px no-repeat,linear-gradient(#7a4a22,#7a4a22) 15% 62px/9px 2px no-repeat,
+    linear-gradient(#9a5ac0,#5a2a80) 22% 60px/6px 16px no-repeat,linear-gradient(rgba(255,255,255,.45),rgba(255,255,255,.45)) calc(22% + 1px) 62px/1px 8px no-repeat,
+    /* bottom right: a book, a blue vial, a small crate */
+    linear-gradient(#e6cf93,#c2a468) 78% 62px/9px 14px no-repeat,linear-gradient(#8a5a2a,#8a5a2a) 78% 66px/9px 2px no-repeat,
+    linear-gradient(#4a9ae0,#2a5a9a) 87% 58px/6px 18px no-repeat,linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.5)) calc(87% + 1px) 60px/1px 9px no-repeat,
+    linear-gradient(#d9a868,#8a5a2a) 94% 64px/7px 12px no-repeat,linear-gradient(#4a2e16,#4a2e16) 94% 69px/7px 1px no-repeat,
+    /* the wall itself is dimmer than the shelf contents, so they read as standing in front of it */
+    linear-gradient(rgba(0,0,0,.34),rgba(0,0,0,.34))}
+
+/* =====================================================================
+   CHEST STAGE inside the zoomed shop (on the stone floor, just above the shelf tabs)
+   A dark oak plaque with iron rivets: the chest on the left (tap it, or the button, to open), the count and a hint beside it, and the buy row underneath.
+   ===================================================================== */
+.sfz-chest{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 12px;align-items:center;margin:0 0 10px;padding:10px 12px 10px 10px;color:#f0e2c0;
+  background:
+    radial-gradient(circle 3px at 8px 8px,#b9c2d0 90%,transparent),radial-gradient(circle 3px at calc(100% - 8px) 8px,#b9c2d0 90%,transparent),
+    radial-gradient(circle 3px at 8px calc(100% - 8px),#b9c2d0 90%,transparent),radial-gradient(circle 3px at calc(100% - 8px) calc(100% - 8px),#b9c2d0 90%,transparent),
+    radial-gradient(ellipse at 22% 40%,rgba(255,200,120,.16),transparent 62%),
+    repeating-linear-gradient(90deg,transparent 0 30px,rgba(0,0,0,.3) 30px 32px),repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 2px,transparent 2px 7px),
+    linear-gradient(#4a2e16,#2e1c0e);
+  border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.2),inset 0 0 0 3px #6b4423,3px 5px 0 rgba(0,0,0,.5)}
+.sfz-chest:empty{display:none}
+.sfz-chest .chestfig{width:68px;height:68px;margin:0;padding:0}
+.sfz-chest .chestfig .px{width:60px;height:60px}
+.sfz-chest .chestfig:not(.ready):not(.shake):not(.burst){filter:grayscale(.85) brightness(.7)}
+.sfz-chest .spark{left:44px;top:40px}
+.sfz-ci{display:grid;gap:4px;min-width:0;justify-items:start}
+.sfz-ci b{font:400 11px/1.3 var(--head);color:var(--gold);text-shadow:2px 2px 0 #000}
+.sfz-ci small{font:400 18px/1 var(--body);color:#d9c38c}
+.sfz-ci .btn{min-height:38px;padding:7px 14px;font-size:10px}
+.sfz-cb{grid-column:1/-1;display:flex;align-items:center;gap:10px}
+.sfz-cb .gbar{flex:1;min-width:0;height:28px}
+.sfz-cb .gbar em{font-size:18px}
+.sfz-cb .ghost{flex:none;min-height:38px}
+@media (max-width:360px){.sfz-chest .chestfig{width:56px;height:56px}.sfz-chest .chestfig .px{width:50px;height:50px}.sfz-ci small{display:none}}
+
+/* =====================================================================
+   SHOP TAB fills the screen: the stone wall carries on down from the shop front to the nav bar (the page no longer scrolls),
+   lit by the same firelight, with a woven rug laid out in front of the counter. Scoped away from the zoomed copy (.sfz-pg), which has its own floor.
+   ===================================================================== */
+#tab-shop.on:not(.sfz-pg){display:flex;flex-direction:column;min-height:calc(100dvh - 116px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+#tab-shop.on:not(.sfz-pg) .storefront{flex:none;margin-bottom:0}
+#tab-shop.on:not(.sfz-pg)::after{content:'';flex:1 1 auto;min-height:178px;border:4px solid #1a0f06;border-top:0;
+  background:
+    linear-gradient(#7a5028,#5a3a1c 35%,#3a2412 80%,#1a0f06) 0 0/100% 9px no-repeat,
+    linear-gradient(rgba(0,0,0,.5),transparent) 0 9px/100% 26px no-repeat,
+    repeating-linear-gradient(90deg,transparent 0 9px,rgba(255,215,90,.4) 9px 11px) 50% 30%/31% 14px no-repeat,
+    linear-gradient(#a8283a,#6e1624) 50% 30%/34% 30px no-repeat,
+    linear-gradient(#e8b93c,#b8861e) 50% 30%/40% 42px no-repeat,
+    linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.35)) 50% calc(30% + 5px)/40% 42px no-repeat,
+    linear-gradient(90deg,rgba(0,0,0,.42),transparent 24%,transparent 76%,rgba(0,0,0,.42)),
+    linear-gradient(rgba(0,0,0,.12),rgba(0,0,0,.5)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='40' viewBox='0 0 60 40' shape-rendering='crispEdges'%3E%3Crect width='60' height='40' fill='%2342393f'/%3E%3Crect width='60' height='20' fill='%2347404a'/%3E%3Crect x='30' y='20' width='30' height='20' fill='%2349424c'/%3E%3Cpath d='M0 1.5H60M0 21.5H60M1.5 0V20M31.5 20V40' stroke='%2318141c' stroke-width='3'/%3E%3Cpath d='M4 5H26M36 25H56' stroke='%2366607a' stroke-width='2' opacity='.45'/%3E%3C/svg%3E") 0 0/60px 40px repeat,
+    #42393f;
+  box-shadow:4px 4px 0 var(--ink)}
+
+/* =====================================================================
+   SHOP TAB, EXTRA ATMOSPHERE
+   A shaft of warm light pours from the hatch across the floor with embers and dust drifting up through it, the sign sways on its chains,
+   the canopy catches the light, the OPEN tag glows like a lit sign, and the whole shop front breathes with firelight.
+   All of it stops for reduced-motion users. Scoped away from the zoomed copy (.sfz-pg).
+   ===================================================================== */
+#tab-shop.on:not(.sfz-pg){position:relative;isolation:isolate}
+
+/* light shaft from the hatch: widens as it falls, flickers, and carries drifting embers */
+
+/* the shop front breathes with the firelight */
+#tab-shop:not(.sfz-pg) .storefront{animation:sfrim 3.4s ease-in-out infinite alternate}
+@keyframes sfrim{
+  from{box-shadow:4px 4px 0 var(--ink),inset 0 0 0 3px #0d0a09,inset 0 0 60px rgba(0,0,0,.45),0 0 16px rgba(255,150,50,.14)}
+  to{box-shadow:4px 4px 0 var(--ink),inset 0 0 0 3px #0d0a09,inset 0 0 60px rgba(0,0,0,.45),0 0 38px 4px rgba(255,150,50,.42)}}
+
+/* the sign sways on its chains */
+.shopsign{transform-origin:50% -20px;animation:signsway 5.5s ease-in-out infinite alternate}
+@keyframes signsway{from{transform:rotate(-.8deg)}to{transform:rotate(.8deg)}}
+
+/* a sheen sweeps across the striped canopy now and then */
+.sf-awn::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.4) 50%,transparent 62%) 160% 0/250% 100% no-repeat;animation:sbglint 6s ease-in-out infinite}
+
+/* the OPEN tag is a lit sign: green glow with the odd flicker */
+.sf-tag.r{color:#a8ffb8;text-shadow:0 0 6px #35e06a,0 0 12px rgba(53,224,106,.6),1px 1px 0 #000;animation:sfneon 4.6s steps(1) infinite}
+@keyframes sfneon{0%,100%{opacity:1}90%{opacity:.55}92%{opacity:1}95%{opacity:.5}97%{opacity:1}}
+.sf-tag.l{text-shadow:0 0 6px rgba(255,200,90,.7),1px 1px 0 #000}
+
+/* floor: a soft reflected pool of light under the counter and a darker edge toward the nav bar */
+#tab-shop.on:not(.sfz-pg)::after{box-shadow:4px 4px 0 var(--ink),inset 0 -26px 30px -14px rgba(0,0,0,.55)}
+
+@media (prefers-reduced-motion:reduce){
+  #tab-shop:not(.sfz-pg) .storefront,.shopsign,.sf-awn::before,.sf-tag.r{animation:none}
+}
+
+/* =====================================================================
+   SHOP FLOOR: item grids under the Guild Store.
+   Left brick wall gets decorative armour stands / weapon holders
+   (the circled area). Functional buy grids sit in front.
+   ===================================================================== */
+.sfz-pg .sf-floor{display:none}
+#tab-shop:not(.sfz-pg) .sf-floor{
+  position:absolute;z-index:3;left:0;right:0;top:340px;bottom:0;
+  pointer-events:none;
+}
+
+/* ---- Armoury corner (LEFT brick wall): one pixel-art scene, drawn like the Guild Store ----
+   weapon rack, plumed armour mannequin, crossed swords + heraldic shield, and a smith's corner with a glowing anvil.
+   It is a single SVG so every prop keeps its place whatever the width of the shop. */
+.sf-armwall{position:absolute;left:1.5%;top:6%;bottom:14%;width:27.5%;z-index:1;pointer-events:none}
+.sf-armwall::before{content:'';position:absolute;inset:-6% -14% -4%;z-index:-1;
+  background:radial-gradient(ellipse 55% 34% at 68% 84%,rgba(255,122,26,.34),transparent 72%),radial-gradient(ellipse 60% 40% at 50% 38%,rgba(255,176,74,.12),transparent 75%);
+  animation:lampflick 2.4s steps(6) infinite alternate}
+.aw-scene{position:absolute;inset:0;width:100%;height:100%;overflow:visible;image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.45))}
+.aw-glow{animation:awglow 2.2s ease-in-out infinite alternate}
+@keyframes awglow{from{opacity:.55}to{opacity:1}}
+.aw-hot{animation:awhot 1.3s steps(2) infinite}
+@keyframes awhot{50%{fill:#ffa83a}}
+.aw-sp{--sx:2px;opacity:0;animation:awspark 2.2s linear infinite}
+.aw-sp.s2{--sx:3px;animation-delay:-.7s}
+.aw-sp.s3{--sx:-3px;animation-delay:-1.4s}
+@keyframes awspark{0%{transform:translate(0,0);opacity:0}12%{opacity:1}100%{transform:translate(var(--sx),-9px);opacity:0}}
+.aw-tw{opacity:0;animation:awtw 4.2s steps(1) infinite}
+@keyframes awtw{0%,60%,100%{opacity:0}66%,80%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.sf-armwall::before,.aw-glow,.aw-hot,.aw-sp,.aw-tw{animation:none!important}.aw-sp{opacity:0}}
+
+/* ---- decorative companion pens against the RIGHT brick wall ---- */
+.sf-petwall{
+  position:absolute;right:2%;top:8%;bottom:18%;width:22%;z-index:1;
+  pointer-events:none;
+}
+
+/* wooden fence rails + posts */
+.pw-fence{position:absolute;left:4%;right:4%;bottom:6%;height:42%;
+  background:
+    linear-gradient(#8a5a2a,#4e3019) 8% 0/5px 100% no-repeat,
+    linear-gradient(#8a5a2a,#4e3019) 32% 0/5px 100% no-repeat,
+    linear-gradient(#8a5a2a,#4e3019) 56% 0/5px 100% no-repeat,
+    linear-gradient(#8a5a2a,#4e3019) 80% 0/5px 100% no-repeat,
+    linear-gradient(#b98448,#5a3a1a) 0 28%/100% 5px no-repeat,
+    linear-gradient(#b98448,#5a3a1a) 0 62%/100% 5px no-repeat;
+  filter:drop-shadow(2px 2px 0 rgba(0,0,0,.4))}
+
+/* hay bale */
+.pw-hay{position:absolute;left:6%;bottom:4%;width:38%;height:24%;
+  background:
+    radial-gradient(ellipse 55% 70% at 30% 60%,#e8c878 0 40%,transparent 48%),
+    radial-gradient(ellipse 48% 60% at 70% 50%,#d4a848 0 35%,transparent 44%),
+    linear-gradient(#c89838,#8a6820);
+  border-radius:40% 40% 18% 18%;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);filter:drop-shadow(1px 2px 0 rgba(0,0,0,.35))}
+
+/* water trough */
+.pw-trough{position:absolute;right:6%;bottom:6%;width:32%;height:18%;
+  background:linear-gradient(#6b4423,#3e2713);border:2px solid #1a0f06;
+  box-shadow:inset 0 3px 0 #2a1808;border-radius:2px;
+  filter:drop-shadow(1px 2px 0 rgba(0,0,0,.35))}
+.pw-trough::after{content:'';position:absolute;inset:3px 3px 3px;background:linear-gradient(#4a8ac8,#2a5a88);border-radius:1px}
+
+/* small tree / bush in the corner */
+.pw-tree{position:absolute;right:0;top:2%;width:36%;height:48%;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 30%,#3a8a2a 0 48%,transparent 52%),
+    radial-gradient(ellipse 65% 45% at 40% 50%,#2a6a1a 0 42%,transparent 48%),
+    linear-gradient(#6b4423,#3e2713) 50% 100%/22% 48% no-repeat;
+  filter:drop-shadow(1px 2px 0 rgba(0,0,0,.35))}
+
+/* crate / feed box */
+.pw-crate{position:absolute;left:4%;top:8%;width:28%;height:22%;
+  background:linear-gradient(90deg,#6b4423 0 25%,#8a5a2a 25% 75%,#6b4423 75%);
+  border:2px solid #1a0f06;box-shadow:inset 0 2px 0 rgba(255,220,160,.12);
+  filter:drop-shadow(1px 2px 0 rgba(0,0,0,.35))}
+.pw-crate::after{content:'';position:absolute;left:15%;right:15%;top:35%;height:2px;background:#4e3019}
+
+/* extra fence post for depth */
+.pw-post{position:absolute;right:18%;bottom:4%;width:8%;height:36%;
+  background:linear-gradient(#8a5a2a,#4e3019);border:2px solid #1a0f06;
+  filter:drop-shadow(1px 1px 0 rgba(0,0,0,.3))}
+
+/* ---- functional grids & signs (sit in front of the wall props) ---- */
+.fz{position:absolute;top:10px;width:27.5%;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:2}
+.fz-arm{left:1.5%}
+.fz-pet{right:1.5%}
+.fz-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 4px;width:100%}
+
+.fz-sign{pointer-events:auto;position:relative;max-width:100%;padding:6px 8px 4px;cursor:pointer;white-space:nowrap;
+  font:400 6px/1.2 var(--head);letter-spacing:.5px;text-transform:uppercase;color:var(--gold);text-shadow:1px 1px 0 #000;
+  background:radial-gradient(circle 2px at 5px 50%,#b9c2d0 90%,transparent),radial-gradient(circle 2px at calc(100% - 5px) 50%,#b9c2d0 90%,transparent),repeating-linear-gradient(90deg,transparent 0 14px,rgba(0,0,0,.25) 14px 16px),linear-gradient(#7a5028,#563518);
+  border:3px solid #1a0f06;box-shadow:inset 0 2px 0 rgba(255,220,160,.25),2px 3px 0 rgba(0,0,0,.5);transform-origin:50% 0;animation:fzsign 5s ease-in-out infinite alternate}
+.fz-pet .fz-sign{animation-delay:-2.5s}
+.fz-sign:active{transform:translateY(1px)}
+@keyframes fzsign{from{transform:rotate(-1deg)}to{transform:rotate(1deg)}}
+
+/* one display spot: a stand or a pen, the item on it, and a price tag */
+.fz-c{pointer-events:auto;position:relative;isolation:isolate;display:block;height:66px;padding:0;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fz-c:active{transform:translateY(1px)}
+.fz-c:focus-visible{outline:2px dashed var(--act);outline-offset:2px}
+.fz-c::before{content:'';position:absolute;left:6%;right:6%;bottom:11px;height:9px;border-radius:50%;z-index:-2;background:radial-gradient(ellipse,rgba(0,0,0,.6),transparent 70%)}   /* contact shadow on the stone */
+.fz-c.rare::after{content:'';position:absolute;inset:-4px -2px 8px;z-index:-2;pointer-events:none;background:radial-gradient(ellipse 62% 58% at 50% 62%,color-mix(in srgb,var(--rar) 42%,transparent),transparent 72%);animation:fzglow 2.8s ease-in-out infinite alternate}
+@keyframes fzglow{from{opacity:.55}to{opacity:1}}
+.fz-st{position:absolute;inset:0 0 15px;pointer-events:none}
+.fz-st::before,.fz-st::after{content:'';position:absolute;inset:0}
+.fz-st::before{z-index:0}
+.fz-ic{position:absolute;z-index:1;left:50%;bottom:24px;width:30px;height:30px;margin-left:-15px;display:grid;place-items:center;
+  filter:drop-shadow(0 0 5px color-mix(in srgb,var(--rar) 75%,transparent)) drop-shadow(0 3px 0 rgba(0,0,0,.5));animation:fzfloat 3.6s ease-in-out infinite alternate}
+.fz-c:nth-child(2) .fz-ic{animation-delay:-.9s}.fz-c:nth-child(3) .fz-ic{animation-delay:-1.8s}.fz-c:nth-child(4) .fz-ic{animation-delay:-2.7s}
+.fz-ic .px{width:30px;height:30px}
+@keyframes fzfloat{from{transform:translateY(-1px)}to{transform:translateY(1px)}}
+.fz-pr{position:absolute;z-index:3;left:50%;bottom:0;transform:translateX(-50%);padding:1px 4px 0;font:400 15px/1.05 var(--body);white-space:nowrap;color:#2a1808;
+  background:linear-gradient(#f6ecc8,#e4d3a0);border:2px solid #1a0f06;box-shadow:1px 2px 0 rgba(0,0,0,.5)}
+.fz-c.sold .fz-st{opacity:.5}
+.fz-c.sold .fz-ic{display:none}
+.fz-c.sold .fz-pr{color:#a8283a;background:linear-gradient(#d9ccaa,#b8a97e)}
+
+/* helm: stone pedestal */
+.fz-c[data-k="helm"] .fz-st::before{background:
+  linear-gradient(#aaa4b4,#6e6a78 60%,#4e4a58) 50% 100%/22px 9px no-repeat,
+  linear-gradient(#bdb7c8,#7e7a88) 50% calc(100% - 9px)/28px 4px no-repeat,
+  linear-gradient(#4a4654,#2c2832) 50% 100%/30px 3px no-repeat}
+.fz-c[data-k="helm"] .fz-ic{bottom:30px}
+/* weapon: a peg rack with two rails */
+.fz-c[data-k="weapon"] .fz-st::before{background:
+  linear-gradient(90deg,#8a5a2a,#4e3019) 16% 100%/4px 34px no-repeat,
+  linear-gradient(90deg,#8a5a2a,#4e3019) 84% 100%/4px 34px no-repeat,
+  linear-gradient(#b98448,#5a3a1a) 50% calc(100% - 12px)/74% 4px no-repeat,
+  linear-gradient(#b98448,#5a3a1a) 50% calc(100% - 26px)/74% 3px no-repeat,
+  linear-gradient(#4a2e16,#2a1808) 50% 100%/88% 3px no-repeat}
+.fz-c[data-k="weapon"] .fz-ic{bottom:20px}
+/* armour: wooden mannequin on a foot, with a round head and a shoulder bar */
+.fz-c[data-k="armor"] .fz-st::before{background:
+  radial-gradient(circle 4px,#d3ad72 88%,transparent) 50% 0/10px 10px no-repeat,
+  linear-gradient(90deg,#b98448,#4e3019) 50% 100%/4px 38px no-repeat,
+  linear-gradient(#b98448,#5a3a1a) 50% calc(100% - 28px)/32px 4px no-repeat,
+  linear-gradient(#6b4423,#3e2713) 50% 100%/26px 4px no-repeat}
+.fz-c[data-k="armor"] .fz-ic{bottom:17px}
+/* off-hand: an easel with a chain */
+.fz-c[data-k="offhand"] .fz-st::before{background:
+  repeating-linear-gradient(180deg,#b9c2d0 0 3px,#3a4050 3px 5px) 50% 0/2px 14px no-repeat,
+  linear-gradient(90deg,#8a5a2a,#4e3019) 24% 100%/3px 30px no-repeat,
+  linear-gradient(90deg,#8a5a2a,#4e3019) 76% 100%/3px 30px no-repeat,
+  linear-gradient(#b98448,#5a3a1a) 50% calc(100% - 4px)/58% 3px no-repeat}
+.fz-c[data-k="offhand"] .fz-ic{bottom:20px}
+/* pens: straw, a low fence with posts, a front board that covers the paws */
+.fz-c[data-k="pet"] .fz-st::before{background:
+  radial-gradient(ellipse 50% 50% at 50% 50%,#dcbb6e,#a8843a 70%,transparent 74%) 50% 100%/42px 13px no-repeat,
+  linear-gradient(90deg,#8a5a2a,#4e3019) 2% 100%/5px 36px no-repeat,
+  linear-gradient(90deg,#8a5a2a,#4e3019) 98% 100%/5px 36px no-repeat,
+  linear-gradient(#b98448,#5a3a1a) 50% calc(100% - 22px)/100% 3px no-repeat}
+.fz-c[data-k="pet"] .fz-st::after{z-index:2;background:
+  linear-gradient(#c28c50,#6b4423 70%,#3e2713) 2% 100%/96% 9px no-repeat}
+.fz-c[data-k="pet"] .fz-ic{bottom:9px;width:34px;height:34px;margin-left:-17px}
+.fz-c[data-k="pet"] .fz-ic .px{width:34px;height:34px}
+
+/* ---- the shop sheet: a wooden counter that slides up from the bottom, with today's stock as rows ---- */
+.fzv{position:fixed;inset:0;z-index:16;display:flex;align-items:flex-end;justify-content:center;background:rgba(8,6,14,0);transition:background-color .25s}
+.fzv.in{background:rgba(8,6,14,.78)}
+.fzv-card{position:relative;width:min(100%,560px);max-height:88dvh;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;padding:14px 12px calc(14px + env(safe-area-inset-bottom,0px));color:#f0e2c0;
+  background:radial-gradient(circle 3px at 9px 9px,#b9c2d0 90%,transparent),radial-gradient(circle 3px at calc(100% - 9px) 9px,#b9c2d0 90%,transparent),repeating-linear-gradient(90deg,transparent 0 46px,rgba(0,0,0,.34) 46px 48px),repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 2px,transparent 2px 9px),linear-gradient(#5a3a1a,#3e2713);
+  border:4px solid #1a0f06;border-bottom:0;box-shadow:inset 0 4px 0 rgba(255,220,160,.22),inset 0 0 0 3px #3a2410;
+  transform:translateY(100%);transition:transform .25s steps(5)}
+.fzv.in .fzv-card{transform:none}
+.fzv[data-k="p"] .fzv-card{box-shadow:inset 0 4px 0 rgba(255,220,160,.22),inset 0 0 0 3px #3a2410,0 -10px 30px rgba(88,179,104,.12)}
+.fzv-hd{display:flex;align-items:center;gap:10px}
+.fzv-tt{flex:1;min-width:0;padding:9px 12px 7px;font:400 12px/1.2 var(--head);letter-spacing:1px;text-transform:uppercase;color:var(--gold);text-shadow:2px 2px 0 #000;
+  background:repeating-linear-gradient(90deg,transparent 0 22px,rgba(0,0,0,.25) 22px 24px),linear-gradient(#7a5028,#563518);border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.24),2px 3px 0 rgba(0,0,0,.45)}
+.fzv-x{flex:none;width:42px;height:42px;padding:0;display:grid;place-items:center;font:400 14px/1 var(--head);color:#d9c38c;cursor:pointer;background:linear-gradient(#4a2e16,#2e1c0e);border:3px solid #1a0f06;box-shadow:inset 0 2px 0 rgba(255,220,160,.18),0 3px 0 rgba(0,0,0,.5)}
+.fzv-x:active{transform:translateY(2px);box-shadow:none}
+.fzv-wal{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}
+.fzv-say{padding:8px 10px 6px;text-align:center;font:400 21px/1.05 var(--body);color:#2a1808;overflow-wrap:anywhere;
+  background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(130,80,20,.22)),repeating-linear-gradient(90deg,rgba(120,80,30,.07) 0 2px,transparent 2px 6px),#f2d8a4;
+  border:3px solid #1a0f06;box-shadow:inset 0 0 0 2px rgba(110,66,18,.25),2px 3px 0 rgba(0,0,0,.45)}
+.fzv-list{display:grid;gap:10px;min-height:0;overflow-y:auto;padding:2px;overscroll-behavior:contain}
+.fzv-row{--rar:#8a7862;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 10px 10px 8px;
+  background:linear-gradient(#34200f,#241508);border:3px solid #1a0f06;border-left:8px solid var(--rar);box-shadow:inset 0 3px 0 rgba(0,0,0,.35)}
+.fzv-row.hl{box-shadow:inset 0 3px 0 rgba(0,0,0,.35),0 0 0 3px #ffd75a}
+.fzv-row.sold{opacity:.5}
+.fzv-ic{display:grid;place-items:center;width:54px;height:54px;background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--rar) 40%,#2a2228),#15111a);border:3px solid #0d0a05;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--rar) 70%,#000)}
+.fzv-ic .px{width:38px;height:38px}
+.fzv-tx{min-width:0}
+.fzv-tx b{display:block;font:400 10px/1.5 var(--head);color:#f0e2c0;overflow-wrap:anywhere}
+.fzv-tx small{display:block;margin-top:2px;font:400 19px/1.05 var(--body);color:#b39f7f}
+.fzv-tx small.bn{color:#8de08d}
+.fzv-tx small.rr{color:var(--rar)}
+.fzv-row .btn{min-width:92px;min-height:46px;padding:6px 8px;font-size:9px;line-height:1.3}
+.fzv-ft{text-align:center;font:400 18px/1 var(--body);color:#b39f7f}
+@media (max-width:360px){.fzv-row{grid-template-columns:auto minmax(0,1fr)}.fzv-row .btn{grid-column:1/-1;width:100%}}
+@media (prefers-reduced-motion:reduce){.fz-sign,.fz-ic,.fz-c.rare::after{animation:none!important}.fzv,.fzv-card{transition:none}}
+
+/* zoom out: play the zoom-in backwards. Shelves and floor fade quickly (no delays), so the copy melts into the real shop instead of popping at the end */
+.sfz.closing .zbs{transition:opacity .15s}
+.sfz.closing .sfz-sf .sf-shelf{transition:opacity .2s}
+.sfz.closing .sfz-floor{opacity:0;transition:opacity .3s}
+
+/* room: the wall comes straight down onto the floor. The shop front loses its bottom border (and 4px of height, so nothing inside moves),
+   and its inner frame and vignette no longer darken the bottom edge, so there is no dark seam above the baseboard */
+#tab-shop .storefront{height:336px;border-bottom:0}
+@keyframes sfrim{
+  from{box-shadow:4px 4px 0 var(--ink),inset 3px 0 0 #0d0a09,inset -3px 0 0 #0d0a09,inset 0 3px 0 #0d0a09,inset 0 30px 50px -20px rgba(0,0,0,.45),inset 30px 0 40px -20px rgba(0,0,0,.45),inset -30px 0 40px -20px rgba(0,0,0,.45),0 0 16px rgba(255,150,50,.14)}
+  to{box-shadow:4px 4px 0 var(--ink),inset 3px 0 0 #0d0a09,inset -3px 0 0 #0d0a09,inset 0 3px 0 #0d0a09,inset 0 30px 50px -20px rgba(0,0,0,.45),inset 30px 0 40px -20px rgba(0,0,0,.45),inset -30px 0 40px -20px rgba(0,0,0,.45),0 0 38px 4px rgba(255,150,50,.42)}}
+#tab-shop:not(.sfz-pg) .storefront{box-shadow:4px 4px 0 var(--ink),inset 3px 0 0 #0d0a09,inset -3px 0 0 #0d0a09,inset 0 3px 0 #0d0a09,inset 0 30px 50px -20px rgba(0,0,0,.45),inset 30px 0 40px -20px rgba(0,0,0,.45),inset -30px 0 40px -20px rgba(0,0,0,.45),0 0 26px rgba(255,150,50,.22)}   /* same, for reduced-motion (no animation) */
+
+/* the wall below the counter: a proper chair rail (lit top edge, shadowed underside), warm firelight pooling down from the counter,
+   and the stone fading darker toward the baseboard, so it reads as a lit wall instead of flat bricks */
+#tab-shop .storefront{
+  background:
+    linear-gradient(#9a6a38 0 2px,#6b4423 2px 5px,#2e1c0e 5px 6px,#150b04 6px 8px) 0 calc(100% - 52px)/100% 8px no-repeat,
+    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.18) 55%,transparent) 0 calc(100% - 44px)/100% 20px no-repeat,
+        linear-gradient(90deg,rgba(0,0,0,.38),transparent 18%,transparent 82%,rgba(0,0,0,.38)) 0 calc(100% - 44px)/100% 44px no-repeat,
+    linear-gradient(transparent,rgba(0,0,0,.4)) 0 100%/100% 44px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='40' viewBox='0 0 60 40' shape-rendering='crispEdges'%3E%3Crect width='60' height='40' fill='%2342393f'/%3E%3Crect width='60' height='20' fill='%2347404a'/%3E%3Crect x='30' y='20' width='30' height='20' fill='%2349424c'/%3E%3Cpath d='M0 1.5H60M0 21.5H60M1.5 0V20M31.5 20V40' stroke='%2318141c' stroke-width='3'/%3E%3Cpath d='M4 5H26M36 25H56' stroke='%2366607a' stroke-width='2' opacity='.45'/%3E%3C/svg%3E") 0 100%/60px 52px repeat-x,
+    linear-gradient(#2e1c0e,#2e1c0e) 0 calc(100% - 52px)/100% 8px no-repeat,
+    linear-gradient(#4a2e16,#2e1c0e) 0 0/100% 12px no-repeat,
+    radial-gradient(circle 2px at 8% 6px,#b9c2d0 90%,transparent) 0 0/100% 12px no-repeat,
+    radial-gradient(circle 2px at 92% 6px,#b9c2d0 90%,transparent) 0 0/100% 12px no-repeat,
+    linear-gradient(90deg,#4a2e16,#2e1c0e) 0 0/14px 100% no-repeat,
+    linear-gradient(90deg,#2e1c0e,#4a2e16) 100% 0/14px 100% no-repeat,
+    linear-gradient(90deg,#4a2e16,#2e1c0e) 16.5% 0/8px 100% no-repeat,
+    linear-gradient(90deg,#2e1c0e,#4a2e16) 83.5% 0/8px 100% no-repeat,
+    radial-gradient(ellipse 55% 60% at 50% 58%,rgba(255,176,74,.24),transparent 75%),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.3) 0 2px,transparent 2px 24px),
+    repeating-linear-gradient(0deg,rgba(255,200,140,.05) 0 2px,transparent 2px 7px),
+    linear-gradient(#6b4423,#4a2e16);}
+
+/* the barrel and crate stand on the floor: their bases sink a few px into the baseboard line (the shop front clips them there) instead of hovering above it.
+   The cat rides down with the barrel so she stays on the lid */
+.sf-barrel{bottom:-4px}
+.sf-crate{bottom:-3px}
+.sf-cat{bottom:52px}
+
+/* zoomed shop: picking a ware hides the chest panel so the item card gets the room */
+.sfz-det:not([hidden]) ~ .sfz-chest{display:none}
+.sfz-det{padding:14px 14px;gap:12px}
+.sfz-dt b{font-size:12px}
+.sfz-dt small{margin-top:6px;font-size:21px}
+.sfz-det .btn{min-width:120px;min-height:44px}
+
+/* zoomed shop: bigger invisible hitboxes on the wares (icon, plank and price tag all count) */
+.zi::before{content:'';position:absolute;left:-10px;right:-10px;top:-5px;bottom:-14px;z-index:2}
+
+/* zoomed shop: no floating price tags under the shelves; wares are bigger, the price shows in the item card */
+.zi-tag{display:none}
+.zslot{padding-bottom:6px}
+.zi-ic{width:32px;height:32px}
+.zi-ic .px{width:32px;height:32px}
+.zi::before{bottom:-8px}
+.sfz-pr{display:block;margin:5px 0 0;font:400 22px/1 var(--body);color:#8a5a0c}
+
+
+/* zoomed shop: much more generous ware hitboxes (each reaches toward its neighbours; the lower one wins the overlap) */
+.zi::before{left:-16px;right:-16px;top:-12px;bottom:-12px}
+
+/* zoomed shop: even bigger ware hitboxes */
+.zi::before{left:-28px;right:-28px;top:-20px;bottom:-20px}
+
+/* zoomed shop: no glass front (or cool blue tint) on the right-hand gem shelf */
+.zbs.r::after{display:none}
+
+/* zoomed shop: the right shelf gets the same wooden backing as the left (its old blue-tint background was overriding it) */
+.zbs.r{background:
+    linear-gradient(90deg,rgba(0,0,0,.55),transparent 20%,transparent 80%,rgba(0,0,0,.55)),
+    linear-gradient(rgba(0,0,0,.7),transparent 30px),
+    linear-gradient(0deg,rgba(0,0,0,.45),transparent 22px),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.38) 0 1px,transparent 1px 9px),
+    repeating-linear-gradient(0deg,rgba(255,200,140,.035) 0 1px,transparent 1px 4px),
+    linear-gradient(#3e2917,#2a1a0e)}

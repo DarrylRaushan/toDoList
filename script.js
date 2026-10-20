@@ -115,7 +115,100 @@ const expired=t=>!!t.once&&t.once<today();   /* a one-off from an earlier day: k
 const addDays=(k,n)=>{const d=new Date(k+'T12:00:00');d.setDate(d.getDate()+n);return dkey(d)};
 const $=id=>document.getElementById(id);
 /* draws an emoji tiny, then scales it up unsmoothed so it looks like pixel art */
-function px(e,n){if(typeof e==='string'&&e.slice(0,4)==='pet:')return petIcon(e.slice(4),n);if(typeof e==='string'&&e.slice(0,5)==='coin:')return coinIcon(e.slice(5));const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.font=Math.round(n*.78)+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,n/2,n/2+1);c.className='px';return c}
+/* hand-drawn 16x16 pixel icons for the shop wares: palette letters -> colours, '.' is clear (looked up by the old emoji they replace) */
+const SHOP_SPR={
+  '🧊':{p:{'k':'#1a0f06','w':'#ffffff','l':'#bfeaff','b':'#6cc4f0','d':'#3a8fd0','D':'#2a64a8'},r:[
+    '................',
+    '..kkkkkkkkkkkk..',
+    '.kwwwwlllllllbk.',
+    '.kwllllllllllbk.',
+    '.kwlllllwlllbbk.',
+    '.kwllllwwwllbbk.',
+    '.kwlllllwlllbbk.',
+    '.kwlllllllllbbk.',
+    '.kllllllllbbbbk.',
+    '.kllllllbbbbbdk.',
+    '.kbbbbbbbbbbddk.',
+    '.kbbbbbbbbbddDk.',
+    '.kddddddddddDDk.',
+    '..kkkkkkkkkkkk..',
+    '................',
+    '................']},
+  '🧪':{p:{'k':'#1a0f06','c':'#b07a3a','g':'#a9d6e8','w':'#ffffff','r':'#e8344a','R':'#a81c34'},r:[
+    '................',
+    '.....kkkkkk.....',
+    '......kccck.....',
+    '......kccck.....',
+    '.....kgwggk.....',
+    '.....kgwggk.....',
+    '....kkgwggkk....',
+    '...kgwrrrrrgk...',
+    '..kgwrrrrrrrrgk.',
+    '..kgwrRrrrrrrgk.',
+    '..kgrrrrrrrrRgk.',
+    '..kgrrrrrrrRRgk.',
+    '..kgRRrrrrRRRgk.',
+    '...kgRRRRRRRgk..',
+    '....kkkkkkkkkk..',
+    '................']},
+  '🎁':{p:{'k':'#1a0f06','b':'#c98a4a','d':'#8a5224','D':'#5e3516','m':'#b9c2d0','y':'#ffd75a'},r:[
+    '................',
+    '................',
+    '...kkkkkkkkkk...',
+    '..kbbbbbbbbbbk..',
+    '.kbbmbbbbbbmbbk.',
+    '.kbbmbbbbbbmbbk.',
+    '.kkkkkkkkkkkkkk.',
+    '.kddmddddddmddk.',
+    '.kddmddyyddmddk.',
+    '.kddmddyyddmddk.',
+    '.kddmddddddmddk.',
+    '.kDDmDDDDDDmDDk.',
+    '..kkkkkkkkkkkk..',
+    '................',
+    '................',
+    '................']},
+  '💖':{p:{'k':'#1a0f06','r':'#ff4d6d','R':'#b81f45','w':'#ffd1dc'},r:[
+    '................',
+    '..kkkk....kkkk..',
+    '.kwwrrk..krrrrk.',
+    'kwwrrrrkkrrrrrrk',
+    'kwrrrrrrrrrrrrRk',
+    'krrrrrrrrrrrrRRk',
+    'krrrrrrrrrrrRRRk',
+    '.krrrrrrrrrrRRk.',
+    '..krrrrrrrrRRk..',
+    '...krrrrrrRRk...',
+    '....krrrrRRk....',
+    '.....krrRRk.....',
+    '......krRk......',
+    '.......kk.......',
+    '................',
+    '................']},
+  '💠':{p:{'k':'#1a0f06','p':'#b968ff','P':'#7a35c8','w':'#f0d8ff'},r:[
+    '................',
+    '......kkkk......',
+    '.....kwwppk.....',
+    '....kwpppppk....',
+    '..kkkkkkkkkkkk..',
+    '.kwwppppppppPPk.',
+    '.kwpppwwpppppPk.',
+    '..kwppppppppPk..',
+    '...kwppppppPk...',
+    '....kwpppPPk....',
+    '.....kwpPPk.....',
+    '......kwPk......',
+    '.......kk.......',
+    '................',
+    '................',
+    '................']},
+};
+function sprIcon(sp,n){
+  const t=document.createElement('canvas');t.width=t.height=16;const tx=t.getContext('2d');
+  sp.r.forEach((row,y)=>{for(let x=0;x<16;x++){const c=sp.p[row[x]];if(c){tx.fillStyle=c;tx.fillRect(x,y,1,1)}}});
+  const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(t,0,0,n,n);c.className='px';c.style.imageRendering='pixelated';return c;
+}
+function px(e,n){if(SHOP_SPR[e])return sprIcon(SHOP_SPR[e],n);if(typeof e==='string'&&e.slice(0,4)==='pet:')return petIcon(e.slice(4),n);if(typeof e==='string'&&e.slice(0,5)==='coin:')return coinIcon(e.slice(5));const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.font=Math.round(n*.78)+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,n/2,n/2+1);c.className='px';return c}
 /* ---------- currency: bronze, silver and gold ----------
    One number is saved (S.gold = the BRONZE count, so old saves keep working). 1 silver = 10 bronze, 1 gold = 100 bronze.
    Everything you see is just that number written as coins: 125 -> '1g 2s 5b'. */
@@ -1746,41 +1839,44 @@ function shopBuy(cur,it){
   if(cur==='g')S.gold-=it.cost;else S.gems-=it.cost;
   it.buy();buzz(30);save();render();
 }
+/* item view + confirm before any purchase (shop shelves or armoury / pens) */
+function confirmBuy(it,priceLabel,doBuy){
+  const ov=el('div','modal on'),card=el('div','card');
+  ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label',it.n||'Item');
+  const esc=e=>{if(e.key==='Escape')close()};
+  const close=()=>{ov.remove();document.removeEventListener('keydown',esc)};
+  const me=el('div','me');me.appendChild(px(typeof it.e==='string'?it.e:iicon(it),48));
+  const title=el('h2','',it.n||'Item');
+  const bits=[];
+  if(it.r!=null)bits.push(RNAME[it.r]||'');
+  if(it.slot)bits.push(SLOTN[it.slot]||it.slot);
+  let desc=(bits.filter(Boolean).join(' · ')||'')+(it.d?'\n'+it.d:'');
+  if(it.b&&Object.keys(it.b).length){
+    desc+=(desc?'\n':'')+bonusTxt(it);
+    if(it.u&&typeof UNIQ!=='undefined'&&UNIQ[it.u])desc+='\n'+UNIQ[it.u].d;
+  }
+  if(it.slot==='companion'){
+    const L=typeof pbase==='function'?pbase(it):1;
+    desc+='\nStarts at Lv '+L+' for its rarity and grows as you finish quests.';
+  }
+  const sub=el('p','',desc);
+  const price=el('p','');price.style.font='400 14px var(--head)';price.style.color='var(--gold)';price.textContent='Price: '+priceLabel;
+  const acts=el('div','stack');
+  const buy=el('button','btn','Buy');buy.type='button';
+  buy.onclick=()=>{close();doBuy()};
+  const cancel=el('button','ghost','Cancel');cancel.type='button';cancel.onclick=close;
+  acts.append(buy,cancel);
+  card.append(me,title,sub,price,acts);
+  ov.onclick=e=>{if(e.target===ov)close()};
+  ov.appendChild(card);document.body.appendChild(ov);
+  document.addEventListener('keydown',esc);buy.focus();
+}
 function renderShop(){
-  const w=$('wallet');if(!w)return;
-  const tile=(e,l,v)=>{const t=el('div','wtile');t.append(px(e,24),el('small','',l),el('b','',String(v)));return t};
-  const purse=()=>{   /* one tile with all three coins: gold, silver, bronze */
-    const t=el('div','wtile purse'),row=el('div','prow'),p=coinParts(S.gold);t.title='1 gold = 10 silver = 100 bronze';
-    p.forEach((v,i)=>{const g=el('span','pc '+COIN_U[i]);g.title=['Gold','Silver','Bronze'][i];g.append(px('coin:'+COIN_U[i],10),el('b','',String(v)));row.appendChild(g)});
-    t.append(el('small','','Coins'),row);return t};
-  w.replaceChildren(purse(),tile('💎','Gems',S.gems||0),tile('🧊','Freezes',(S.freezes|0)+'/'+FREEZE_MAX),tile('🎁','Chests',S.chests));
-  const fill=(id,cur)=>{
-    const box=$(id);if(!box)return;box.replaceChildren();
-    SHOP[cur].forEach(it=>{
-      const have=cur==='g'?S.gold:(S.gems||0),blocked=!!(it.ok&&!it.ok());
-      const r=el('div','panel sitem'),ic=el('span','ei'),tx=el('div','itx'),b=el('button','btn',blocked?it.full:(cur==='g'?coinText(it.cost):it.cost+' 💎'));
-      ic.appendChild(px(it.e,24));tx.append(el('b','',it.n),el('small','',it.d));
-      b.type='button';b.disabled=blocked||have<it.cost;b.onclick=()=>shopBuy(cur,it);
-      r.append(ic,tx,b);box.appendChild(r);
-    });
-  };
-  fill('shopgold','g');fill('shopgem','m');
   const ds=$('dot-shop');if(ds)ds.hidden=!(S.chests>0);
-  renderChest();
+  if(window.sfShelfRefresh)window.sfShelfRefresh();   /* keep the zoomed-in shelves in step with your purse and stock */
+  if(window.sfFloorRefresh)window.sfFloorRefresh();   /* and the armoury / companion pens on the floor */
 }
 const CHEST_COST=150;
-function renderChest(){   /* the chest stage, Open button and Buy row live in the Shop tab */
-  const f=$('chestbox');if(!f||CHEST_BUSY)return;f.innerHTML='';
-  const nc=S.chests,st=el('div','chestwrap'),fg=el('button','chestfig'+(nc>0?' ready':''));
-  fg.type='button';fg.setAttribute('aria-label',nc>0?'Open a chest':'No chests to open');fg.appendChild(chestPx(false));
-  fg.onclick=()=>{if(nc<1){toast('No chests yet. Perfect days and weekly bosses drop them.');return}openChestFx(fg,st)};
-  st.append(fg,el('div','chestcount','Chests: '+nc),el('div','sub',nc>0?'Tap the chest to open it.':'No chests yet. Earn them from perfect days and weekly bosses, or buy one below.'));
-  f.appendChild(st);
-  const ob=el('button','btn wide','Open chest');ob.type='button';ob.disabled=nc<1;ob.onclick=()=>openChestFx(fg,st);f.appendChild(ob);
-  const br=el('div','buyrow'),gb=el('div','bar gold gbar'+(S.gold>=CHEST_COST?' full':'')),gf=document.createElement('i');
-  gf.style.width=Math.min(100,S.gold/CHEST_COST*100)+'%';gb.append(gf,el('em','',coinText(S.gold)+' / '+coinText(CHEST_COST)));
-  const bc=el('button','ghost','Buy chest');bc.type='button';bc.disabled=S.gold<CHEST_COST;bc.onclick=buyChest;br.append(gb,bc);f.appendChild(br);
-}
 function buyChest(){if(S.gold<CHEST_COST)return;S.gold-=CHEST_COST;S.chests++;toast('Bought a chest');buzz(30);save();render()}
 /* drop weights per rarity: every rarity can drop at any level, but the odds slide toward the good stuff as you level.
    Lv 1 uses DROP_LO, Lv 40+ uses DROP_HI, levels in between blend the two (Lv 30 is about 20% Legendary).
@@ -1813,13 +1909,16 @@ function rollLoot(minR){
     }
     r=6;   /* you own every unique: this one drops as Mythical gear instead */
   }
-  const slot=SLOTS[Math.floor(Math.random()*SLOTS.length)];
+  return buildGear(SLOTS[Math.floor(Math.random()*SLOTS.length)],r);
+}
+/* one piece of gear or one companion of a given slot and rarity: random drops use it, and so do the shop's armoury and companion pens (st = look, pet = which companion; both optional) */
+function buildGear(slot,r,st,pet){
   const n=Math.min(4,1+(r>=2?1:0)+(r>=4?1:0)),b={};
   Object.keys(STAT_STEP).sort(()=>Math.random()-.5).slice(0,n).forEach(k=>{b[k]=Math.max(1,Math.round(STAT_STEP[k]*RSC[r]*(.6+Math.random()*.8)))});
   const ks=Object.keys(NOUN[slot]||{});
   const pool=r>=5?['dragon','drake','unicorn','genie','wendigo']:r>=3?['unicorn','genie','golem','troll','drake','wendigo']:['wolfpup','sprite','imp','goblin','wendigo'];
-  const it={id:uid(),slot,r,b,st:ks.length?ks[Math.floor(Math.random()*ks.length)]:null,isNew:true};
-  if(slot==='companion')it.pet=pool[Math.floor(Math.random()*pool.length)];
+  const it={id:uid(),slot,r,b,st:st!=null?st:(ks.length?ks[Math.floor(Math.random()*ks.length)]:null),isNew:true};
+  if(slot==='companion')it.pet=pet||pool[Math.floor(Math.random()*pool.length)];
   it.n=itemName(it);return it;
 }
 const iicon=it=>it.slot==='trinket'?'\ud83d\udcff':it.slot==='companion'?(PETS[it.pet]||PETS.wolfpup).e:ICON[it.slot][it.st];
@@ -2314,6 +2413,11 @@ function render(){
 
 /* ---------- honours: one row per "track" (e.g. Quests finished) showing its tier pips and the next goal. Category tabs keep each page short; tap a row to see all its tiers. ---------- */
 let HC='q',HX=null;   /* selected category / expanded track */
+let HOPEN=true;try{HOPEN=localStorage.getItem('hnOpen')!=='0'}catch(e){}   /* whole Honours section open / closed (remembered) */
+function setHonoursOpen(o){HOPEN=o;try{localStorage.setItem('hnOpen',o?'1':'0')}catch(e){}$('tab-hero').classList.toggle('hn-closed',!o);$('hhead').setAttribute('aria-expanded',o)}
+$('hhead').onclick=()=>setHonoursOpen(!HOPEN);
+$('hhead').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setHonoursOpen(!HOPEN)}};
+setHonoursOpen(HOPEN);
 const TRACKN={done:'Quests finished',perf:'Perfect days',tasks:'Quests on your board',hard:'Hard quests',str:'Streak',qs:'Single-quest streak',frz:'Streak Freezes',lv:'Level',cls:'Class',sub:'Subclass',wn:'Gear worn',pets:'Companions',plv:'Companion level',prar:'Best companion',inv:'Items owned',gold:'Gold held',gems:'Gems held',kills:'Bosses defeated',chs:'Chests opened',rar:'Best loot',uniq:'Unique items',fell:'Knockouts'};
 function renderHonours(){
   const st=hstat(),E={};BADGES.forEach(b=>E[b.id]=st[b.m]>=b.v);
@@ -3134,3 +3238,387 @@ initCloud();
   };
   setTimeout(tick,2500);
 })();
+
+/* shop front: tap the keeper and he rings the bell and says something. His line appears on a small sideways parchment scroll that floats above his hatch, then fades away.
+   Lines are dealt from a shuffled bag so none repeats until he has said them all; a few depend on how your hero is doing. */
+(function(){
+  const sf=document.querySelector('.storefront');if(!sf)return;
+  const say=document.getElementById('sfsay'),inn=document.getElementById('sfsayin');
+  const L=[
+    'Welcome! Everything here is sturdy, long-lasting and sold without refunds. Seriously no refunds.',
+    'Try the staff. Its very well polished. I polish it nightly. Alone. Pause....',
+    'That sword is long, hard and surprisingly affordable.',
+    'No refunds. Once its out of the box, it is yours.',
+    'Whatever your into, I dont judge. I will charge extra, though.',
+    'Do not ask what is in the sack. White stuff. Probably flour.',
+    'Rub the lamp all you like. Nothing comes out but oil and disappointment.',
+    'A smart hero buys protection. I meant armour you pervert.',
+    'I sell bows, whips, rods and rope. What you do with them is between you and God.',
+    'I used to be an adventurer like you, till I took an arrow to the knee.',
+    'If it glows, it is probably enchanted. If it looks cursed, leave it alone. Yes, dont touch that one.',
+    'The bell is for emergencies. Or for fun. I like the sound.',
+    'You can handle a big weapon, right? Pause, i heard it as i said it out loud.',
+    'Take your time and feel the quality. Bro not that, thats my arm.',
+    'Buy two potions, get a third one free. The third ones mine. I drank it already.',
+    'If a dragon asks, Ive never heard of you. Ive also never heard of dragons. Dragon these nuts on your face',
+    'I accept grass, cash, and ass and im all good on grass and cash.',
+    'We do not take returns, but we do take compliments. Please compliment my hat, im really insecure about it.',
+    'Business has been slow. A goblin came in last week and just wanted to talk. Goblin these nuts in your mouth.',
+  ];
+  /* tapping the cat: the keeper comments on it (the cat itself says nothing), dealt from its own shuffled bag */
+  const C=[
+    'That cat has been asleep on my best cloak for three days. I started charging it rent. It has not paid.',
+    'Dont let the cat fool you. Its not sleeping. Its judging me.',
+    'The cat caught a rat yesterday and left its head on my pillow. I think it was a Godfather reference.',
+    'I named the cat Jimothy. It does not answer to Jimothy. It does not answer to anything.',
+    'People ask if the cat is for sale. I dont own the cat. Im its familliar.',
+  ];
+  /* lines that only make sense for how you are doing right now */
+  const pool=()=>{
+    const a=L.slice();
+    try{
+      if(typeof S==='object'&&S){
+        if(typeof CHEST_COST!=='undefined'&&S.gold>=CHEST_COST)a.push('Thats a heavy sack you are carrying.','All that coin and so reluctant to spend it, are you jewish?');
+        if(S.gold<20)a.push('Light purse today? Come back when you have something to put on the counter brokie.','Empty pockets again? Pft, brokie.');
+        if(S.freezes>0)a.push('Keep those Streak Freezes handy. Cold showers are a hero\u2019s best friend.');
+        const st=typeof streak==='function'?streak():0;
+        if(st>=3)a.push(st+' days in a row! Goddamn tryhard.');
+        if(typeof maxHp==='function'&&typeof levelOf==='function'&&S.hp<maxHp(levelOf(S.xp))*.4)a.push('You look rough. Rest up, drink something and stay out of the wolf pit tonight.');
+      }
+    }catch(e){}
+    return a;
+  };
+  let rt=null,hideT=null;
+  const bagOf=get=>{
+    let bag=[],last='';
+    return()=>{
+      if(!bag.length){
+        bag=get();
+        for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]]}
+        if(bag.length>1&&bag[bag.length-1]===last){const t=bag.pop();bag.unshift(t)}   /* never the same line twice in a row */
+      }
+      last=bag.pop();return last;
+    };
+  };
+  const next=bagOf(pool),nextCat=bagOf(()=>C.slice());
+  function speak(text){
+    if(!say||!inn){toast('\u201C'+text+'\u201D');return}   /* no scroll in the page: fall back to the old toast */
+    clearTimeout(hideT);
+    inn.textContent='\u201C'+text+'\u201D';
+    say.classList.add('on');
+    hideT=setTimeout(()=>say.classList.remove('on'),1500+text.length*28);   /* short stay: about 2.5s for a short line, 4s for a long one */
+  }
+  /* ---- up close: tap the shop front and it zooms in on the shelves. Pick wares off them while the keeper stays in view behind his counter. ---- */
+  let zo=null,zsel=null,zHide=null,zcat='all';
+  const ZKIND={fz:'supplies',pot:'supplies',heal:'supplies',ch:'chests',epic:'chests'};   /* which shelf each ware belongs to */
+  const ZCATS=[['all','All wares',null],['supplies','Supplies','🧪'],['chests','Chests','🎁']];
+  const ZLINES={
+    fz:'Streak Freeze. Keeps your streak alive when you slack. I dont judge. Out loud.',
+    pot:'Healing Potion. Tastes like feet. Works like magic.',
+    ch:'A loot chest. Could be a legendary blade. Could be a sock. No refunds.',
+    heal:'Full Heal. Dont ask what the gem does inside it. It just works.',
+    epic:'An Epic Chest. Opens right away. Dont shake it. Itl finish.'
+  };
+  const BUYL=['Pleasure doing business.','Coin received. Items yours. No refunds.','A fine choice. A very expensive choice, but a fine one.'];
+  const BROKE=['Short on coin? The wolves pay well, I hear.','Come back when your purse is heavier brokie. I mean that kindly.'];
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  const zsay=text=>{
+    if(!zo)return;const b=zo.querySelector('.sfz-say');if(!b)return;
+    clearTimeout(zHide);
+    b.querySelector('.sf-say-in').textContent='\u201C'+text+'\u201D';
+    b.classList.add('on');
+    zHide=setTimeout(()=>b.classList.remove('on'),2200+text.length*30);
+  };
+  const zFind=()=>{
+    if(!zsel)return null;
+    const i=zsel.indexOf(':'),c=zsel.slice(0,i),id=zsel.slice(i+1),it=SHOP[c]&&SHOP[c].find(x=>x.id===id);
+    return it?{cur:c,it}:null;
+  };
+  const zPrice=(cur,it)=>cur==='g'?coinText(it.cost):it.cost+' 💎';
+  /* the chest stage lives on the stone floor under the counter: the chest and Open button (skipped while the open animation plays so it is not rebuilt mid-shake) */
+  function zChest(){
+    const box=zo&&zo.querySelector('.sfz-chest');if(!box||CHEST_BUSY)return;
+    box.replaceChildren();
+    const nc=S.chests,fg=el('button','chestfig'+(nc>0?' ready':''));
+    fg.type='button';fg.setAttribute('aria-label',nc>0?'Open a chest':'No chests to open');fg.appendChild(chestPx(false));
+    const go=()=>{if(nc<1){zsay('No chests yet. Perfect days and weekly bosses drop them.');return}openChestFx(fg,box)};
+    fg.onclick=go;
+    const ob=el('button','btn','Open chest');ob.type='button';ob.disabled=nc<1;ob.onclick=go;
+    const info=el('div','sfz-ci');info.append(el('b','','Chests: '+nc),el('small','',nc>0?'Tap the chest to open it.':'None yet. Earn them from perfect days and weekly bosses.'),ob);
+    box.append(fg,info);
+  }
+  function zRender(){
+    if(!zo)return;
+    const have=c=>c==='g'?S.gold:(S.gems||0);
+    const chip=(ico,txt)=>{const d=el('span','sfz-chip');if(ico)d.appendChild(ico);d.appendChild(el('b','',txt));return d};
+    /* money first and big (coins by denomination, then gems); what you are holding is smaller beside it. The currency of the ware you picked glows. */
+    const f0=zFind(),act=c=>f0&&f0.cur===c?' act':'';
+    const purse=el('span','sfz-chip cur sfz-purse'+act('g'));purse.title='1 gold = 10 silver = 100 bronze';
+    coinParts(S.gold).forEach((v,i)=>{const g=el('span','sfz-pc');g.title=['Gold','Silver','Bronze'][i];g.append(px('coin:'+COIN_U[i],10),el('b','',String(v)));purse.appendChild(g)});
+    const gems=chip(px('💎',16),String(S.gems||0));gems.className='sfz-chip cur gem'+act('m');gems.title='Gems';
+    const fz=chip(px('🧊',16),(S.freezes|0)+'/'+FREEZE_MAX),ch=chip(px('🎁',16),String(S.chests));
+    fz.classList.add('sm');ch.classList.add('sm');fz.title='Streak Freezes held';ch.title='Chests to open';
+    zo.querySelector('.sfz-wal').replaceChildren(purse,gems,fz,ch);
+    zChest();
+    zo.querySelectorAll('.sfz-tab').forEach(t=>{const on=t.dataset.cat===zcat;t.setAttribute('aria-selected',on?'true':'false');t.tabIndex=on?0:-1});
+    /* coin goods on the back shelf at the left of the hatch, gem goods on the right */
+    [['g','l'],['m','r']].forEach(([cur,side])=>{
+      const u=zo.querySelector('.zbs.'+side);u.replaceChildren();
+      const items=SHOP[cur].filter(it=>zcat==='all'||ZKIND[it.id]===zcat);
+      u.className='zbs '+side+(items.length<3?' few':'');
+      items.forEach(it=>{
+        const key=cur+':'+it.id,blocked=!!(it.ok&&!it.ok()),poor=have(cur)<it.cost,slot=el('div','zslot');
+        const b=el('button','zi'+(zsel===key?' sel':'')+(blocked?' full':(poor?' poor':''))),ic=el('span','zi-ic');
+        b.type='button';b.title=it.n;b.setAttribute('aria-label',it.n+', '+(blocked?it.full:zPrice(cur,it)));b.setAttribute('aria-pressed',zsel===key?'true':'false');
+        ic.appendChild(px(it.e,32));
+        b.append(ic,el('span','zi-tag',blocked?it.full:(cur==='g'?coinText(it.cost):it.cost+'\u{1F48E}')));
+        b.onclick=()=>{zsel=key;zsay(poor&&!blocked?pick(BROKE):(ZLINES[it.id]||it.d));zRender()};
+        slot.append(b,el('i','zi-pl'));u.appendChild(slot);
+      });
+    });
+    const det=zo.querySelector('.sfz-det');det.replaceChildren();
+    const f=zFind();
+    det.hidden=!f;
+    if(!f)return;
+    const {cur,it}=f,blocked=!!(it.ok&&!it.ok()),poor=have(cur)<it.cost,t=el('div','sfz-dt');
+    t.append(el('b','',it.n),el('span','sfz-pr',zPrice(cur,it)),el('small','',it.d));   /* the price lives here now, not on a tag under the shelf */
+    const buy=el('button','btn',blocked?it.full:'Buy');
+    buy.type='button';buy.disabled=blocked||poor;
+    buy.onclick=()=>{
+      if(blocked||poor)return;
+      confirmBuy(it,zPrice(cur,it),()=>{shopBuy(cur,it);zsay(pick(BUYL));zRender()});
+    };
+    det.append(t,buy);
+    if(poor&&!blocked)det.appendChild(el('div','sfz-poor','Not enough '+(cur==='g'?'coin':'gems')+' yet.'));
+  }
+  const zKey=e=>{if(e.key==='Escape')zClose()};
+  const zReduce=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  /* the shop front itself is what zooms: a copy sits exactly on top of the real one, then scales up on the hatch */
+  function zPlace(wrap,rect,zoomed){
+    if(!zoomed){wrap.style.transform='translate('+rect.left+'px,'+rect.top+'px) scale(1)';return}
+    const o=wrap._off,vw=window.innerWidth,vh=window.innerHeight,hud=zo.querySelector('.sfz-hud'),bot=zo.querySelector('.sfz-bot');
+    const top=hud.offsetHeight+2,bottom=vh-140,h=Math.max(120,bottom-top),W=o.W;
+    const s=Math.max(1.25,Math.min((vw-8)/(.58*W),h/180));
+    const x=vw/2-s*(o.x+W/2),y=top+h/2-s*(o.y+240);   /* 240 sits the awning just under the top bar */
+    wrap.style.transform='translate('+x+'px,'+y+'px) scale('+s+')';
+  }
+  function zClose(){
+    if(!zo)return;
+    const r=zo,wrap=r.querySelector('.sfz-zoom');zo=null;zsel=null;clearTimeout(zHide);
+    document.removeEventListener('keydown',zKey);window.removeEventListener('resize',zResize);
+    document.body.classList.remove('sfz-open');
+    /* shrink back to exactly where it started: the whole Shop tab, not just the storefront (same target zOpen began from) */
+    const tab=sf.closest('.tab')||sf,rect=tab.getBoundingClientRect();
+    r.classList.remove('in');r.classList.add('closing');r.style.backgroundColor='transparent';
+    zPlace(wrap,rect,false);
+    setTimeout(()=>r.remove(),zReduce()?30:520);
+  }
+  const zResize=()=>{if(!zo)return;const w=zo.querySelector('.sfz-zoom');zPlace(w,w._rect,true)};
+  function zOpen(){
+    if(zo)return;
+    /* the whole shop page is copied (not just the storefront) so everything around the shop zooms with it */
+    const tab=sf.closest('.tab')||sf,tr=tab.getBoundingClientRect(),rect=sf.getBoundingClientRect();
+    const root=el('div','sfz'),wrap=el('div','sfz-zoom'),c=tab.cloneNode(true);
+    const oc=tab.querySelectorAll('canvas'),cc=c.querySelectorAll('canvas');
+    cc.forEach((k,i)=>{try{if(oc[i]){k.width=oc[i].width;k.height=oc[i].height;k.getContext('2d').drawImage(oc[i],0,0)}}catch(e){}});   /* cloned canvases come out blank */
+    c.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
+    if(tab.id)c.id=tab.id;   /* only so the #tab-shop styles still apply to the copy */
+    c.removeAttribute('aria-hidden');
+    c.classList.add('sfz-pg');
+    c.querySelectorAll('.sf-say,.sf-hint').forEach(n=>n.remove());
+    const sfc=c.querySelector('.storefront');if(sfc){sfc.classList.add('sfz-sf');const fl=el('div','sfz-floor');fl.onclick=zClose;sfc.prepend(fl)}   /* the stone wall continues down from inside the shop front, so there is no seam */
+    const hatch=c.querySelector('.sf-hatch');
+    if(hatch)hatch.append(el('div','zbs l'),el('div','zbs r'));
+    wrap.style.width=tr.width+'px';wrap.style.height=tr.height+'px';
+    wrap._rect=tr;wrap._off={x:rect.left-tr.left,y:rect.top-tr.top,W:rect.width};
+    wrap.appendChild(c);
+    c.querySelectorAll(':scope > :not(.storefront)').forEach(n=>{n.style.visibility='hidden'});
+    
+    root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','The Guild Store');
+    const hud=el('div','sfz-hud'),sayrow=el('div','sfz-sayrow'),sayEl=el('div','sfz-say'),box=el('div','sf-say-box');
+    box.appendChild(el('span','sf-say-in'));sayEl.appendChild(box);sayrow.appendChild(sayEl);
+    hud.append(el('div','sfz-wal'),sayrow);
+    const bot=el('div','sfz-bot'),det0=el('div','sfz-det'),tabs=el('div','sfz-tabs');det0.hidden=true;
+    tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Shop shelves');
+    ZCATS.forEach(([id,label,ico])=>{
+      const t=el('button','sfz-tab');t.type='button';t.dataset.cat=id;t.setAttribute('role','tab');
+      if(ico)t.appendChild(px(ico,14));t.appendChild(el('span','',label));
+      t.onclick=()=>{zcat=id;const f=zFind();if(f&&zcat!=='all'&&ZKIND[f.it.id]!==zcat)zsel=null;zsay(id==='all'?'Everything I have, laid out for you.':id==='supplies'?'Supplies. For heroes who plan ahead. Or panic.':'Chests. Lovely things. Some of them are even legal.');zRender()};
+      tabs.appendChild(t);
+    });
+    bot.append(det0,el('div','sfz-chest'),tabs);
+    root.append(wrap,hud,bot);
+    root.addEventListener('click',e=>{if(e.target===root)zClose()});
+    document.addEventListener('keydown',zKey);window.addEventListener('resize',zResize);
+    document.body.appendChild(root);
+    zo=root;zsel=null;zRender();
+    zPlace(wrap,tr,false);void wrap.offsetWidth;   /* start exactly where the real page is */
+    document.body.classList.add('sfz-open');
+    root.classList.add('in');root.style.backgroundColor=getComputedStyle(document.body).backgroundColor;zPlace(wrap,tr,true);
+    setTimeout(()=>zsay('Take a look around. Touch nothing you cannot afford.'),zReduce()?60:520);
+  }
+  window.sfShelfRefresh=zRender;
+  sf.addEventListener('click',e=>{
+    if(e.target.closest('.sf-cat')){const ct=sf.querySelector('.sf-cat');ct.classList.remove('wake');void ct.offsetWidth;ct.classList.add('wake');speak(nextCat());return}
+    if(!e.target.closest('.sf-keeper')){zOpen();return}   /* anywhere else on the shop front: zoom in on the shelves */
+    sf.classList.remove('ring');void sf.offsetWidth;sf.classList.add('ring');clearTimeout(rt);rt=setTimeout(()=>sf.classList.remove('ring'),600);
+    speak(next());
+  });
+})();
+
+/* ---------- shop floor: the Armoury (left) and the Companion pens (right) ----------
+   Both restock once a day. Today's stock is saved (S.sa = armoury, S.sp = pens) so reloading the app never re-rolls it.
+   The stands and pens on the floor show the real stock; tapping one (or a sign) opens a sheet with every item and a Buy button. */
+(function(){
+  const fl=document.getElementById('sffloor');if(!fl)return;
+  const ARM_SLOTS=['helm','weapon','armor','offhand'];            /* the four stands, in order */
+  const ARM_COST=[80,260,700,1600];                                /* bronze, by rarity 0-3 (Common ... Very rare) */
+  const PET_COST={0:['g',400],1:['g',1200],2:['m',7],3:['m',14],4:['m',28]};   /* by rarity: 'g' = coins (bronze), 'm' = gems */
+  const PET_POOL=r=>r>=3?['unicorn','genie','golem','troll','drake','wendigo']:['wolfpup','sprite','imp','goblin','wendigo'];
+  const LINES={
+    a:['Steel is honest. My prices, less so.','New stock every dawn. Early heroes get the good plate.','Try the shield. Everyone looks braver behind one.','Mind the edges. Mind the prices more.'],
+    p:['They bite. Mostly the ones that do not.','Feed them. Pat them. Do not name them until you have paid.','Every one is house trained. Mostly.','A companion fights harder when it likes you.'],
+    buy:['Pleasure doing business.','Sold. It is yours now, along with all its problems.','A fine choice.'],
+    poor:['Your purse says no. Your quests say yes.','Come back with more coin.']
+  };
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  const price=e=>e.cur==='g'?coinText(e.cost,2):e.cost+'\u{1F48E}';
+  const stk=k=>k==='a'?S.sa.s:S.sp.s;
+
+  /* ---- stock ---- */
+  function armRarity(){   /* Common..Very rare; the odds slide toward the better stuff as you level */
+    const p=Math.min(1,(levelOf(S.xp)-1)/39),w=[50-30*p,30,15+15*p,5+15*p];
+    let r=Math.random()*w.reduce((a,b)=>a+b,0);
+    for(let i=0;i<4;i++){if((r-=w[i])<0)return i}
+    return 0;
+  }
+  function genArm(){
+    return ARM_SLOTS.map(slot=>{
+      const r=armRarity(),ks=Object.keys(NOUN[slot]),own=S.cls&&NOUN[slot][S.cls]?S.cls:null;
+      const st=own&&Math.random()<.7?own:ks[Math.floor(Math.random()*ks.length)];   /* mostly gear that suits your class */
+      const it=buildGear(slot,r,st);delete it.isNew;
+      return {it,cur:'g',cost:ARM_COST[r],sold:false};
+    });
+  }
+  function genPets(){
+    const rs=[0,1,2,Math.random()<.25?4:3],seen=[];
+    return rs.map(r=>{
+      const pool=PET_POOL(r);let k=pool[Math.floor(Math.random()*pool.length)];
+      for(let t=0;t<8&&seen.indexOf(k)>-1;t++)k=pool[Math.floor(Math.random()*pool.length)];
+      seen.push(k);
+      const it=buildGear('companion',r,null,k);delete it.isNew;
+      const c=PET_COST[r];return {it,cur:c[0],cost:c[1],sold:false};
+    });
+  }
+  function ensure(){
+    const d=today();let ch=false;
+    if(!S.sa||S.sa.d!==d||!Array.isArray(S.sa.s)||S.sa.s.length!==4){S.sa={d,s:genArm()};ch=true}
+    if(!S.sp||S.sp.d!==d||!Array.isArray(S.sp.s)||S.sp.s.length!==4){S.sp={d,s:genPets()};ch=true}
+    if(ch)save();
+  }
+
+  /* ---- the floor ---- */
+  let lastSig='';
+  function cell(k,i,e){
+    const it=e.it,b=el('button','fz-c'+(e.sold?' sold':'')+(it.r>=2?' rare':''));
+    b.type='button';b.dataset.k=k==='a'?it.slot:'pet';b.style.setProperty('--rar',RAR[it.r]);
+    b.setAttribute('aria-label',e.sold?'Sold out':it.n+', '+price(e));
+    const ic=el('span','fz-ic');if(!e.sold)ic.appendChild(px(iicon(it),32));
+    b.append(el('i','fz-st'),ic,el('span','fz-pr',e.sold?'SOLD':price(e)));
+    b.onclick=()=>openSheet(k,i);
+    return b;
+  }
+  function paint(){
+    ensure();
+    const sig=[S.sa,S.sp].map(o=>o.d+':'+o.s.map(e=>e.it.id+(e.sold?'x':'')).join(',')).join('|');
+    if(sig!==lastSig){
+      lastSig=sig;
+      [['a','fzarmgrid'],['p','fzpetgrid']].forEach(([k,id])=>{const g=document.getElementById(id);if(g)g.replaceChildren(...stk(k).map((e,i)=>cell(k,i,e)))});
+    }
+    if(sheet)fill();
+  }
+
+  /* ---- the sheet ---- */
+  let sheet=null,kind='a',hl=null,sayEl=null;
+  const onKey=e=>{if(e.key==='Escape')closeSheet()};
+  function say(t){if(sayEl)sayEl.textContent='\u201C'+t+'\u201D'}
+  function row(e,i){
+    const it=e.it,have=e.cur==='g'?S.gold:(S.gems||0),poor=have<e.cost;
+    const r=el('div','fzv-row'+(e.sold?' sold':'')+(hl===i?' hl':''));r.style.setProperty('--rar',RAR[it.r]);
+    const ic=el('span','fzv-ic');if(!e.sold)ic.appendChild(px(iicon(it),36));
+    const tx=el('div','fzv-tx');
+    tx.append(el('b','',it.n),el('small','rr',RNAME[it.r]+' \u00B7 '+(it.slot==='companion'?'starts at Lv '+pbase(it):SLOTN[it.slot])),el('small','bn',bonusTxt(it)));
+    const btn=el('button','btn',e.sold?'Sold':'Buy \u00B7 '+price(e));btn.type='button';btn.disabled=e.sold||poor;
+    btn.onclick=()=>{
+      if(e.sold||poor)return;
+      confirmBuy(it,price(e),()=>buy(i));
+    };
+    if(poor&&!e.sold)btn.title='Not enough '+(e.cur==='g'?'coin':'gems');
+    r.append(ic,tx,btn);
+    return r;
+  }
+  function fill(){
+    if(!sheet)return;
+    const w=sheet.querySelector('.fzv-wal'),purse=el('span','sfz-chip cur sfz-purse');
+    coinParts(S.gold).forEach((v,i)=>{const g=el('span','sfz-pc');g.title=['Gold','Silver','Bronze'][i];g.append(px('coin:'+COIN_U[i],10),el('b','',String(v)));purse.appendChild(g)});
+    const gem=el('span','sfz-chip cur gem');gem.title='Gems';gem.append(px('\u{1F48E}',16),el('b','',String(S.gems||0)));
+    w.replaceChildren(purse,gem);
+    const list=sheet.querySelector('.fzv-list');
+    list.replaceChildren(...stk(kind).map((e,i)=>row(e,i)));
+  }
+  function openSheet(k,i){
+    if(sheet)closeSheet(true);
+    ensure();kind=k;hl=i==null?null:i;
+    const src=document.getElementById(k==='a'?'fzarm':'fzpet');
+    const root=el('div','fzv'),card=el('div','fzv-card'),hd=el('div','fzv-hd'),x=el('button','fzv-x','\u2715');
+    root.dataset.k=k;root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label',k==='a'?'The Armoury':'The Companion Pens');
+    x.type='button';x.setAttribute('aria-label','Close');x.onclick=()=>closeSheet();
+    hd.append(el('div','fzv-tt',k==='a'?'The Armoury':'Companion Pens'),x);
+    sayEl=el('div','fzv-say');
+    card.append(hd,el('div','fzv-wal'),sayEl,el('div','fzv-list'),el('div','fzv-ft','Fresh stock every dawn.'));
+    root.appendChild(card);
+    root.addEventListener('click',e=>{if(e.target===root)closeSheet()});
+    document.addEventListener('keydown',onKey);
+    document.body.appendChild(root);document.body.classList.add('sfz-open');
+    sheet=root;fill();say(pick(LINES[k]));
+    /* zoom-from-source: start the card scaled/positioned over the Armoury or pens, then expand to full (same feel as the Guild Store zoom) */
+    if(src&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){
+      const r=src.getBoundingClientRect(),vw=innerWidth,vh=innerHeight;
+      const cx=r.left+r.width/2,cy=r.top+r.height/2;
+      const s=Math.max(0.35,Math.min(r.width/Math.min(560,vw*0.9),r.height/(vh*0.5)));
+      card.style.transition='none';
+      card.style.transform='translate('+(cx-vw/2)+'px,'+(cy-vh+vh*0.25)+'px) scale('+s+')';
+      card.style.opacity='0.6';
+      void card.offsetWidth;
+      card.style.transition='transform .45s cubic-bezier(.22,.7,.2,1),opacity .3s';
+      card.style.transform='';
+      card.style.opacity='';
+    }
+    requestAnimationFrame(()=>root.classList.add('in'));
+    x.focus({preventScroll:true});
+  }
+  function closeSheet(now){
+    if(!sheet)return;
+    const r=sheet;sheet=null;sayEl=null;
+    document.removeEventListener('keydown',onKey);document.body.classList.remove('sfz-open');
+    r.classList.remove('in');
+    setTimeout(()=>r.remove(),now||(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)?0:260);
+  }
+
+  /* ---- buying: the item goes into your bag (the Hero tab shows a "!" until you look at it) ---- */
+  function buy(i){
+    ensure();const e=stk(kind)[i];if(!e||e.sold)return;
+    const have=e.cur==='g'?S.gold:(S.gems||0);
+    if(have<e.cost){say(pick(LINES.poor));return}
+    if(e.cur==='g')S.gold-=e.cost;else S.gems=(S.gems||0)-e.cost;
+    const it=Object.assign({},e.it,{id:uid(),b:Object.assign({},e.it.b),isNew:true});
+    S.inv.push(it);e.sold=true;hl=i;
+    addLog('Bought '+it.n,'good');toast('Bought '+it.n);buzz(30);
+    save();render();paint();
+    say(pick(LINES.buy));
+  }
+
+   document.getElementById('fzarmsign').onclick=()=>openSheet('a',null);
+  document.getElementById('fzpetsign').onclick=()=>openSheet('p',null);
+  window.sfFloorRefresh=paint;
+  paint();})
