@@ -3250,6 +3250,20 @@ function sfFit(){
   const h=Math.round(Math.max(MIN,Math.min(MAX,mh-10-FLOOR)));
   const k=Math.min(1.22,1+(h-MIN)/MIN*0.9);
   r.style.setProperty('--sfh',h+'px');r.style.setProperty('--sfe',(h-MIN)+'px');r.style.setProperty('--sfk',k.toFixed(3));r.style.setProperty('--sfx',h>MIN+40?'1':'0');
+  sfSpread();
+}
+/* when the stone floor is tall, the armoury scene is cut into its three props (rack + mannequin, shield, anvil) that are spread down the wall instead of sitting in a heap at the bottom */
+function sfSpread(){
+  const fl=document.querySelector('#tab-shop .sf-floor'),aw=fl&&fl.querySelector('.sf-armwall'),pw=fl&&fl.querySelector('.sf-petwall');if(!aw)return;
+  const tall=fl.offsetHeight>270;
+  if(tall&&!aw._seg){
+    const src=aw.querySelector('.aw-scene');
+    [['0 15 52 39','a'],['0 54 27 24','b'],['23 52 29 32','c']].forEach(([vb,c])=>{
+      const s=src.cloneNode(true);s.setAttribute('viewBox',vb);s.setAttribute('class','aw-scene aw-seg aw-s'+c);
+      s.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));aw.appendChild(s)});
+    aw._seg=1;
+  }
+  aw.classList.toggle('spread',tall);if(pw)pw.classList.toggle('spread',tall);
 }
 addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfFit();
 
@@ -3533,13 +3547,13 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
 
   /* ---- the floor ---- */
   let lastSig='';
-  function cell(k,i,e){
+  function cell(k,i,e,fn){
     const it=e.it,b=el('button','fz-c'+(e.sold?' sold':'')+(it.r>=2?' rare':''));
     b.type='button';b.dataset.k=k==='a'?it.slot:'pet';b.style.setProperty('--rar',RAR[it.r]);
     b.setAttribute('aria-label',e.sold?'Sold out':it.n+', '+price(e));
     const ic=el('span','fz-ic');if(!e.sold)ic.appendChild(px(iicon(it),32));
     b.append(el('i','fz-st'),ic,el('span','fz-pr',e.sold?'SOLD':price(e)));
-    b.onclick=()=>openSheet(k,i);
+    b.onclick=fn||(()=>openSheet(k,i));
     return b;
   }
   function paint(){
@@ -3550,12 +3564,13 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       [['a','fzarmgrid'],['p','fzpetgrid']].forEach(([k,id])=>{const g=document.getElementById(id);if(g)g.replaceChildren(...stk(k).map((e,i)=>cell(k,i,e)))});
     }
     if(sheet)fill();
+    if(zf)zfRender();
   }
 
   /* ---- the sheet ---- */
   let sheet=null,kind='a',hl=null,sayEl=null;
   const onKey=e=>{if(e.key==='Escape')closeSheet()};
-  function say(t){if(sayEl)sayEl.textContent='\u201C'+t+'\u201D'}
+  function say(t){if(sayEl)sayEl.textContent='\u201C'+t+'\u201D';if(zf)zfSay(t)}
   function row(e,i){
     const it=e.it,have=e.cur==='g'?S.gold:(S.gems||0),poor=have<e.cost;
     const r=el('div','fzv-row'+(e.sold?' sold':'')+(hl===i?' hl':''));r.style.setProperty('--rar',RAR[it.r]);
@@ -3580,7 +3595,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const list=sheet.querySelector('.fzv-list');
     list.replaceChildren(...stk(kind).map((e,i)=>row(e,i)));
   }
-  function openSheet(k,i){
+  function openSheetOld(k,i){
     if(sheet)closeSheet(true);
     ensure();kind=k;hl=i==null?null:i;
     const src=document.getElementById(k==='a'?'fzarm':'fzpet');
@@ -3619,6 +3634,241 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     setTimeout(()=>r.remove(),now||(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)?0:260);
   }
 
+
+  /* ---- turn to face the Armoury / Companion pens ----
+     Standing at the counter you turn your head: the shop slides away and the wall of weapons and armour (or the pens) slides in, as if you had turned left
+     (Armoury) or right (Companions). The real stock stands in four niches; tap one to see its card and buy it. "Turn back" (or Esc) swings you round again. */
+  let zf=null,zfK='a',zfSel=null;
+  const zfReduce=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const zfKey=e=>{if(e.key==='Escape')zfClose()};
+  /* like the main shop's stone floor: tapping empty wall (or the empty strip under the ware card) takes you back. Wares, the ware card and the purse are left alone. */
+  const zfTap=e=>{
+    if(!zf)return;
+    const room=document.getElementById('sfroom');if(!room||!room.classList.contains('done'))return;   /* only once the camera has arrived */
+    const t=e.target;if(!t||!t.closest)return;
+    if(t.closest('[data-i],.fz-c,.sfz-det,.sfz-chip'))return;
+    if(t.closest('#sfroom,.sfz-bot')||t===document.body||t===document.documentElement||t.tagName==='MAIN')zfClose();
+  };
+  function zfSay(t){
+    if(!zf)return;const b=zf.querySelector('.sfz-say');if(!b)return;
+    clearTimeout(zf._h);b.querySelector('.sf-say-in').textContent='\u201C'+t+'\u201D';b.classList.add('on');
+    zf._h=setTimeout(()=>b.classList.remove('on'),2400+t.length*30);
+  }
+  /* pixel-art props for the walls (viewBox 100 x 170, drawn flat like the rest of the shop) */
+  const SW=(x,y,l,c)=>'<rect x="'+(x-.6)+'" y="'+(y-.6)+'" width="3.2" height="'+(l+1.2)+'" fill="#1a0f06"/><rect x="'+x+'" y="'+y+'" width="2" height="'+l+'" fill="'+(c||'#d6dde8')+'"/><rect x="'+(x+1)+'" y="'+y+'" width=".6" height="'+l+'" fill="#fff" opacity=".45"/><rect x="'+(x-2)+'" y="'+(y+l)+'" width="6" height="1.8" fill="#e8b93c" stroke="#1a0f06" stroke-width=".5"/><rect x="'+(x+.4)+'" y="'+(y+l+1.8)+'" width="1.2" height="4" fill="#6b4423"/><rect x="'+(x+.1)+'" y="'+(y+l+5.6)+'" width="1.8" height="1.6" fill="#e8b93c"/>';
+  const SP=(x,y,l)=>'<rect x="'+(x+.2)+'" y="'+(y+5)+'" width="1.2" height="'+l+'" fill="#6b4423" stroke="#1a0f06" stroke-width=".4"/><path d="M'+(x+.8)+' '+y+'L'+(x+2.6)+' '+(y+5.4)+'L'+(x-1)+' '+(y+5.4)+'Z" fill="#d6dde8" stroke="#1a0f06" stroke-width=".5"/>';
+  const AX=(x,y)=>'<rect x="'+x+'" y="'+y+'" width="1.6" height="24" fill="#6b4423" stroke="#1a0f06" stroke-width=".4"/><path d="M'+(x+1.6)+' '+(y+1)+'Q'+(x+8)+' '+(y-1)+' '+(x+7)+' '+(y+8)+'Q'+(x+4)+' '+(y+6)+' '+(x+1.6)+' '+(y+7)+'Z" fill="#b9c2d0" stroke="#1a0f06" stroke-width=".5"/>';
+  const SH=(cx,cy,r,c)=>'<circle cx="'+cx+'" cy="'+cy+'" r="'+(r+.8)+'" fill="#1a0f06"/><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+c+'"/><rect x="'+(cx-.7)+'" y="'+(cy-r)+'" width="1.4" height="'+(2*r)+'" fill="#e8b93c"/><rect x="'+(cx-r)+'" y="'+(cy-.7)+'" width="'+(2*r)+'" height="1.4" fill="#e8b93c"/><circle cx="'+cx+'" cy="'+cy+'" r="'+(r*.28)+'" fill="#ffd75a" stroke="#1a0f06" stroke-width=".4"/>';
+  const HM=(cx,cy)=>'<path d="M'+(cx-5)+' '+(cy+5)+'V'+cy+'Q'+(cx-5)+' '+(cy-6)+' '+cx+' '+(cy-6)+'Q'+(cx+5)+' '+(cy-6)+' '+(cx+5)+' '+cy+'V'+(cy+5)+'Z" fill="#b9c2d0" stroke="#1a0f06" stroke-width=".7"/><rect x="'+(cx-3.4)+'" y="'+(cy-.5)+'" width="6.8" height="1.6" fill="#1a0f06"/><rect x="'+(cx-.5)+'" y="'+(cy-6)+'" width="1" height="5" fill="#a8283a"/>';
+  /* hanging versions for the wall rail: pommel on a peg, blade pointing down */
+  const SWH=(x,y,l,c)=>'<rect x="'+(x+.4)+'" y="'+y+'" width="1.2" height="4" fill="#6b4423"/><rect x="'+(x+.1)+'" y="'+(y-1.6)+'" width="1.8" height="1.6" fill="#e8b93c"/><rect x="'+(x-2)+'" y="'+(y+4)+'" width="6" height="1.8" fill="#e8b93c" stroke="#1a0f06" stroke-width=".5"/><rect x="'+(x-.6)+'" y="'+(y+5.8)+'" width="3.2" height="'+(l+1.2)+'" fill="#1a0f06"/><rect x="'+x+'" y="'+(y+6)+'" width="2" height="'+l+'" fill="'+(c||'#d6dde8')+'"/><rect x="'+(x+1)+'" y="'+(y+6)+'" width=".6" height="'+l+'" fill="#fff" opacity=".45"/>';
+  const AXH=(x,y)=>'<rect x="'+x+'" y="'+y+'" width="1.6" height="11" fill="#6b4423" stroke="#1a0f06" stroke-width=".4"/><path d="M'+(x+1.6)+' '+(y+5)+'Q'+(x+7.5)+' '+(y+3)+' '+(x+6.8)+' '+(y+11.5)+'Q'+(x+4)+' '+(y+9.5)+' '+(x+1.6)+' '+(y+10)+'Z" fill="#b9c2d0" stroke="#1a0f06" stroke-width=".5"/>';
+  const MCH=(x,y)=>'<rect x="'+(x+.3)+'" y="'+y+'" width="1.4" height="9" fill="#6b4423" stroke="#1a0f06" stroke-width=".4"/><circle cx="'+(x+1)+'" cy="'+(y+10.6)+'" r="3.2" fill="#8a92a0" stroke="#1a0f06" stroke-width=".6"/><path d="M'+(x+1)+' '+(y+6.6)+'v-1.2M'+(x+1)+' '+(y+14.6)+'v1.2M'+(x-3)+' '+(y+10.6)+'h-1.2M'+(x+5)+' '+(y+10.6)+'h1.2" stroke="#1a0f06" stroke-width="1.1"/>';
+  const CH=(x,y1,y2)=>{let s='<rect x="'+(x-2)+'" y="'+(y1-1.6)+'" width="4" height="2" fill="#6a7384" stroke="#1a0f06" stroke-width=".4"/>';for(let y=y1;y<y2;y+=2.6)s+='<rect x="'+(x-.7)+'" y="'+y+'" width="1.4" height="1.9" fill="#aab3c2" stroke="#1a0f06" stroke-width=".3"/>';return s};
+  const ZD={
+    a:'<rect x="0" y="102" width="100" height="1.6" fill="#1a0f06" opacity=".5"/>'
+      /* upper wall: two big banners, a crest on crossed spears with an axe and spears either side, a row of round shields and a shelf of helmets */
+      +SP(7,30,34)+SP(92,30,34)+AX(31,26)+SP(66,26,36)
+      +'<g stroke="#1a0f06" stroke-width=".6"><rect x="14" y="22" width="18" height="2" fill="#8a5a2a"/><path d="M16 24H30V57L23 50L16 57Z" fill="#a8283a"/><path d="M18 26H28V54L23 48L18 54Z" fill="none" stroke="#e8b93c" stroke-width=".8"/><rect x="21" y="35" width="4" height="4" fill="#ffd75a" transform="rotate(45 23 37)"/>'
+      +'<rect x="68" y="22" width="18" height="2" fill="#8a5a2a"/><path d="M70 24H84V57L77 50L70 57Z" fill="#a8283a"/><path d="M72 26H82V54L77 48L72 54Z" fill="none" stroke="#e8b93c" stroke-width=".8"/><rect x="75" y="35" width="4" height="4" fill="#ffd75a" transform="rotate(45 77 37)"/></g>'
+      +'<path d="M36 20L64 62M64 20L36 62" stroke="#1a0f06" stroke-width="3.4"/><path d="M36 20L64 62M64 20L36 62" stroke="#8a5a2a" stroke-width="1.6"/>'
+      +'<g fill="#d6dde8" stroke="#1a0f06" stroke-width=".5"><circle cx="36" cy="20" r="2"/><circle cx="64" cy="20" r="2"/></g>'
+      +SH(50,43,11,'#7a1c2a')
+      +SH(16,67,5.5,'#2a4a8a')+SH(34,67,5.5,'#7a1c2a')+SH(66,67,5.5,'#7a1c2a')+SH(84,67,5.5,'#2a4a8a')
+      +'<rect x="3" y="85.5" width="94" height="2.4" fill="#8a5a2a" stroke="#1a0f06" stroke-width=".5"/>'
+      +HM(14,80)+HM(32,80)+HM(50,80)+HM(68,80)+HM(86,80)
+      /* row 1: pennants either side of a heraldic shield on crossed swords, helmets on pegs at the edges */
+      +'<g stroke="#1a0f06" stroke-width=".6"><rect x="22" y="104" width="13" height="1.8" fill="#8a5a2a"/><path d="M24 105.8H33V122L28.5 118L24 122Z" fill="#a8283a"/><path d="M25.6 107.4H31.4V118.6L28.5 116L25.6 118.6Z" fill="none" stroke="#e8b93c" stroke-width=".7"/><rect x="27.4" y="109.6" width="2.2" height="2.2" fill="#ffd75a" transform="rotate(45 28.5 110.7)"/>'
+      +'<rect x="65" y="104" width="13" height="1.8" fill="#8a5a2a"/><path d="M67 105.8H76V122L71.5 118L67 122Z" fill="#a8283a"/><path d="M68.6 107.4H74.4V118.6L71.5 116L68.6 118.6Z" fill="none" stroke="#e8b93c" stroke-width=".7"/><rect x="70.4" y="109.6" width="2.2" height="2.2" fill="#ffd75a" transform="rotate(45 71.5 110.7)"/></g>'
+      +'<path d="M41 105L59 124M59 105L41 124" stroke="#1a0f06" stroke-width="3.6"/><path d="M41 105L59 124M59 105L41 124" stroke="#d6dde8" stroke-width="1.8"/>'
+      +'<g fill="#e8b93c" stroke="#1a0f06" stroke-width=".5"><circle cx="41" cy="105" r="1.7"/><circle cx="59" cy="105" r="1.7"/><circle cx="41" cy="124" r="1.7"/><circle cx="59" cy="124" r="1.7"/></g>'
+      +SH(50,114.5,7,'#7a1c2a')
+      +HM(10,115)+HM(90,115)+'<rect x="8" y="121" width="4" height="1.6" fill="#6a7384" stroke="#1a0f06" stroke-width=".4"/><rect x="88" y="121" width="4" height="1.6" fill="#6a7384" stroke="#1a0f06" stroke-width=".4"/>'
+      /* row 2: the weapons are mounted on the wall on ONE rail (iron brackets at both ends); swords, hand axes and a mace hang from pegs.
+         The two round shields hang from the wall by chains. */
+      +'<g stroke="#1a0f06" stroke-width=".5"><rect x="-22" y="126" width="144" height="2.4" fill="#8a5a2a"/><rect x="-24" y="123.6" width="3" height="8" fill="#6a7384"/><rect x="121" y="123.6" width="3" height="8" fill="#6a7384"/></g>'
+      +SWH(11,128.4,6)+SWH(18,128.4,7,'#aab3c2')+AXH(27,128.4)+SWH(40,128.4,7)+SWH(46,128.4,6,'#aab3c2')+MCH(56,128.4)+AXH(66,128.4)+SWH(78,128.4,7)+SWH(85,128.4,6,'#aab3c2')
+      +SWH(-17,128.4,6)+SWH(-10,128.4,7,'#aab3c2')+AXH(-5,128.4)+SWH(97,128.4,6,'#aab3c2')+SWH(104,128.4,7)+AXH(111,128.4)
+      +CH(-13,98,107)+SH(-13,113,6,'#2a4a8a')+CH(113,98,107)+SH(113,113,6,'#2a4a8a')
+      /* row 3: ONE row on the floor (drawn a little smaller so the hanging weapons clear it): crate, barrel of spears, armour stand, grindstone, anvil, strongbox */
+      +'<g transform="translate(50 168) scale(.88) translate(-50 -168)">'
+      +'<g stroke="#1a0f06" stroke-width=".8"><rect x="-22" y="156" width="14" height="12" fill="#a8764a"/><path d="M-22 156L-8 168M-8 156L-22 168" stroke="#4a2e16" fill="none"/><rect x="102" y="155" width="18" height="13" fill="#6b4423"/><path d="M102 155Q111 147 120 155Z" fill="#8a5a2a"/><rect x="102" y="159" width="18" height="2" fill="#e8b93c"/><rect x="109.5" y="158" width="3" height="4" fill="#ffd75a"/></g>'
+      +'<g><rect x="6" y="147" width="20" height="21" rx="4" fill="#6b4423" stroke="#1a0f06" stroke-width="1"/><rect x="6" y="152" width="20" height="2" fill="#aab3c2"/><rect x="6" y="161" width="20" height="2" fill="#aab3c2"/></g>'
+      +SP(10,141,13)+SP(15,139,15)+SP(20,142,12)
+      +'<g stroke="#1a0f06" stroke-width=".7"><rect x="31" y="165.4" width="14" height="2.6" fill="#6b4423"/><rect x="37.2" y="157" width="1.6" height="9" fill="#8a5a2a"/><path d="M32 154H44L43 165H33Z" fill="#8a92a0"/><path d="M32.5 155H37V164H33.4Z" fill="#b8c0cc" stroke="none"/><rect x="33" y="160.6" width="10" height="1.8" fill="#e8b93c"/><rect x="36.4" y="156" width="2.6" height="2.6" fill="#ffd75a"/><ellipse cx="31" cy="154.6" rx="3.4" ry="2.6" fill="#aab3c2"/><ellipse cx="45" cy="154.6" rx="3.4" ry="2.6" fill="#8a92a0"/></g>'
+      +HM(38,150)
+      +'<g stroke="#1a0f06" stroke-width=".8"><rect x="47.5" y="163" width="13" height="4.6" fill="#6b4423"/><circle cx="54" cy="158.4" r="5.8" fill="#aab3c2"/><circle cx="54" cy="158.4" r="2" fill="#6a7384"/><path d="M54 152.8V164M48.4 158.4H59.6" stroke="#6a7384" stroke-width=".6"/></g>'
+      +'<ellipse cx="78" cy="153" rx="15" ry="9" fill="#ff9a3a" opacity=".2"/>'
+      +'<g><rect x="66" y="158" width="24" height="10" fill="#4a2e16" stroke="#1a0f06" stroke-width="1"/><rect x="63" y="150" width="31" height="6.4" fill="#6a7384" stroke="#1a0f06" stroke-width="1"/><rect x="62" y="146" width="14" height="5" fill="#8a93a3" stroke="#1a0f06" stroke-width=".8"/><rect x="69" y="143" width="6" height="3" fill="#ff9a3a"/><rect x="70" y="143" width="4" height="1.2" fill="#ffd75a"/><rect x="88.6" y="141" width="1.6" height="11" fill="#6b4423" stroke="#1a0f06" stroke-width=".4"/><rect x="86" y="139.8" width="6.6" height="3" fill="#8a93a3" stroke="#1a0f06" stroke-width=".5"/></g>'
+      +'</g>'
+      +'<rect x="-30" y="167.6" width="160" height="2.4" fill="#1a0f06" opacity=".55"/>',
+    p:'<rect x="0" y="116" width="100" height="1.6" fill="#1a0f06" opacity=".5"/>'
+      +'<g stroke="#1a0f06" stroke-width=".8"><path d="M50 0V14" fill="none" stroke="#8a93a3"/><rect x="45" y="14" width="10" height="13" fill="#ffe9a8" opacity=".95"/><rect x="44" y="12" width="12" height="3" fill="#6b4423"/><rect x="44" y="26" width="12" height="3" fill="#6b4423"/></g><ellipse cx="50" cy="21" rx="14" ry="12" fill="#ffb04a" opacity=".22"/>'
+      +'<g stroke="#1a0f06" stroke-width="1"><rect x="6" y="124" width="30" height="20" rx="3" fill="#d9a848"/><rect x="6" y="132" width="30" height="2" fill="#a8782c" stroke="none"/><rect x="38" y="130" width="26" height="14" rx="3" fill="#c89838"/><rect x="66" y="122" width="28" height="22" rx="3" fill="#d9a848"/><rect x="66" y="132" width="28" height="2" fill="#a8782c" stroke="none"/></g>'
+      +'<g stroke="#1a0f06" stroke-width="1"><rect x="10" y="150" width="30" height="14" fill="#6b4423"/><rect x="12" y="152" width="26" height="6" fill="#4a8ac8" stroke="none"/><rect x="62" y="146" width="12" height="16" fill="#8a5a2a"/><rect x="62" y="146" width="12" height="3" fill="#aab3c2"/><rect x="78" y="150" width="16" height="14" fill="#a8764a"/><path d="M78 150L94 164M94 150L78 164" stroke="#4a2e16" fill="none"/></g>'
+      +'<path d="M0 120C12 116 24 118 38 120M62 116C76 118 88 116 100 120" stroke="#c9a46a" stroke-width="1.2" fill="none"/>'
+  };
+  /* The Armoury wall IS the shop: the props are the tap targets. i = which of today's four wares (0 helm, 1 weapon, 2 armour, 3 shield);
+     boxes are in the artwork's own units (lower scene, viewBox y 100-170); tag = where the price tag hangs. Weapons are listed first so the shields sit on top of the crossed swords behind them. */
+  const ZH_A=[
+    {i:1,tag:[49,146.5],box:[[-24,123,148,20],[9,141,22,27],[40,104,20,21],[36,19,28,44],[29,24,11,28],[63,24,8,44],[3,28,8,42],[89,28,7,42]]},   /* wall rail with its weapons, barrel of spears, crossed swords, crossed spears, axe, spears */
+    {i:2,tag:[38.5,166.6],box:[[31.5,145,16,23]]},                                                                                                        /* the armour stand */
+    {i:0,tag:[10,104.6],box:[[3,106,14,17],[83,106,14,17],[8,73,12,13],[26,73,12,13],[44,73,12,13],[62,73,12,13],[80,73,12,13]]},                        /* the helmets */
+    {i:3,tag:[50,103.4],box:[[42,106,16,17],[-20,106,14,14],[106,106,14,14],[38,30,24,25],[10,61,12,12],[28,61,12,12],[60,61,12,12],[78,61,12,12]]}      /* the shields */
+  ];
+  const ZSAY={
+    helm:['Heads are fragile. Helmets are not.','Dented in all the right places.'],
+    weapon:['Sharp end away from you. Always.','That blade has opinions. Mostly about goblins.'],
+    armor:['Fits better than it looks. Mostly.','Heavy. But so is regret.'],
+    offhand:['Everyone looks braver behind a shield.','Hold it higher. Now you are a wall.'],
+    gone:['That one is already gone. New stock every dawn.','Sold. Early heroes get the good plate.']
+  };
+  function zfHot(list){
+    const g=zf&&zf._wall&&zf._wall.querySelector('.zhl');if(!g)return;
+    let a='',b='';
+    ZH_A.forEach(h=>{
+      const e=list[h.i];if(!e)return;
+      const cl=(zfSel===h.i?' sel':'')+(e.sold?' sold':''),tx=e.sold?'SOLD':price(e),w=Math.max(10,tx.length*2.2+3.4);
+      h.box.forEach(r=>{a+='<rect class="zb'+cl+'" data-i="'+h.i+'" x="'+r[0]+'" y="'+r[1]+'" width="'+r[2]+'" height="'+r[3]+'" rx="1.2"/>'});
+      b+='<g class="zt'+cl+'" data-i="'+h.i+'" transform="translate('+h.tag[0]+' '+h.tag[1]+')">'
+        +'<rect x="'+(-w/2-.7)+'" y="-3.7" width="'+(w+1.4)+'" height="7.4" fill="#1a0f06"/>'
+        +'<rect class="zp" x="'+(-w/2)+'" y="-3" width="'+w+'" height="6" style="stroke:'+RAR[e.it.r]+'"/>'
+        +'<text x="0" y="1.9" text-anchor="middle">'+tx+'</text></g>';
+    });
+    g.innerHTML=a+b;
+  }
+  function zfBuild(k){
+    const sc=el('div','sfw-scene sfw-'+k),A=k==='a';
+    sc.innerHTML='<div class="sfw-wall"></div><div class="sfw-ceil"></div><i class="sfw-post l"></i><i class="sfw-post r"></i>'
+      +'<div class="sfw-in">'+(A?'<div class="sfw-floor"></div>':'<svg class="sfw-decor up" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges" aria-hidden="true">'+ZD[k]+'</svg>')
+      +'<svg class="sfw-decor lo" viewBox="0 100 100 70" preserveAspectRatio="xMidYMax meet" shape-rendering="crispEdges"'+(A?'':' aria-hidden="true"')+'>'+ZD[k]+(A?'<g class="zhl"></g>':'')+'</svg>'
+      +'<div class="sfw-sign fz-sign">'+(k==='a'?'Armoury':'Companions')+'</div>'
+      +'<i class="sfw-torch l"></i><i class="sfw-torch r"></i><div class="sfw-slots"></div></div><div class="sfw-shade"></div>';
+    if(A)sc.querySelector('.sfw-decor.lo').addEventListener('click',ev=>{
+      const h=ev.target.closest&&ev.target.closest('[data-i]');if(!h||!zf||zfK!=='a')return;
+      const i=+h.dataset.i,e=stk('a')[i];if(!e)return;
+      zfSel=i;kind='a';zfSay(e.sold?pick(ZSAY.gone):pick(ZSAY[e.it.slot]||LINES.a));zfRender();
+    });
+    return sc;
+  }
+  function zfRender(){
+    if(!zf)return;
+    ensure();
+    const list=stk(zfK);
+    const purse=el('span','sfz-chip cur sfz-purse');
+    coinParts(S.gold).forEach((v,i)=>{const g=el('span','sfz-pc');g.title=['Gold','Silver','Bronze'][i];g.append(px('coin:'+COIN_U[i],10),el('b','',String(v)));purse.appendChild(g)});
+    const gem=el('span','sfz-chip cur gem');gem.title='Gems';gem.append(px('\u{1F48E}',16),el('b','',String(S.gems||0)));
+    zf.querySelector('.sfz-wal').replaceChildren(purse,gem);
+    const box=zf._wall.querySelector('.sfw-slots');
+    if(zfK==='a'){box.replaceChildren();zfHot(list)}
+    else box.replaceChildren(...list.map((e,i)=>{
+      const n=el('div','sfw-s s'+i+(zfSel===i?' sel':'')+(e.sold?' sold':'')),b=cell(zfK,i,e,()=>{zfSel=i;kind=zfK;if(!e.sold)zfSay(e.it.slot==='companion'?'A good one. Keep it fed.':pick(LINES.a));zfRender()});
+      n.appendChild(b);return n;
+    }));
+    const det=zf.querySelector('.sfz-det'),ft=zf.querySelector('.sfz-ft');det.replaceChildren();
+    const e=zfSel!=null?list[zfSel]:null;
+    det.hidden=!e;ft.hidden=!!e;
+    if(e){
+      const it=e.it,have=e.cur==='g'?S.gold:(S.gems||0),poor=have<e.cost,t=el('div','sfz-dt');
+      t.append(el('b','',it.n),el('span','sfz-pr',e.sold?'Sold':price(e)),
+        el('small','',RNAME[it.r]+' \u00B7 '+(it.slot==='companion'?'starts at Lv '+pbase(it):SLOTN[it.slot])+'. '+bonusTxt(it)));
+      const buyb=el('button','btn',e.sold?'Sold':'Buy');buyb.type='button';buyb.disabled=e.sold||poor;
+      buyb.onclick=()=>{if(e.sold||poor)return;kind=zfK;confirmBuy(it,price(e),()=>buy(zfSel))};
+      const ic=el('span','sfz-di');ic.style.setProperty('--rar',RAR[it.r]);if(!e.sold)ic.appendChild(px(iicon(it),36));
+      const lf=el('div','sfz-dl');lf.append(ic,t);det.append(lf,buyb);
+      if(poor&&!e.sold)det.appendChild(el('div','sfz-poor','Not enough '+(e.cur==='g'?'coin':'gems')+' yet.'));
+    }
+    zfFit();
+  }
+  /* the four stands are drawn for a 70px-wide cell; scale them to the niche so they fill it on any phone */
+  function zfFit(){
+    if(!zf||!zf._wall)return;
+    const n=zf._wall.querySelector('.sfw-s');if(!n||!n.clientWidth)return;
+    const z=Math.max(.8,Math.min(2.5,(n.clientWidth-10)/70,(n.clientHeight-8)/68));
+    zf._wall.style.setProperty('--zf',z.toFixed(3));
+  }
+  /* the room: the real Shop tab is wrapped (once) so it can be the front wall of a 3D room. Nothing is cloned. */
+  function sfRoom(){
+    let r=document.getElementById('sfroom');if(r)return r;
+    const tab=document.getElementById('tab-shop');if(!tab||!tab.parentNode)return null;
+    r=el('div','sf-room');r.id='sfroom';
+    const w=el('div','sf-world');
+    tab.parentNode.insertBefore(r,tab);r.appendChild(w);w.appendChild(tab);
+    return r;
+  }
+  function zfDims(room){
+    const R=Math.round(room.getBoundingClientRect().width/2)||180;
+    room.style.setProperty('--rr',R+'px');room.style.setProperty('--pp',Math.round(R*1.5)+'px');room.style.setProperty('--zc',Math.round(R*1.5)+'px');
+  }
+  /* the camera ends zoomed in (ZS x). Work out which part of the wall is on screen, clear of the coin bar above and the ware card below,
+     and lay the wall's contents (decor, sign, torches, niches) out inside it, keeping the artwork's 100:170 shape. */
+  const ZS=1.5;
+  function zfFrame(room,wall){
+    const inn=wall&&wall.querySelector('.sfw-in');if(!inn||!room)return;
+    const rc=room.getBoundingClientRect();if(!rc.width||!rc.height)return;
+    const cx=rc.width/2,cy=rc.height/2,vw=window.innerWidth,vh=window.innerHeight;
+    const toX=x=>cx+(x-rc.left-cx)/ZS,toY=y=>cy+(y-rc.top-cy)/ZS;
+    const x0=Math.max(0,toX(Math.max(rc.left,10))),x1=Math.min(rc.width,toX(Math.min(rc.right,vw-10)));
+    const y0=Math.max(0,toY(105)),y1=Math.min(rc.height,toY(vh-165));
+    const aw=x1-x0,ah=y1-y0;if(aw<80||ah<120)return;
+    const s=inn.style;
+    s.left=x0.toFixed(1)+'px';s.top=y0.toFixed(1)+'px';s.width=aw.toFixed(1)+'px';s.height=ah.toFixed(1)+'px';s.right='auto';s.bottom='auto';
+    /* the lower artwork (rack, shelves, floor) fills the bottom 40% edge to edge: widen what it shows to match, up to the 140 units drawn */
+    const lo=inn.querySelector('.sfw-decor.lo');
+    if(wall.querySelector('.sfw-a')){   /* Armoury: all 170 units of the wall, from the banners down to the floor; the floor strip takes the bottom 43 */
+      const bh=Math.max(120,ah-43),W=Math.max(100,Math.min(150,170*aw/bh));
+      if(lo)lo.setAttribute('viewBox',(50-W/2).toFixed(1)+' 0 '+W.toFixed(1)+' 170');
+      return;
+    }
+    const W=Math.max(100,Math.min(140,70*aw/(ah*.4)));
+    if(lo)lo.setAttribute('viewBox',(50-W/2).toFixed(1)+' 100 '+W.toFixed(1)+' 70');
+  }
+  function zfClose(){
+    if(!zf)return;
+    const r=zf,room=document.getElementById('sfroom'),wall=r._wall;zf=null;zfSel=null;clearTimeout(r._h);
+    document.removeEventListener('keydown',zfKey);document.removeEventListener('click',zfTap);window.removeEventListener('resize',zfResize);
+    document.body.classList.remove('sfz-open');
+    r.classList.remove('in');r.classList.add('closing');
+    /* the same camera move, played backwards: turn back to the counter, then pull out of the middle of the room */
+    room.classList.remove('done','go');room.classList.add('back');
+    setTimeout(()=>{room.classList.remove('moving','back','turn-l','turn-r');if(wall)wall.classList.remove('on')},zfReduce()?30:1200);
+    setTimeout(()=>r.remove(),zfReduce()?30:900);
+  }
+  const zfResize=()=>{const room=document.getElementById('sfroom');if(room&&zf){zfDims(room);zfFrame(room,zf._wall);zfFit()}};
+  function zoomFloor(k,i){
+    if(zf)return;if(sheet)closeSheet(true);
+    const room=sfRoom();if(!room)return;
+    const world=room.firstChild;
+    if(room.classList.contains('moving'))return;                       /* still arriving or leaving */
+    ensure();zfK=k;kind=k;zfSel=i==null?null:i;
+    /* the wall you are about to face (built once, then reused) */
+    let wall=world.querySelector('.sf-rwall.'+(k==='a'?'l':'r'));
+    if(!wall){wall=el('div','sf-rwall '+(k==='a'?'l':'r'));wall.appendChild(zfBuild(k));world.appendChild(wall)}
+    zfDims(room);zfFrame(room,wall);
+    /* the coin purse, the keeper's words and the ware card sit above the room; the room itself is the real shop */
+    const root=el('div','sfz sfw-root');
+    root.setAttribute('role','dialog');root.setAttribute('aria-label',k==='a'?'The Armoury':'The Companion Pens');
+    const hud=el('div','sfz-hud'),sayrow=el('div','sfz-sayrow'),sayEl2=el('div','sfz-say'),box=el('div','sf-say-box');
+    box.appendChild(el('span','sf-say-in'));sayEl2.appendChild(box);sayrow.appendChild(sayEl2);
+    hud.append(el('div','sfz-wal'),sayrow);
+    const bot=el('div','sfz-bot'),det=el('div','sfz-det'),ft=el('div','sfz-ft',k==='a'?'Fresh stock every dawn. Tap a helm, weapon, armour or shield. Tap the wall to leave.':'Fresh stock every dawn. Tap a pen to see it. Tap the wall to leave.');
+    det.hidden=true;
+    bot.append(det,ft);
+    root.append(hud,bot);
+    document.addEventListener('keydown',zfKey);window.addEventListener('resize',zfResize);
+    document.body.appendChild(root);
+    root._wall=wall;wall.classList.add('on');
+    room.classList.add('moving',k==='a'?'turn-l':'turn-r');
+    zf=root;zfRender();
+    void room.offsetWidth;
+    document.body.classList.add('sfz-open');
+    root.classList.add('in');room.classList.add('go');
+    /* once the camera has arrived (zoomed in, no pull-back), draw the wall flat and crisp at the same zoom */
+    setTimeout(()=>{if(zf===root){room.classList.add('done');zfFit();document.addEventListener('click',zfTap)}},zfReduce()?20:1420);
+    setTimeout(()=>zfSay(pick(LINES[k])),zfReduce()?60:1460);
+  }
+  function openSheet(k,i){zoomFloor(k,i)}
+
   /* ---- buying: the item goes into your bag (the Hero tab shows a "!" until you look at it) ---- */
   function buy(i){
     ensure();const e=stk(kind)[i];if(!e||e.sold)return;
@@ -3632,7 +3882,9 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     say(pick(LINES.buy));
   }
 
-   document.getElementById('fzarmsign').onclick=()=>openSheet('a',null);
+  document.getElementById('fzarmsign').onclick=()=>openSheet('a',null);
   document.getElementById('fzpetsign').onclick=()=>openSheet('p',null);
+  [['.sf-armwall','a'],['.sf-petwall','p']].forEach(([q,k])=>{const w=fl.querySelector(q);if(w)w.onclick=()=>openSheet(k,null)});   /* the whole wall is the button */
   window.sfFloorRefresh=paint;
-  paint();})
+  sfRoom();
+  paint();})();

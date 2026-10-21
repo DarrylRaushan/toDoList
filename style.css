@@ -2777,7 +2777,7 @@ body[data-tab="shop"]::before{background:radial-gradient(ellipse 80% 38% at 50% 
 @keyframes sfglow{from{opacity:.65}to{opacity:1}}
 /* gear hung on the wall above the shelves */
 .sf-wall{z-index:2;top:88px;width:11.5%;height:auto;aspect-ratio:24/28;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
-.sf-wall.l{left:4.6%}.sf-wall.r{right:4.6%}
+.sf-rwall.l{left:4.6%}.sf-rwall.r{right:4.6%}
 .sf-tag{z-index:4;top:148px;padding:5px 7px 3px;font:400 7px/1 var(--head);letter-spacing:1px;color:var(--gold);text-shadow:1px 1px 0 #000;background:repeating-linear-gradient(90deg,transparent 0 12px,rgba(0,0,0,.25) 12px 14px),linear-gradient(#7a5028,#563518);border:2px solid #1a0f06;box-shadow:inset 0 2px 0 rgba(255,220,160,.25),2px 3px 0 rgba(0,0,0,.5)}
 .sf-tag.l{left:4.6%}.sf-tag.r{right:4.6%}
 /* open shelves down both sides: two planks of bottles, a jar, a crate, a hooped barrel, a scroll case and a sack */
@@ -3184,9 +3184,9 @@ body.sfz-open .toast{z-index:40}   /* purchase toasts stay readable above the zo
    SHOP TAB fills the screen: the stone wall carries on down from the shop front to the nav bar (the page no longer scrolls),
    lit by the same firelight, with a woven rug laid out in front of the counter. Scoped away from the zoomed copy (.sfz-pg), which has its own floor.
    ===================================================================== */
-#tab-shop.on:not(.sfz-pg){display:flex;flex-direction:column;min-height:calc(100dvh - 116px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
-#tab-shop.on:not(.sfz-pg) .storefront{flex:none;margin-bottom:0}
-#tab-shop.on:not(.sfz-pg)::after{content:'';flex:1 1 auto;min-height:178px;border:4px solid #1a0f06;border-top:0;
+#tab-shop.on:not(.sfz-pg),#tab-shop.on.sfz-fl{display:flex;flex-direction:column;min-height:calc(100dvh - 116px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+#tab-shop.on:not(.sfz-pg) .storefront,#tab-shop.on.sfz-fl .storefront{flex:none;margin-bottom:0}
+#tab-shop.on:not(.sfz-pg)::after,#tab-shop.on.sfz-fl::after{content:'';flex:1 1 auto;min-height:178px;border:4px solid #1a0f06;border-top:0;
   background:
     linear-gradient(#7a5028,#5a3a1c 35%,#3a2412 80%,#1a0f06) 0 0/100% 9px no-repeat,
     linear-gradient(rgba(0,0,0,.5),transparent) 0 9px/100% 26px no-repeat,
@@ -3206,7 +3206,7 @@ body.sfz-open .toast{z-index:40}   /* purchase toasts stay readable above the zo
    the canopy catches the light, the OPEN tag glows like a lit sign, and the whole shop front breathes with firelight.
    All of it stops for reduced-motion users. Scoped away from the zoomed copy (.sfz-pg).
    ===================================================================== */
-#tab-shop.on:not(.sfz-pg){position:relative;isolation:isolate}
+#tab-shop.on:not(.sfz-pg),#tab-shop.on.sfz-fl{position:relative;isolation:isolate}
 
 /* light shaft from the hatch: widens as it falls, flickers, and carries drifting embers */
 
@@ -3230,7 +3230,7 @@ body.sfz-open .toast{z-index:40}   /* purchase toasts stay readable above the zo
 .sf-tag.l{text-shadow:0 0 6px rgba(255,200,90,.7),1px 1px 0 #000}
 
 /* floor: a soft reflected pool of light under the counter and a darker edge toward the nav bar */
-#tab-shop.on:not(.sfz-pg)::after{box-shadow:4px 4px 0 var(--ink),inset 0 -26px 30px -14px rgba(0,0,0,.55)}
+#tab-shop.on:not(.sfz-pg)::after,#tab-shop.on.sfz-fl::after{box-shadow:4px 4px 0 var(--ink),inset 0 -26px 30px -14px rgba(0,0,0,.55)}
 
 @media (prefers-reduced-motion:reduce){
   #tab-shop:not(.sfz-pg) .storefront,.shopsign,.sf-awn::before,.sf-tag.r{animation:none}
@@ -3530,3 +3530,126 @@ body.sfz-open .toast{z-index:40}   /* purchase toasts stay readable above the zo
 .storefront::before,.storefront::after{zoom:var(--sfk);top:calc((var(--sfh) - 68px - 92px * var(--sfk)) / var(--sfk))}
 /* the keeper's speech scroll stays where it was relative to the top of the shop front */
 .sf-say{bottom:calc(204px + var(--sfe))}
+
+/* ---- tall floor: the armoury props are spread down the wall (script.js cuts the scene into three pieces) ---- */
+.aw-seg{display:none}
+.sf-armwall.spread .aw-scene:not(.aw-seg){visibility:hidden;height:0}
+.sf-armwall.spread{display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;top:44px;bottom:14px;width:28%;left:2%}
+.sf-armwall.spread .aw-seg{display:block;position:static;inset:auto;height:auto;flex:none}
+.sf-armwall.spread .aw-seg.aw-sa{width:100%}
+.sf-armwall.spread .aw-seg.aw-sb{width:54%;align-self:flex-start}
+.sf-armwall.spread .aw-seg.aw-sc{width:58%;align-self:flex-end}
+.sf-armwall.spread .aw-seg{overflow:hidden}
+
+/* ---- tall floor: companions wall. The pens fill the wall top to bottom instead of huddling at the bottom ---- */
+.sf-petwall.spread{top:44px;bottom:14px}
+.sf-petwall.spread .pw-tree{top:0;height:30%;width:40%}
+.sf-petwall.spread .pw-crate{top:34%;width:30%;height:12%;left:2%}
+.sf-petwall.spread .pw-fence{height:38%;bottom:5%}
+.sf-petwall.spread .pw-hay{height:16%;bottom:3%;width:40%}
+.sf-petwall.spread .pw-trough{height:11%;bottom:5%}
+.sf-petwall.spread .pw-post{height:26%;bottom:3%}
+
+/* =====================================================================
+   ARMOURY / COMPANION PENS: you turn to face the wall (script.js zoomFloor). The shop slides away, the wall slides in.
+   ===================================================================== */
+.sf-armwall,.sf-petwall{pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sf-floor .fz-grid{display:none}
+#tab-shop.sfz-fl .sf-floor{display:block;position:absolute;z-index:3;left:0;right:0;top:calc(var(--sfh) + 4px);bottom:0;pointer-events:none}
+/* THE ROOM. The real Shop tab is the front wall of a small 3D room (script.js sfRoom wraps it in .sf-room > .sf-world); the Armoury and the pens are the
+   left and right walls. Nothing is cloned and no page is opened: the camera (the .sf-world transform) moves and turns inside the same scene.
+   At rest nothing is 3D at all, so the shop is drawn exactly as before; the 3D only exists while the camera is moving. */
+.sf-room{position:relative;perspective:var(--pp,300px);perspective-origin:50% 50%}
+.sf-world{position:relative;transform-style:preserve-3d}
+.sf-rwall{display:none;position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;background:#0d0a09}
+.sf-rwall.l{transform:rotateY(90deg) translateZ(calc(var(--rr,180px) * -1))}
+.sf-rwall.r{transform:rotateY(-90deg) translateZ(calc(var(--rr,180px) * -1))}
+.sf-room.moving{overflow:hidden}
+.sf-room.moving .sf-world{transform:translateZ(var(--rr,180px))}
+.sf-room.moving #tab-shop{transform:translateZ(calc(var(--rr,180px) * -1));backface-visibility:hidden}
+.sf-room.moving .sf-rwall.on{display:block}
+.sfw-root{background:transparent!important;pointer-events:none}
+.sfw-root .sfz-hud,.sfw-root .sfz-bot{pointer-events:auto}
+@keyframes sfwTL{
+  0%{transform:translateZ(var(--rr)) rotateY(0deg);animation-timing-function:cubic-bezier(.45,0,.25,1)}
+  44%{transform:translateZ(var(--zc)) rotateY(0deg);animation-timing-function:cubic-bezier(.3,0,.2,1)}
+  100%{transform:translateZ(var(--zc)) rotateY(-90deg)}}
+@keyframes sfwTR{
+  0%{transform:translateZ(var(--rr)) rotateY(0deg);animation-timing-function:cubic-bezier(.45,0,.25,1)}
+  44%{transform:translateZ(var(--zc)) rotateY(0deg);animation-timing-function:cubic-bezier(.3,0,.2,1)}
+  100%{transform:translateZ(var(--zc)) rotateY(90deg)}}
+.sf-room.moving.go.turn-l .sf-world{animation:sfwTL 1.4s both}
+.sf-room.moving.go.turn-r .sf-world{animation:sfwTR 1.4s both}
+.sf-room.moving.back.turn-l .sf-world{animation:sfwTL 1.15s reverse both}
+.sf-room.moving.back.turn-r .sf-world{animation:sfwTR 1.15s reverse both}
+/* arrived: drop the 3D and show the wall flat and crisp */
+.sf-room.moving.done{overflow:hidden}
+/* arrived: stay exactly on the camera's last frame (same transform, no swap to a flat copy, so nothing can shift) */
+.sf-room.moving.done.turn-l .sf-world{animation:none!important;transform:translateZ(var(--zc)) rotateY(-90deg)}
+.sf-room.moving.done.turn-r .sf-world{animation:none!important;transform:translateZ(var(--zc)) rotateY(90deg)}
+.sf-room.moving.done #tab-shop{visibility:hidden;transform:none!important}
+/* the counter and the coin purse only come back once you are facing the wall */
+.sfw-root .sfz-hud,.sfw-root .sfz-bot{transition-delay:1.2s}
+.sfw-root.closing .sfz-hud,.sfw-root.closing .sfz-bot{transition-delay:0s}
+.sfw-scene{position:absolute;inset:0;overflow:hidden}
+.sfw-wall{position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 50% 38%,rgba(255,176,74,.2),transparent 75%),linear-gradient(rgba(0,0,0,.35),transparent 30%,transparent 62%,rgba(0,0,0,.5)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='40' viewBox='0 0 60 40' shape-rendering='crispEdges'%3E%3Crect width='60' height='40' fill='%2342393f'/%3E%3Crect width='60' height='20' fill='%2347404a'/%3E%3Crect x='30' y='20' width='30' height='20' fill='%2349424c'/%3E%3Cpath d='M0 1.5H60M0 21.5H60M1.5 0V20M31.5 20V40' stroke='%2318141c' stroke-width='3'/%3E%3Cpath d='M4 5H26M36 25H56' stroke='%2366607a' stroke-width='2' opacity='.45'/%3E%3C/svg%3E") 0 1px/60px 40px}
+.sfw-p .sfw-wall{background:radial-gradient(ellipse 60% 40% at 50% 38%,rgba(255,176,74,.24),transparent 75%),linear-gradient(rgba(0,0,0,.35),transparent 30%,transparent 62%,rgba(0,0,0,.5)),repeating-linear-gradient(90deg,rgba(0,0,0,.35) 0 2px,transparent 2px 26px),repeating-linear-gradient(0deg,rgba(255,200,140,.05) 0 2px,transparent 2px 9px),linear-gradient(#6b4423,#4a2e16)}
+.sfw-ceil{position:absolute;left:0;right:0;top:0;height:54px;background:linear-gradient(#2e1c0e,#4a2e16 70%,#1a0f06);border-bottom:4px solid #1a0f06;box-shadow:0 6px 14px rgba(0,0,0,.5)}
+.sfw-post{position:absolute;top:0;bottom:0;width:14px;background:linear-gradient(90deg,#4a2e16,#2e1c0e);z-index:1}
+.sfw-post.l{left:0;border-right:3px solid #1a0f06}.sfw-post.r{right:0;border-left:3px solid #1a0f06;background:linear-gradient(90deg,#2e1c0e,#4a2e16)}
+.sfw-in{position:absolute;left:0;right:0;top:118px;bottom:0}   /* script.js zfFrame() sets left/top/width/height so everything sits inside the zoomed-in view */
+.sfw-decor{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.45))}
+.sfw-decor.up{inset:0 0 auto 0;height:60%}
+.sfw-decor.lo{inset:auto 0 0 0;height:40%}   /* upper art sits behind the niches, lower art is pinned to the floor */
+.sfw-sign.fz-sign{position:absolute;left:50%;top:-6px;transform:translateX(-50%);z-index:3;pointer-events:none;font-size:11px}
+.sfw-torch{position:absolute;top:9%;width:10px;height:26px;z-index:2;background:linear-gradient(#6b4423,#3a2410);border:2px solid #1a0f06}
+.sfw-torch.l{left:3.4%}.sfw-torch.r{right:3.4%}
+.sfw-torch::before{content:'';position:absolute;left:50%;bottom:100%;width:10px;height:16px;margin:0 0 1px -5px;background:linear-gradient(#fff6c0 0 30%,#ffc02a 30% 62%,#ff7a1a 62%);clip-path:polygon(50% 0,100% 55%,85% 100%,15% 100%,0 55%);animation:candleflame .9s steps(1) infinite}
+.sfw-torch::after{content:'';position:absolute;left:50%;top:-30px;width:90px;height:90px;margin-left:-45px;border-radius:50%;background:radial-gradient(circle,rgba(255,170,60,.38),transparent 68%);animation:lampflick 2.4s steps(6) infinite alternate;pointer-events:none}
+.sfw-slots{position:absolute;inset:0;z-index:2}
+.sfw-s{position:absolute;width:41%;height:23.5%;box-sizing:border-box;border:4px solid #1a0f06;
+  background:radial-gradient(ellipse 70% 60% at 50% 45%,rgba(255,200,120,.2),transparent 75%),linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.55)),#2a1a0e;
+  box-shadow:inset 0 0 0 3px #6b4423,inset 0 5px 14px rgba(0,0,0,.7),3px 4px 0 rgba(0,0,0,.5)}
+.sfw-s.s0{left:6.5%;top:11%}.sfw-s.s1{right:6.5%;top:11%}.sfw-s.s2{left:6.5%;top:36.5%}.sfw-s.s3{right:6.5%;top:36.5%}   /* a little lower so the Armoury sign never covers a niche */
+.sfw-s .fz-c{zoom:var(--zf,2);position:absolute;left:50%;top:50%;width:70px;height:66px;margin:-33px 0 0 -35px;pointer-events:auto}
+.sfw-s.sel{box-shadow:inset 0 0 0 3px #e8b93c,inset 0 5px 14px rgba(0,0,0,.7),0 0 16px 3px rgba(255,200,80,.55),3px 4px 0 rgba(0,0,0,.5)}
+.sfw-s.sold{filter:grayscale(.7) brightness(.7)}
+.sfw-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.45),transparent 18%,transparent 82%,rgba(0,0,0,.45))}
+.sfz-ft{margin:0 0 8px;text-align:center;font:400 20px/1 var(--body);color:#d9c38c;text-shadow:1px 1px 0 #000}
+.sfz-ft[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.sf-room .sf-world{animation:none!important}.sfw-root .sfz-hud,.sfw-root .sfz-bot{transition-delay:0s}.sfw-torch::before,.sfw-torch::after{animation:none}}
+/* while you face a wall the tab bar steps aside and the strip under the room matches the wall */
+body.sfz-open .nav{visibility:hidden}
+body.sfz-open{background-color:#0d0a09!important}
+
+/* ---- Armoury v2: the wall is the shop. No niches; the helms, shields, weapon rack and armour stand are the tap targets, each with a price tag.
+   The scene stands alone in the upper middle of the wall; empty wall (and the strip under the ware card) takes you back, like the main shop's stone floor. ---- */
+.sfw-a .sfw-in{--fh:48px;--fb:0px}   /* --fb pushes the floor (and everything standing on it) down past the usable area, nearer the bottom of the wall */
+.sfw-a .sfw-decor.lo{inset:0 0 calc(var(--fh) + var(--fb) - 5px) 0;height:auto}   /* props stand on the floor: their feet overlap its top edge a little */
+/* the floor: a strip of flagstones along the bottom of the wall, lit from above, with a shadow where wall meets floor */
+.sfw-floor{position:absolute;left:-60px;right:-60px;bottom:var(--fb,0);height:var(--fh);z-index:0;border-top:4px solid #1a0f06;
+  background:
+    linear-gradient(rgba(255,196,130,.16),transparent 34%,rgba(0,0,0,.4)),
+    linear-gradient(transparent calc(50% - 1.5px),rgba(0,0,0,.45) calc(50% - 1.5px) calc(50% + 1.5px),transparent calc(50% + 1.5px)),
+    repeating-linear-gradient(90deg,transparent 0 54px,rgba(0,0,0,.45) 54px 57px) 0 0/100% 50% no-repeat,
+    repeating-linear-gradient(90deg,transparent 0 54px,rgba(0,0,0,.45) 54px 57px) 27px 100%/100% 50% no-repeat,
+    #5a4a4c;
+  box-shadow:0 -8px 12px -4px rgba(0,0,0,.45),inset 0 3px 0 rgba(255,225,180,.14)}
+.sfw-a .sfw-slots{display:none}
+.zb{fill:transparent;stroke:none;pointer-events:all;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.zb.sold{fill:rgba(6,3,9,.5)}
+.zb.sel{stroke:#ffd75a;stroke-width:1.2;stroke-dasharray:3 1.6;animation:zbdash .9s linear infinite}
+@keyframes zbdash{to{stroke-dashoffset:-9.2}}
+.zt{cursor:pointer;pointer-events:all}
+.zt .zp{fill:#f2e6bf;stroke-width:.8}
+.zt text{font-family:var(--body),monospace;font-size:5.4px;fill:#2a1808;pointer-events:none}
+.zt.sel .zp{fill:#ffd75a}
+.zt.sold .zp{fill:#c9bd96}
+.zt.sold text{fill:#a8283a}
+@media (prefers-reduced-motion:reduce){.zb.sel{animation:none}}
+/* ware card: the item's picture beside its name and price */
+.sfz-dl{display:flex;align-items:center;gap:10px;min-width:0}
+.sfz-dl .sfz-dt{min-width:0}
+.sfz-di{flex:none;display:grid;place-items:center;width:52px;height:52px;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--rar) 40%,#2a1808),#15111a);border:3px solid #1a0f06;box-shadow:inset 0 0 0 2px var(--rar)}
+.sfz-di:empty{display:none}
