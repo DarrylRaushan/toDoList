@@ -3245,7 +3245,7 @@ initCloud();
    The floor under it keeps about the height it has on a short window, so the Armoury and Companion walls fill it the same way. */
 function sfFit(){
   const r=document.documentElement,tab=document.getElementById('tab-shop');if(!tab)return;
-  const FLOOR=215,MIN=336,MAX=470;
+  const FLOOR=215,MIN=336,MAX=380;
   const mh=parseFloat(getComputedStyle(tab).minHeight)||Math.max(0,innerHeight-116);   /* the Shop tab's min-height already subtracts the nav and safe areas */
   const h=Math.round(Math.max(MIN,Math.min(MAX,mh-10-FLOOR)));
   const k=Math.min(1.22,1+(h-MIN)/MIN*0.9);
