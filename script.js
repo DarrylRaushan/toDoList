@@ -2263,7 +2263,7 @@ function tab(n){
   document.body.dataset.tab=n;   /* the tavern backdrop only shows on the Quests tab */
   const hud=document.querySelector('.hud');if(hud)hud.hidden=n==='hero';   /* Hero tab: just the full avatar and its gear */
   const th=$('tab-hero');if(th)th.style.paddingTop=n==='hero'?'env(safe-area-inset-top,0px)':'';
-  fitCap();requestAnimationFrame(drawLinks);scrollTo(0,0);try{localStorage.setItem('dq.tab',n)}catch(e){}
+  sfFit();fitCap();requestAnimationFrame(drawLinks);scrollTo(0,0);try{localStorage.setItem('dq.tab',n)}catch(e){}
 }
 function initNav(){
   const ic={quests:'📜',hero:'🍺',shop:'⚖️',realm:'🚪'};
@@ -3238,6 +3238,20 @@ initCloud();
   };
   setTimeout(tick,2500);
 })();
+
+
+/* ---------- shop: on tall phones the Guild Store front grows (instead of the stone floor), so it fills the screen like it does on desktop ----------
+   --sfh = shop front height in px (336 = the designed size, never smaller). --sfk = how much the hatch contents (shelves, keeper) are enlarged to fill the taller window.
+   The floor under it keeps about the height it has on a short window, so the Armoury and Companion walls fill it the same way. */
+function sfFit(){
+  const r=document.documentElement,tab=document.getElementById('tab-shop');if(!tab)return;
+  const FLOOR=196,MIN=336,MAX=520;
+  const mh=parseFloat(getComputedStyle(tab).minHeight)||Math.max(0,innerHeight-116);   /* the Shop tab's min-height already subtracts the nav and safe areas */
+  const h=Math.round(Math.max(MIN,Math.min(MAX,mh-10-FLOOR)));
+  const k=Math.min(1.32,1+(h-MIN)/MIN*1.1);
+  r.style.setProperty('--sfh',h+'px');r.style.setProperty('--sfe',(h-MIN)+'px');r.style.setProperty('--sfk',k.toFixed(3));r.style.setProperty('--sfx',h>MIN+40?'1':'0');
+}
+addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfFit();
 
 /* shop front: tap the keeper and he rings the bell and says something. His line appears on a small sideways parchment scroll that floats above his hatch, then fades away.
    Lines are dealt from a shuffled bag so none repeats until he has said them all; a few depend on how your hero is doing. */

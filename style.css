@@ -3506,3 +3506,27 @@ body.sfz-open .toast{z-index:40}   /* purchase toasts stay readable above the zo
     repeating-linear-gradient(90deg,rgba(0,0,0,.38) 0 1px,transparent 1px 9px),
     repeating-linear-gradient(0deg,rgba(255,200,140,.035) 0 1px,transparent 1px 4px),
     linear-gradient(#3e2917,#2a1a0e)}
+
+
+
+
+/* =====================================================================
+   SHOP, tall phones: the Guild Store front grows with the screen (script.js sets --sfh / --sfe / --sfk), so it fills the screen like on desktop
+   and the stone floor with the Armoury and Companion walls stays about the height it has on a short window.
+   On a short window --sfh is 336px, --sfe is 0px and --sfk is 1, so nothing below changes.
+   ===================================================================== */
+:root{--sfh:336px;--sfe:0px;--sfk:1}
+#tab-shop .storefront{height:var(--sfh)}
+#tab-shop:not(.sfz-pg) .sf-floor{top:calc(var(--sfh) + 4px)}
+/* hatch contents grow with the window: the keeper, the lamp, his pipe smoke and the back shelves are scaled together, and when the window is
+   much taller than the original two more rows of shelves continue down behind him (--sfx is 0 on a short window, so desktop is untouched) */
+.sf-lamp,.sf-smoke,.sf-keeper,.sf-shelf{zoom:var(--sfk)}
+.sf-shelf::before,.sf-shelf::after{content:'';position:absolute;left:0;right:0;height:100%;background:inherit;opacity:var(--sfx,0);pointer-events:none}
+.sf-shelf::before{top:100%}
+.sf-shelf::after{top:200%}
+/* side wall: gear and its tag drift down with the taller wall, the open shelves stay sitting on the barrel / crate and grow with the window */
+.sf-wall{top:calc(88px + var(--sfe) * .45)}
+.sf-tag{top:calc(148px + var(--sfe) * .45)}
+.storefront::before,.storefront::after{zoom:var(--sfk);top:calc((var(--sfh) - 68px - 92px * var(--sfk)) / var(--sfk))}
+/* the keeper's speech scroll stays where it was relative to the top of the shop front */
+.sf-say{bottom:calc(204px + var(--sfe))}
