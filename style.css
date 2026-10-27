@@ -2507,8 +2507,8 @@ body[data-tab="quests"] .board,.board{box-shadow:4px 4px 0 var(--ink),0 18px 46p
   background:radial-gradient(circle 4px at 50% 4px,#ffe9a8 0 1px,#8a6a1a 2px,#1a0f06 3px,transparent 4px),repeating-linear-gradient(180deg,#b9c2d0 0 4px,#4a5060 4px 6px);
   border:2px solid #1a0f06;border-top:0;border-bottom:0}   /* top:-28px = the 22px gap + the sign's 3px border + 3px tucked into the plaque's frame */
 .racksign::before{left:calc(50% - 100px)}.racksign::after{left:calc(50% + 92px)}   /* wide apart: they hang from the plaque's ends down to the wooden beam, either side of the sign */
-.rackgrid{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:148px 148px 88px;
-  grid-template-areas:"helm weapon weapon" "armor offhand trinket" "pet pet pet";gap:24px 14px;padding:36px 14px 20px;border:4px solid #1a0f06;
+.rackgrid{position:relative;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:148px 148px 124px 88px;
+  grid-template-areas:"helm helm weapon weapon weapon weapon" "armor armor offhand offhand trinket trinket" "legs legs legs boots boots boots" "pet pet pet pet pet pet";gap:24px 14px;padding:36px 14px 20px;border:4px solid #1a0f06;
   background:linear-gradient(rgba(8,4,10,.5),rgba(8,4,10,.62)),var(--stone);background-size:auto,72px 48px;
   box-shadow:inset 0 6px 0 rgba(0,0,0,.45),inset 0 0 36px rgba(0,0,0,.65),3px 4px 0 rgba(0,0,0,.5)}
 .rackgrid::before{content:'';position:absolute;left:-4px;right:-4px;top:-4px;height:18px;border:3px solid #1a0f06;background:var(--wd);box-shadow:inset 0 3px 0 rgba(255,220,160,.25),0 4px 0 rgba(0,0,0,.4)}
@@ -2517,6 +2517,8 @@ body[data-tab="quests"] .board,.board{box-shadow:4px 4px 0 var(--ink),0 18px 46p
 .rack .eslot[data-k="armor"]{grid-area:armor}
 .rack .eslot[data-k="offhand"]{grid-area:offhand}
 .rack .eslot[data-k="trinket"]{grid-area:trinket}
+.rack .eslot[data-k="legs"]{grid-area:legs}
+.rack .eslot[data-k="boots"]{grid-area:boots}
 .rack .eslot[data-k="companion"]{grid-area:pet}
 
 /* a niche cut into the wall, lit from behind in the colour of what hangs in it (--rar) */
@@ -3157,7 +3159,7 @@ body.sfz-open .toast{z-index:40}   /* purchase toasts stay readable above the zo
    CHEST STAGE inside the zoomed shop (on the stone floor, just above the shelf tabs)
    A dark oak plaque with iron rivets: the chest on the left (tap it, or the button, to open), the count and a hint beside it, and the buy row underneath.
    ===================================================================== */
-.sfz-chest{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 12px;align-items:center;margin:0 0 10px;padding:10px 12px 10px 10px;color:#f0e2c0;
+.sfz-chest,.sfz-plq{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 12px;align-items:center;margin:0 0 10px;padding:10px 12px 10px 10px;color:#f0e2c0;
   background:
     radial-gradient(circle 3px at 8px 8px,#b9c2d0 90%,transparent),radial-gradient(circle 3px at calc(100% - 8px) 8px,#b9c2d0 90%,transparent),
     radial-gradient(circle 3px at 8px calc(100% - 8px),#b9c2d0 90%,transparent),radial-gradient(circle 3px at calc(100% - 8px) calc(100% - 8px),#b9c2d0 90%,transparent),
@@ -3625,31 +3627,195 @@ body.sfz-open{background-color:#0d0a09!important}
 
 /* ---- Armoury v2: the wall is the shop. No niches; the helms, shields, weapon rack and armour stand are the tap targets, each with a price tag.
    The scene stands alone in the upper middle of the wall; empty wall (and the strip under the ware card) takes you back, like the main shop's stone floor. ---- */
-.sfw-a .sfw-in{--fh:48px;--fb:0px}   /* --fb pushes the floor (and everything standing on it) down past the usable area, nearer the bottom of the wall */
-.sfw-a .sfw-decor.lo{inset:0 0 calc(var(--fh) + var(--fb) - 5px) 0;height:auto}   /* props stand on the floor: their feet overlap its top edge a little */
-/* the floor: a strip of flagstones along the bottom of the wall, lit from above, with a shadow where wall meets floor */
-.sfw-floor{position:absolute;left:-60px;right:-60px;bottom:var(--fb,0);height:var(--fh);z-index:0;border-top:4px solid #1a0f06;
-  background:
-    linear-gradient(rgba(255,196,130,.16),transparent 34%,rgba(0,0,0,.4)),
-    linear-gradient(transparent calc(50% - 1.5px),rgba(0,0,0,.45) calc(50% - 1.5px) calc(50% + 1.5px),transparent calc(50% + 1.5px)),
-    repeating-linear-gradient(90deg,transparent 0 54px,rgba(0,0,0,.45) 54px 57px) 0 0/100% 50% no-repeat,
-    repeating-linear-gradient(90deg,transparent 0 54px,rgba(0,0,0,.45) 54px 57px) 27px 100%/100% 50% no-repeat,
-    #5a4a4c;
-  box-shadow:0 -8px 12px -4px rgba(0,0,0,.45),inset 0 3px 0 rgba(255,225,180,.14)}
-.sfw-a .sfw-slots{display:none}
-.zb{fill:transparent;stroke:none;pointer-events:all;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.zb.sold{fill:rgba(6,3,9,.5)}
-.zb.sel{stroke:#ffd75a;stroke-width:1.2;stroke-dasharray:3 1.6;animation:zbdash .9s linear infinite}
-@keyframes zbdash{to{stroke-dashoffset:-9.2}}
-.zt{cursor:pointer;pointer-events:all}
-.zt .zp{fill:#f2e6bf;stroke-width:.8}
-.zt text{font-family:var(--body),monospace;font-size:5.4px;fill:#2a1808;pointer-events:none}
-.zt.sel .zp{fill:#ffd75a}
-.zt.sold .zp{fill:#c9bd96}
-.zt.sold text{fill:#a8283a}
-@media (prefers-reduced-motion:reduce){.zb.sel{animation:none}}
-/* ware card: the item's picture beside its name and price */
 .sfz-dl{display:flex;align-items:center;gap:10px;min-width:0}
 .sfz-dl .sfz-dt{min-width:0}
 .sfz-di{flex:none;display:grid;place-items:center;width:52px;height:52px;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--rar) 40%,#2a1808),#15111a);border:3px solid #1a0f06;box-shadow:inset 0 0 0 2px var(--rar)}
 .sfz-di:empty{display:none}
+
+
+/* ---- hero tab inventory: a leather-strapped pack. Bought goods wait here until you tap Use / Open ---- */
+.panel.inv{position:relative;padding:12px;
+  background:radial-gradient(circle 3px at 9px 9px,#b9c2d0 90%,transparent),radial-gradient(circle 3px at calc(100% - 9px) 9px,#b9c2d0 90%,transparent),radial-gradient(circle 3px at 9px calc(100% - 9px),#b9c2d0 90%,transparent),radial-gradient(circle 3px at calc(100% - 9px) calc(100% - 9px),#b9c2d0 90%,transparent),
+    repeating-linear-gradient(90deg,transparent 0 46px,rgba(0,0,0,.34) 46px 48px),repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 2px,transparent 2px 9px),linear-gradient(#6b4423,#4a2e16);
+  border:4px solid #1a0f06;box-shadow:4px 4px 0 var(--ink),inset 0 4px 0 rgba(255,220,160,.22),inset 0 0 0 3px #3a2410}
+.invhd{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 12px 5px;margin-bottom:10px;background:linear-gradient(#1f150b,#120a05);border:3px solid #0d0a05;box-shadow:inset 0 0 0 2px #5a3a1a,0 3px 0 rgba(0,0,0,.4)}
+.invhd b{font:400 11px var(--head);letter-spacing:1px;text-transform:uppercase;color:#ffd75a;text-shadow:2px 2px 0 #000}
+.invhd span{font:400 20px var(--body);color:#f0e2c0;text-shadow:1px 1px 0 #000}
+.invempty{padding:14px 12px 12px;text-align:center;font-size:21px;line-height:1.1;color:#d9c38c;background:rgba(0,0,0,.38);border:3px dashed #8a6a3a}
+.invlist{display:grid;gap:10px;padding:10px;background:linear-gradient(#1a1410,#0f0b08);border:3px solid #0d0a05;box-shadow:inset 0 5px 10px rgba(0,0,0,.7),0 0 0 2px #5a3a1a}
+.invrow{display:flex;align-items:center;gap:10px;padding:8px;background:radial-gradient(ellipse at 20% 50%,rgba(255,200,120,.1),transparent 70%),#241d27;border:3px solid #0d0a05;box-shadow:inset 0 0 0 2px #4e4658,0 3px 0 rgba(0,0,0,.5)}
+.invic{position:relative;flex:none;display:grid;place-items:center;width:50px;height:50px;background:radial-gradient(circle at 50% 38%,#4a3a52,#15111a);border:3px solid #0d0a05;box-shadow:inset 3px 3px 0 rgba(255,255,255,.1),inset -3px -3px 0 rgba(0,0,0,.35)}
+.invn{position:absolute;right:-8px;bottom:-8px;padding:2px 5px 1px;font:400 18px/1 var(--body);font-style:normal;color:#2a1d00;background:linear-gradient(#f6d56a,#b8902e);border:2px solid #1a0f06}
+.invtx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.invtx b{font:400 10px/1.4 var(--head);color:var(--gold);text-shadow:1px 1px 0 #000;overflow-wrap:anywhere}
+.invtx small{font-size:19px;line-height:1.05;color:#d9c38c}
+.invrow .btn{flex:none;min-width:76px;min-height:44px;padding:6px 10px;font-size:10px}
+.invtag{flex:none;padding:4px 7px 2px;font:400 8px/1.2 var(--head);letter-spacing:1px;color:#9fe8ff;background:rgba(0,0,0,.4);border:2px solid #3a6a80}
+@media (max-width:380px){.invrow{flex-wrap:wrap}.invrow .btn{flex:1 0 100%}}
+
+/* ---- Armoury wall: four display bays, no second shopkeeper. The helm stands on a pedestal, the weapon hangs on a peg rail, the armour wears a mannequin stand and the shield hangs on a chain.
+   Each bay shows the real item in its rarity colour with a price tag under it; tap a bay to select it. ---- */
+.sfw-a .sfw-slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:22px 14px;inset:46px 14px 12px}
+.sfw-a .sfw-s{position:relative;left:auto;right:auto;top:auto;width:auto;height:auto;min-height:0}
+.sfa-b{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:4px;width:100%;padding:12px 4px 8px;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sfa-b:active .sfa-it{transform:translateY(1px)}
+.sfa-k{position:absolute;top:-12px;left:50%;z-index:4;transform:translateX(-50%);padding:4px 9px 2px;font:400 7px/1.2 var(--head);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;color:#ffd75a;text-shadow:1px 1px 0 #000;background:linear-gradient(#2a2430,#15111a);border:2px solid #5a5664;box-shadow:0 3px 0 rgba(0,0,0,.5)}
+.sfa-it{position:relative;flex:1;min-height:0;width:100%;display:grid;place-items:center}
+.sfa-it .px{position:relative;z-index:2;width:64px;height:64px;filter:drop-shadow(0 4px 0 rgba(0,0,0,.55)) drop-shadow(0 0 8px color-mix(in srgb,var(--rar) 75%,transparent))}
+.sfa-gl{position:absolute;left:50%;top:50%;z-index:0;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,color-mix(in srgb,var(--rar) 55%,transparent),transparent 70%);animation:nichepulse 3.4s ease-in-out infinite alternate}
+/* fixtures */
+.sfa-prop{position:absolute;z-index:1;display:block;pointer-events:none}
+.sfa-it[data-k="helm"] .sfa-prop{left:24%;right:24%;bottom:0;height:16px;background:linear-gradient(#9a94a4,#5e5a6a);border:3px solid #0d0a09;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 4px 0 -1px #4a4654}
+.sfa-it[data-k="helm"] .px{margin-bottom:14px}
+.sfa-it[data-k="weapon"] .sfa-prop{left:8%;right:8%;top:56%;height:9px;background:linear-gradient(#8a5a2a,#4e3019);border:2px solid #1a0f06;box-shadow:0 3px 0 rgba(0,0,0,.45)}
+.sfa-it[data-k="weapon"] .sfa-prop::before,.sfa-it[data-k="weapon"] .sfa-prop::after{content:'';position:absolute;top:-9px;width:8px;height:25px;background:linear-gradient(90deg,#d6dde8,#6e7788);border:2px solid #1a0f06}
+.sfa-it[data-k="weapon"] .sfa-prop::before{left:-4px}.sfa-it[data-k="weapon"] .sfa-prop::after{right:-4px}
+.sfa-it[data-k="armor"] .sfa-prop{left:50%;top:12%;bottom:4px;width:6px;margin-left:-3px;background:linear-gradient(90deg,#8a5a2a,#4e3019);border:2px solid #1a0f06}
+.sfa-it[data-k="armor"] .sfa-prop::before{content:'';position:absolute;left:-26px;right:-26px;top:8px;height:6px;background:linear-gradient(#8a5a2a,#4e3019);border:2px solid #1a0f06}
+.sfa-it[data-k="armor"] .sfa-prop::after{content:'';position:absolute;left:-18px;right:-18px;bottom:-6px;height:8px;background:linear-gradient(#8a5a2a,#4e3019);border:2px solid #1a0f06}
+.sfa-it[data-k="offhand"] .sfa-prop{left:50%;top:0;height:32%;width:4px;margin-left:-2px;background:repeating-linear-gradient(180deg,#b9c2d0 0 4px,#3a4050 4px 6px)}
+.sfa-it[data-k="offhand"] .sfa-prop::before{content:'';position:absolute;left:50%;top:-4px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#b9c2d0 45%,#4a5060);border:2px solid #0d0a09}
+.sfa-it[data-k="offhand"] .px{margin-top:12px}
+/* price tag */
+.sfa-tag{position:relative;z-index:3;padding:3px 10px 1px;font:400 20px/1 var(--body);color:#2a1808;background:#f2e6bf;border:2px solid var(--rar,#1a0f06);box-shadow:0 0 0 2px #1a0f06,2px 3px 0 2px rgba(0,0,0,.45);white-space:nowrap}
+.sfw-s.sel .sfa-tag{background:#ffd75a}
+.sfa-tag.gone{background:#c9bd96;color:#a8283a}
+.sfw-s.sold .sfa-prop{opacity:.5}
+@media (prefers-reduced-motion:reduce){.sfa-gl{animation:none}}
+
+/* ---- Armoury wall decor: the bays now sit between a decorated top band, a rail of axes and a stone floor with racks ---- */
+.sfw-a .sfw-slots{gap:56px 14px;inset:46px 44px 70px}
+.sfw-a .sfa-b{padding:10px 4px 6px}
+.sfw-a .sfa-tag{padding:2px 5px 0;font-size:18px}
+.sfw-a .sfa-it .px{width:52px;height:52px}
+.sfw-a .sfa-gl{width:70px;height:70px;margin:-35px 0 0 -35px}
+.sfa-dec{position:absolute;inset:0;z-index:1;pointer-events:none}
+.sfa-ax{position:absolute;display:block;image-rendering:pixelated;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+.sfa-ch{position:absolute;top:0;width:30px;height:46px;display:flex;align-items:flex-end;justify-content:center}
+.sfa-ch.l{left:17%}.sfa-ch.r{right:17%}
+.sfa-ch::before{content:'';position:absolute;left:50%;top:0;width:12px;height:18px;margin-left:-6px;background:repeating-linear-gradient(180deg,#9aa3b2 0 3px,#2a2f3c 3px 5px) 0 0/2px 100% no-repeat,repeating-linear-gradient(180deg,#9aa3b2 0 3px,#2a2f3c 3px 5px) 10px 0/2px 100% no-repeat}
+.sfa-ch svg{position:relative;display:block;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+.sfa-rail{position:absolute;left:44px;right:44px;top:calc(46px + (100% - 172px)/2);height:56px}
+.sfa-rail>i{position:absolute;left:0;right:0;top:9px;height:7px;background:linear-gradient(#8a5a2a,#4e3019);border:2px solid #1a0f06;box-shadow:0 3px 0 rgba(0,0,0,.45)}
+.sfa-rail .p{position:absolute;top:4px;width:7px;height:17px;background:linear-gradient(90deg,#b9c2d0,#4a5266);border:2px solid #1a0f06}
+.sfa-rail .p.l{left:6%}.sfa-rail .p.r{right:6%}
+.sfa-rowx{position:absolute;left:0;right:0;top:20px;height:36px;display:flex;justify-content:space-around;align-items:flex-start;padding:0 4px;pointer-events:auto}
+.sfa-rowx .sfa-ax{position:static;margin:0 -4px;flex:none}
+
+.sfa-col{overflow:hidden;position:absolute;top:68px;bottom:70px;width:38px;display:flex;flex-direction:column;justify-content:space-around;align-items:center;padding:6px 0;box-sizing:border-box;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 2px,transparent 2px 9px),linear-gradient(90deg,#6b4423,#4a2e16);border:3px solid #1a0f06;box-shadow:inset 0 0 0 2px #3a2410,3px 4px 0 rgba(0,0,0,.45)}
+.sfa-col.l{left:2px}.sfa-col.r{right:2px}
+.sfa-col .sfa-ax{position:static;flex:none}
+.sfa-rail::before{content:'VAULT';position:absolute;left:50%;top:-5px;transform:translateX(-50%);z-index:3;padding:3px 7px 1px;font:400 6px/1.2 var(--head);letter-spacing:1px;color:#ffd75a;background:#1a0f06;border:1px solid #8a6a3a}
+.sfa-v{position:relative;flex:none;width:34px;height:34px;padding:0;display:grid;place-items:center;background:none;border:0;cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent}
+.sfa-v::before{content:'';position:absolute;left:50%;top:-6px;width:2px;height:8px;margin-left:-1px;background:repeating-linear-gradient(180deg,#9aa3b2 0 2px,#2a2f3c 2px 4px)}
+.sfa-v .px{width:30px;height:30px;filter:drop-shadow(0 0 5px var(--rar)) drop-shadow(0 2px 0 rgba(0,0,0,.55))}
+.sfa-v.sel{outline:2px solid #ffd75a;outline-offset:1px;background:rgba(255,200,80,.18)}
+.sfa-v.sold{opacity:.4;filter:grayscale(1)}
+.sfa-cur{position:absolute;right:-3px;top:-4px;z-index:3;display:block;line-height:0}
+.sfa-cur .px{width:10px;height:10px;filter:drop-shadow(0 1px 0 #000)}
+/* Armoury floor and fittings: crates of axes on a wall shelf, plank floor, upright racks for swords and staffs */
+.sfa-shelf{position:absolute;left:0;right:0;bottom:22px;height:50px;display:flex;justify-content:space-around;align-items:flex-end;padding:0 3px 7px;box-sizing:border-box}
+.sfa-shelf::after{content:'';position:absolute;left:0;right:0;bottom:0;height:7px;background:linear-gradient(#a07040,#6b4423 40%,#4a2e16);border:2px solid #1a0f06;box-sizing:border-box;box-shadow:0 4px 0 rgba(0,0,0,.45)}
+.sfa-cr{position:relative;flex:none;width:76px;height:42px;margin:0 -3px;z-index:1}
+.sfa-cr>svg{position:absolute;left:0;bottom:0;z-index:2;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+.sfa-cr .ax{position:absolute;inset:0;z-index:1}
+.sfa-floor{position:absolute;left:0;right:0;top:calc(100% - 6px);height:130px;background:#5a3a1f}
+.sfa-floor>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sfa-floor::before{content:'';position:absolute;left:0;right:0;top:-9px;height:9px;background:linear-gradient(#7a5230,#4a2e16 45%,#2e1c0e);border-top:2px solid #1a0f06;border-bottom:3px solid #1a0f06;box-sizing:border-box;z-index:1}
+.sfa-floor::after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(rgba(0,0,0,.55),transparent 38%,transparent 70%,rgba(0,0,0,.4))}
+.sfa-rk,.sfa-sd{position:absolute;z-index:2}
+.sfa-rk{bottom:-44px;width:80px;height:var(--rh,72px)}.sfa-rk.l{left:2%}.sfa-rk.r{right:2%}
+.sfa-sd{left:50%;margin-left:-17px;bottom:-46px;width:34px;height:58px}
+.sfa-rk>svg,.sfa-sd>svg{position:absolute;left:0;bottom:0;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+.sfa-rk>svg.bk{z-index:1}.sfa-rk>svg.fr{z-index:3}
+.sfa-rk .it{position:absolute;inset:0;z-index:2}
+.sfa-rk .it>svg{position:absolute;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.45))}
+.sfa-rk::after,.sfa-sd::after{content:'';position:absolute;left:-5%;right:-5%;bottom:-5px;height:9px;border-radius:50%;background:rgba(0,0,0,.5);z-index:0}
+
+/* ===== Armoury redesign: pixel-art sprites at 2x ===== */
+.sfw-a .sfw-wall{background:radial-gradient(ellipse 60% 40% at 50% 30%,rgba(255,176,74,.24),transparent 75%),linear-gradient(rgba(0,0,0,.45),transparent 26%,transparent 58%,rgba(0,0,0,.55)),url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAADwklEQVR42u1ZvW7bQAz+IugBbCmGtRToP4JsXTp07lagL9CtQx+wQLdOHTwEBbIYhuGkSEcHtiS/QTsUVKnP5N1JyZYIMOLojsefI/mR9MmT6vkfPOAnB4AP7z+ai7t6j1l52ns3n1e4vd0CAL59/wqh13t39R4AerSyLvS7eo+LywU0f4sf89TnaXqLVt558lxcLv4ZQDbwo4kBoG6b7v+6bVxGvK73efR126CcFmB5NE/9WPTeJVrfZX+mlRULyWLIMCKsdTgAnL18Pcol+RzmM/SxPEo/mb5pYV5OC9Rt0xHLX31DnsU9RWJPqqIeX01vKe0ZIgOA9fXGPJDjKqZ0iqBjafkSvNvmUJTvOg9onbLYodo4Ibdmoe/iujElY57HsnC+0AbK9QZxfRZGjCBrzWFrMri6WaGYVK5wQldMqt4ZddugOWxRTCpTBs3DkkHogXNXFn2mpj158HVAqAZgnE5NerPyFOvrDX79XgMA3r5514M5D2ZD9HKLofCQdbltoffkn88r5IzBlsusrzfJwlsIwO4rjxcy/136WJZYcrVCxDPycrVE5t2MlZRSi4/UxCbKc065K2Ra64xmYpRMKycftpgHQZZhYu7JiUiSX6pCbCxrzatCNc1RJVhOi+7jQY0+WO9Jhbyrm5XrBaEb1HyLSXUUErI/ZkiLJkuJYV0hWvVBDJ8tARkKY4a6r6KLy/jcI9bChZKVtaecFia9p3AsB+j10Dkp6MA1z2MdkIKz3FMLAgjOfv705ahfj80VdJ0Ro0+ZB6TQcOvezQM4qejMLKWwfscxulwto3Hn1QYp9Gz8WXnak8HCeZ5R8LyhhwIcU1KTa0FF+bpt3GwbSoReaz1mVrCr98kZ36oQj9phfVhz2HabWchQ8pH6gYcq3IFZE6ExFV9Kt8joZRk9YwU1zuqMCQCvnp0HoU673JiWVt9SanXK8Ln4+WOQwXqFkAcxkhfuawrk1eYxbB/qId4ezSuXm9eKD8Vri1FKiavpvT6fL0HO9fZZlSJ7mG62HusA6dWtG2wPhyOctfBVv7Pm/lJnhFpoyyu4n+d6IoT1ADr+L56euSiQp9bdnMWtabLGWJ2krHmAJ5AVbt5sP2RMHoF54ZvFOrMQI+99TDnLGEN6g6GD0pCO2VjGsdn7kLPYWCG4teh0Z2rJxXWOa4AhTDkUeJASQgDpFj3kCVWbVi2gPcjyytBlDDaAVYDs6n1wkKIF8MKDFY55kJzh/XAToi8mVccvH1tLW4qEBNAjsKFh5/3owv19Su5hnn8BnLnNDrHRJREAAAAASUVORK5CYII=) 0 0/128px 64px;image-rendering:pixelated}
+.sfw-a .sfw-slots{gap:56px 14px;inset:54px 46px 70px}
+.sfw-a .sfw-s{border:0;background:radial-gradient(ellipse 70% 60% at 50% 45%,rgba(255,200,120,.22),transparent 75%),linear-gradient(rgba(0,0,0,.4),rgba(0,0,0,.66)),url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAADwklEQVR42u1ZvW7bQAz+IugBbCmGtRToP4JsXTp07lagL9CtQx+wQLdOHTwEBbIYhuGkSEcHtiS/QTsUVKnP5N1JyZYIMOLojsefI/mR9MmT6vkfPOAnB4AP7z+ai7t6j1l52ns3n1e4vd0CAL59/wqh13t39R4AerSyLvS7eo+LywU0f4sf89TnaXqLVt558lxcLv4ZQDbwo4kBoG6b7v+6bVxGvK73efR126CcFmB5NE/9WPTeJVrfZX+mlRULyWLIMCKsdTgAnL18Pcol+RzmM/SxPEo/mb5pYV5OC9Rt0xHLX31DnsU9RWJPqqIeX01vKe0ZIgOA9fXGPJDjKqZ0iqBjafkSvNvmUJTvOg9onbLYodo4Ibdmoe/iujElY57HsnC+0AbK9QZxfRZGjCBrzWFrMri6WaGYVK5wQldMqt4ZddugOWxRTCpTBs3DkkHogXNXFn2mpj158HVAqAZgnE5NerPyFOvrDX79XgMA3r5514M5D2ZD9HKLofCQdbltoffkn88r5IzBlsusrzfJwlsIwO4rjxcy/136WJZYcrVCxDPycrVE5t2MlZRSi4/UxCbKc065K2Ra64xmYpRMKycftpgHQZZhYu7JiUiSX6pCbCxrzatCNc1RJVhOi+7jQY0+WO9Jhbyrm5XrBaEb1HyLSXUUErI/ZkiLJkuJYV0hWvVBDJ8tARkKY4a6r6KLy/jcI9bChZKVtaecFia9p3AsB+j10Dkp6MA1z2MdkIKz3FMLAgjOfv705ahfj80VdJ0Ro0+ZB6TQcOvezQM4qejMLKWwfscxulwto3Hn1QYp9Gz8WXnak8HCeZ5R8LyhhwIcU1KTa0FF+bpt3GwbSoReaz1mVrCr98kZ36oQj9phfVhz2HabWchQ8pH6gYcq3IFZE6ExFV9Kt8joZRk9YwU1zuqMCQCvnp0HoU673JiWVt9SanXK8Ln4+WOQwXqFkAcxkhfuawrk1eYxbB/qId4ezSuXm9eKD8Vri1FKiavpvT6fL0HO9fZZlSJ7mG62HusA6dWtG2wPhyOctfBVv7Pm/lJnhFpoyyu4n+d6IoT1ADr+L56euSiQp9bdnMWtabLGWJ2krHmAJ5AVbt5sP2RMHoF54ZvFOrMQI+99TDnLGEN6g6GD0pCO2VjGsdn7kLPYWCG4teh0Z2rJxXWOa4AhTDkUeJASQgDpFj3kCVWbVi2gPcjyytBlDDaAVYDs6n1wkKIF8MKDFY55kJzh/XAToi8mVccvH1tLW4qEBNAjsKFh5/3owv19Su5hnn8BnLnNDrHRJREAAAAASUVORK5CYII=) 0 0/128px 64px;image-rendering:pixelated;box-shadow:inset 0 6px 14px rgba(0,0,0,.75),3px 4px 0 rgba(0,0,0,.5)}
+.sfw-a .sfw-s::before{content:'';position:absolute;inset:-6px;z-index:3;pointer-events:none;border:6px solid transparent;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAsElEQVR42mMU4BP7z0ACYGFgYGB4fsyLIWOKFIOWtg7DtatXMGgGBgaGGTnPGCSttjEwCvCJ/ReXVWRgYGBg8Ff9gtXUjbd5GBgYGBhePr7PwCDAJ/a/c/Ky/2UB2jidVhag/T8+o+q/AJ/YfyYGBga4tfiAlrYOAwMDAwMTMgcfgBk6CG1gYWBgYEhNTWZgYEhmYGDwwxpSfrWb4GxGAT6x/7CIg5mELfJQIo6UpAEAL3VHhJR3UHoAAAAASUVORK5CYII=) 3 stretch;image-rendering:pixelated}
+.sfw-a .sfw-s.sel{box-shadow:inset 0 0 0 3px #e8b93c,inset 0 6px 14px rgba(0,0,0,.7),0 0 16px 3px rgba(255,200,80,.55),3px 4px 0 rgba(0,0,0,.5)}
+.sfw-a .sfa-k{color:#2a1808;text-shadow:0 1px 0 rgba(255,235,170,.7);background:linear-gradient(#f0d078,#c9a040 45%,#8c6a24);border:2px solid #2a1a08;box-shadow:inset 0 0 0 1px #f8e6a0,0 3px 0 rgba(0,0,0,.55)}
+.sfw-a .sfw-torch{top:12px;width:24px;height:68px;border:0;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAiCAYAAAA3WXuFAAAC0ElEQVR42tWXP2hTQRzHvwkBUyj+G0p4LUZElyToFlwURKdO4iJkcnVShw5NwEGoQ10idEoRMlhHESwOojSgSZO4NFhdEmJimxIjprWUxoJwDum93F3u3l2avMHfknDv8/v/u99LAInELT8hjXkSt/wEBmLKmYh3WANxy0/mPj0aOChjPm75CdlfI6QxT8j+mrZKLD9IRY152wEhhGRC5gERYuRkIN6GGQWdkujAieeqr+DlMzR2qftpzQDltL4HLL+0oOetGe6TnUGfo2KnpB/oSp7no+MAWmp2+20vgU6pL2Fvn0Ix1mdMdos4BwY8gC4rq3hxT3HtJcYBKNtQj03LHajatrTAObft5P4qAiqnewq0XcU9ToHK844HqWIbuHDHmE8kW4ct5XlWfKwCYlXM3Z8AngS56FPFNh5v/fFIsy6nexWJjut5wNG+dKhlGSqFrUhuR4vXk84MF9DVe7eQSL6UllsmR+FTT535vgpN3YyitvWrm02zjY2fHaBzoMxo1Lwd2plTY2TqxDGpkc3fB/i+zaftFs9V6OHdaVTrm1wGVEEmbvCOPz+CgdPdkhrKKHgvAJw8PiF9GX783LC/s4ybPNcyWk5aSp24wdsBvXi3jtiNiPxlbl3E7sY37swt3g4omyvg2u0HCIUj+PplHQBQq1bQbNSlRtziPWIPl1dWkZidBQA0G3X8OIx8Z7fFXWOWX1x8hlq1AgAo5TPGvMy+fctYA2fPneeiFo2rzmi2przs2dD/OgAgFI6M6l+QOiDVLMiEzsRIAxJ3RWAyCKc9Qs+yuQJUz3Rnsmc+erC8sgrWAZ2jy1euo1atoJTPENrrYXhxTkXeK15NUXRXWWyzCc/OnMh7WVg2C07GWT4UjiAwGdTyop7RHnLaE6PaQwCQ//DebA+Z7JBh9xBN4P/cQ4M6oDPBroqjik82fG9evzJejNlcwfFmDcr/A5567TvhEm4+AAAAAElFTkSuQmCC) 0 0/72px 68px no-repeat;image-rendering:pixelated;animation:armtorch .72s steps(1) infinite}
+.sfw-a .sfw-torch::before{display:none}
+.sfw-a .sfw-torch.l{left:3%}.sfw-a .sfw-torch.r{right:3%;transform:scaleX(-1)}
+@keyframes armtorch{0%{background-position:0 0}34%{background-position:-24px 0}67%{background-position:-48px 0}}
+.sfa-beam{position:absolute;left:-14px;right:-14px;top:-12px;height:24px;z-index:2;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAMCAYAAAADFL+5AAABGklEQVR42mO0Uhb4z4AG3nKoM2ADwj9uMlAbMO7ojMJwwEUuH4ZtmzegiL14+pBhYpwy1R3Acu/hE0xRTeyKsaql1AEHz91mYGBgYJCXEGJgYGBgePjiHYMR1AGt7e0MDAwMDNWVlQwMDAwMD569ZXj44h2GemxsdIBN3cMX7xiY5CWEUDShGzB79lwUQ5DZyAbB9CKrQQbY7JCXEGJgwedqH0dLBgYGBgZ9CwecQYjLQmzyMAci28eCTRAG0C1GDkJ0H6OHDq5QRQ8xJnQF+HyELf7xqcXmOJh+mBks+OIKPRHiSyvYHEiMHAs2nwvjSIS4Ujo+i7EFPbI+FnzBiJ4IcQUpsQkSmxpGbEXxtddsWDVrif6iekEEAGMXodyJdER4AAAAAElFTkSuQmCC) repeat-x 0 0/64px 24px;image-rendering:pixelated;box-shadow:0 5px 0 rgba(0,0,0,.5)}
+.sfa-ch{display:block;top:10px;width:32px;height:40px}
+.sfa-ch.l{left:15%}.sfa-ch.r{right:15%}
+.sfa-ch::before{display:none}
+.sfa-cu,.sfa-hm{display:block;width:32px;height:40px;image-rendering:pixelated;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+.sfa-cu{background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAYAAACEYr13AAABcElEQVR42mNgQAKdk5f9V9c2/8+AA2CTZ0LmbNu8gcHC1hmXfqzyKAZ4+QYwnDi8F6cB2ORp4wIRCSWMcBCRUPqP04UiEkr/kfH0hVv+EyPGwMDAwCgiofT/9fO7DHeW6TOoRF1kYGBgYDh3/SmGJX39UxhsbGwYGBgYGFxYqhj2/GljqC3PQxiArOnU6QsMR44cYSgqzEHhI4MbVy4xPLx/g4EFm41mpgZYA/HGlUsMGjp6mIFopCkNt4mBgYFB618NhuY5+S8wNMMNgLnAzNSAwUhTmuEaUwuGwpSJElhdxfTmxT1Gdyc7uCvOXX+K0wXo/n/z4h4jPB0gh8M1phaUQDMzNcDtAgYGBgZ0V2j9q4FHGSwKYS5Ath0jJSK7ABnY2NjgdwEhgJ4GCBoA8woxgAVdgO+8F8Od8wwMLiwMDAznIWINDgj5iCsyuA2YsWgrAwNDG4qzbWxsGObMmIbTBYzouZIYZ8NigIGBgQEAIa609V9PLCgAAAAASUVORK5CYII=) 0 0/32px 40px no-repeat}
+.sfa-hm{width:28px;margin-left:2px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAUCAYAAAC9BQwsAAABH0lEQVR42mNgwAI6Jy/7r65t/p8BD2DCJrht8wYGC1tnBpI1evkGMJw4vJeBJjYyYhMUkVBC8d+bF/cY8WqEaTjm4oWiyGrPNgwDGJE1vX5+l4GBgYHh3PWnDK/jUhgYGBgYFhsaMNjY2DAcOXKEYefmVXDNGH48d/0phtOPHDnCcOPKJUynwmyDaTp1+gKKJmQAs5WJgQSAbCsLsoSzhRFejcraJvjjkRiAYuP7jy8Zzl1/ytDXP4Vh68p5DAwMDAze4UlYncqEHqJRocEMNjY2KKafObafuCRHDEDRiBwNRGs8d/0pg5mpAcOy1WsxFJlYOeJO5OiJoK9/CjypwQLm4f0b8CTHgh446KkGFpIaOnoMD+/fwJ87cAHk3AEA/DGDXyKVuegAAAAASUVORK5CYII=) 0 0/28px 40px no-repeat}
+.sfa-rail{left:46px;right:46px;top:calc(54px + (100% - 180px)/2)}
+.sfa-rail>i{top:6px;height:12px;border:0;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAGCAYAAADKfB7nAAAAYklEQVR42mM8cvbufwYKAMvRYydRBK5dvcKgpa2DVxOyGsb4jCqCLnhw7w6DgpIKVjkmYpyJTfODe3cgXoAxcIEXTx8ySEjL43QZo7q2OYoXXj6+zyAuq4ih+OXj+yh8mBoAs6wjy4jXMGoAAAAASUVORK5CYII=) repeat-x 0 0/32px 12px;image-rendering:pixelated;box-shadow:0 4px 0 rgba(0,0,0,.45)}
+.sfa-rail .p{top:0;width:16px;height:24px;border:0;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAATElEQVR42mPsnLzsPwMOcO3qFQYWGAMbeHDvDkQBNgkYYMEmefHEAdwKYODDp1eMDAwMDEzYdMMkMRRgA0z4dBNvAi7dxJmAKxRhAADjnS6S29ojpQAAAABJRU5ErkJggg==) no-repeat center/16px 24px;image-rendering:pixelated}
+.sfa-rail .p.l{left:0}.sfa-rail .p.r{right:0;transform:scaleX(-1)}
+.sfa-rowx{top:22px}
+.sfa-col{top:84px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAgCAYAAADwvkPPAAABl0lEQVR42pVWO27DMAx9NbJkKxIYMFIEDtC5PUCRKUu3nKBzlqJH6NQjFF1yjBygU27QC1gwaggwrNVjO8mgKVKWOdkWzUfy8aObp/vbv5fnR1RNBwAw1qEsVvBy/fkFAOwf7oJz/2ysAwBkIMINAcA2XwIAdps1AIzO/XPd9qGxsljh+H6BJsY6GOsCHQ+YUUUAuHwccf5uh3cORnW4BGECwOmQD998CFxOhzwAXHBUnrttvhQN8vzWbS97liISUZmkQKmPkRHNWQzd16HmWdQYR/Z1RktENcYPOXLVdIOO5NXIGGeTA1DPJIMqm5QIXhaaVwGbsXxUTacaSmLTWBc0Ok2B2AGUdj4V/AjSajHwbLdZqwXqPeN1lsymJJzN2R3ACZgq7kxSlJKr1RmNaBHrSWOdOs/UnHFUanQ2ASmKMcZFz6YYpWttlmf+J21kRz3jk4LugKmRrRbtVCiaBCMoNTdSqOoISiVjcgm/fV2jiaZXCN4pwar7fN0Pq5+j+5/99aAsViOdTFv9/HpAJ62xLtCp2x7/hVgE3tDbMXYAAAAASUVORK5CYII=) 0 0/38px 64px repeat-y;image-rendering:pixelated;box-shadow:inset 0 0 0 2px rgba(0,0,0,.35),3px 4px 0 rgba(0,0,0,.45)}
+.sfa-shelf{height:58px;padding:0 3px 12px}
+.sfa-shelf::after{height:12px;border:0;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAGCAYAAADKfB7nAAAAXUlEQVR42mPc0Rn1n4GBgeHewycMSvIyDKQClnsPn8A5yGyiDXjw7C1BRQ9fvGNgYGBgkJcQwpBjYqAQMFopC/yXFeUkWsPj198ZkNWzwATRwZN3PxlkhNixiiMDAEvTHdvI7HHNAAAAAElFTkSuQmCC) repeat-x 0 0/32px 12px;image-rendering:pixelated;box-shadow:0 4px 0 rgba(0,0,0,.5)}
+.sfa-sbr{position:absolute;bottom:-18px;width:16px;height:24px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAATElEQVR42mPsnLzsPwMOcO3qFQYWGAMbeHDvDkQBNgkYYMEmefHEAdwKYODDp1eMDAwMDEzYdMMkMRRgA0z4dBNvAi7dxJmAKxRhAADjnS6S29ojpQAAAABJRU5ErkJggg==) no-repeat 0 0/16px 24px;image-rendering:pixelated}
+.sfa-sbr.l{left:9%}.sfa-sbr.r{right:9%;transform:scaleX(-1)}
+.sfa-cr{height:46px}
+.sfa-cr>.sfa-crf{position:absolute;left:0;bottom:0;z-index:2;width:76px;height:26px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAANCAYAAADFVhxbAAABz0lEQVR42q2Uv0sCYRzGH+MWBRdfBJNCc4ugoaU2CYcghGrKfiwt0djUIrQ1NLSGf0KjIEgECUeCQyAc+YO4kjtO5eC4I2y4osEGPb0f75knfaf3nu/7Pu/DvR++vvvrwz4AcIE0GvUaDpYEtMQ2ErEFeC3zuVk8jAzrc2UwLbENoauCpNIQWm8oyXWQVBalxyvHQZLKQv1DF7rqSP9cPkOwmQNb5RGLhBz7RVmz6YMMXz0evv2N+b6k6Ng5v0WxkEek9+T5T8UiIYiyNnPfqLWjGxQLefy8P4CxNyVF9xxMUjoObTHsH3nR+tRgpjVzsrc5eN+hcHm6TeXDTQNAZWkW3owMx1urVsYME6GrWlgBgHiUoFThLNod2xqunh2XZJIJh4f928nqIANb5cEIXRWirIEMm2yVB+15aYxkkglXduz6NIwR032MKGuQFH30vm6M0fRp2XFjzzNj/1HTcGXfM5GxUoVzzCtj3ph18wwiqSyCzRwMLGKREOJRAi6Qnjj3DG7jUWLJwFZ5+C52V/rllw51jkmKjsWw39Msmn7EjL2pc8x+mf39x9/aaD2JE6/hzH4WxiqvHwCARr0GAGhr31QTs+62Z9Yy/MwZfgHLKTJBtWL7/QAAAABJRU5ErkJggg==) 0 0/76px 26px no-repeat;image-rendering:pixelated;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+.sfa-floor{height:150px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAEVUlEQVR42s1ZQUtbQRCeRCnkJgkPUjU8MQg1EAs5tUEQ9BDw4rEHcw4ehd4a8FConrx68Gz/QiGHCkKgt0AVpCBIQkwQHvHiISBIegizzts3s29f+gxdePiyu29mZ3dmvm/HRDk/N4IptJyTgq43hGk1W32Jcn5udFDbNk667dzBsrsYKozO+3r6A9aLC5EX3rl/ADebtp7fvOqxemzkdO4fYBYXDgDQ7g9gaT4Dy+5ioI8ad9u5Y+dSWagAm3QaOSel3nHBzauer19qOF/S0/V6Rn0AAEl8eVzdg82P732DaCS281+/lYHYj5uBMnRPKe0eK8Xco58It0i9oUxquK5nvbjg+4vvdK4KgWplDb6c/YHD6jujYjQUG92cdn8Ap+eeknHRugEAgMb1M1QKM+zpUQM4L5E2gsrsekPIOSlRD47T39feG6htOi8hAABQ23SMBup91PXx1A+rmYBiblH66XHJSzLezaahAsFvC84TdD0I3cCxN7zon5WM1TdDDwfMCbedO1/cx9HWiwuBuEZjaL+bTas4lzZMP319XmJaMBgXtOmhQj0mKszmnNRLEpzW4vXfUj/Xut4wYCT+noRjdL3hOAQOatvWbnzWuIRqZe3VNuqidWPkD0vzmUB4ho2ZOMEswpspMVHM5fLDpAvlFjY+yQdxDWeNSyMpQg/SUUayTSXBzFYd4Oc3dlJmqw4DbYzr45Iop1jv42SVdo+h9f1z4Luck2IhVA8HEwmishPl/NxovbgAp+ce1DYd1hg6hrvcuH4W59tSXjwpSb4trmMC1NFDyvxUttoAk/sDAGyUVqDdHyjuvTSfgYvWjXJhzuXDQor7xuTGYQnNhj6zIcARnjAW2O4PWC4u5Q1uY8JyieTmEsGh4zab1/WG0XiADdbGce2lMl77Gp0Mw2sTV5fYVlxc4V/l2dilckCUFhVvsZ+OS/d4m/t/tbJmVZ+wzgF0gVEzuP6NJAP7TdhsOm39BOO4fyy7i5BEwZmtuqKa9DEtLGr1ht7DuT6pZrCzfxLQ87i6Jybpdn9gfPDb284dJNG4o/o+W6zwk4vg5kgniAumfUf1/cA3XJ/NHL2PIlkYqtFvE+X83Ijibhh+x9U4ODOFAHKVrjdUOSBKGOjX+QAVjlKLi8NgE5ZzVSN6KGi8ZJSUuEUU+F8w2URsqIdwdYHYeMBr4fAkHuOv8A4DY1G9lZs/i7TRBvo2Sis+/s/hsz6OSCHdFThZdG7zqgduNg1uVuIhMhLp95VxWPl1qyRoQ3FNlV2bE5FubKaLj0murXea1qVCYGf/JACBtKYu1Qk4XOcgEw2hG0af5lVPvUt8QeclEm8w/e8BZY0LqkNIfPrwdoR35ILzZEx0XH29UpjxLQjrBFGgVD/9KHX/SRq1VaGAyc24+7lUmPiXpm+Em01bQ7MpvEwhlgyLETpGBejJM46bnI3X+BNaWvwedYeROzYJSrV2CX+n/a/vONtfBgd3uzGfDVMAAAAASUVORK5CYII=) 0 0/128px 64px;image-rendering:pixelated}
+.sfa-floor::before{top:-12px;height:12px;border:0;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAGCAYAAADKfB7nAAAAX0lEQVR42mPc0Rn1nwEJ3Hv4hIGBgYFBSV6GgRjAAtOADpDFHzx7y8DAwMCgICWMaQBMkhiATS0TA4WA5eGLd1glHr/+ziAryknQAEYrZYH/6IJP3v1kkBFix6kJWR4AoYggelikeucAAAAASUVORK5CYII=) repeat-x 0 0/32px 12px;image-rendering:pixelated;box-shadow:0 4px 0 rgba(0,0,0,.45)}
+.sfa-run{position:absolute;left:50%;top:8px;width:56px;height:88px;margin-left:-28px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAsCAYAAAB2d9g5AAACFklEQVR42sVYoU4DQRCdblCoihMNgpAgITWgEGgwTTDwFfQHqtEIvgJVCRrRD2hqMRWkohrJIZpthtn3ZrYkHGs2t7d7b9/Mm9nZ641H/fb+7lCenpfyly1j7OmBLtoW8P3xQObrlQybgczXq2JiHs/9zcOXTCepGLfr9XwRkd541G8vTvc7YTdbfG4Ynp00BUO247xT3aaTVDBCDGeLpWxnMhAG1r5cwnEENmwG27Gkd4pA8uRhM/jBpHf9Rhkin0NAJhRtAf1xC2YtZTfvAlpz6I9kEAvGfEgB9Uu7Qw2efZZ7ZEbLuACMdmbjSQumJg4LQGtrZE5Ppcxnrkp3EYxVqbVIyBD5ED0jlbJ0GDKsMasGzb2dh4TkMmRqtb7UKvUylcsQxV+NStl6a7nkCYUxY7nUyzAuQyagKJd6vnQZItVFKmXrdz4tkLmRSn/lQ695uZRZCCWDxHInA0Uq9cxJAWscHuVSFlKUIQoJ/b5GpZ4vqxkiwUSJm4Emz+FskVapJxBkqRTVIghUq5TFGzuFqjNNpFLPLW4cemr7TS4NqzYvPUUnvlcTuQxZBc1U6h3W1IeoSmO+sSqNzFldtbGkEKm0KtNE9SgSDrvIVGUar3JGIcFuT9FR938XUnR9ZsWsZuRdRq3pZwv1U2HzkQ85FlF9bvZZiDn5vOKnQhe/TURE5PX8qu2yT9Jx6xxQbpujtsv+G50d4ONx6wtxAAAAAElFTkSuQmCC) 0 0/56px 88px no-repeat;image-rendering:pixelated;opacity:.95}
+.sfa-rk>i{display:block;position:absolute;left:0;bottom:0;width:80px;height:72px;image-rendering:pixelated;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+.sfa-rk>i.bk{z-index:1;height:var(--rh,72px);box-sizing:border-box;background:none;border:solid transparent;border-width:22px 12px 0;border-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAkCAYAAAD7PHgWAAABeklEQVR42u2YMUvDQBTH/wkhmDEtQqlNUsRBHDK4+g26uTq5+g38CvoR3Lt3dBJBiLOQrRA8G+SgmCpCQ6dzkNTEu9iQ2uTE/Kfwctz78d7975EAjX5JrqUz19KZlByupTP2PmKxf1orpJAjCY6HLhsP3dog8zgU2zTY5Zm5XOj5c4zuFrVUUMShXF+cMAB4fbuF588xOBr8uElAwlLJH59fCq07PJjB8+fYUndAaATtK+ke9nvFAIomS4vQSBh3Oq3MO0IBwADwGVPrdm0eOABMpjG0gIRcRQiN4HRa3DMA9LttbtPvVchLVkaKbRrs6vwYN/cPIDTCZBojjOoxiYhDy1v8NIuVKuFs0xBebeo6zqxCKgDsOj25Af9MBcs6bROyto3sPdjvtpdBGZQUS11nOmwaTsozSGiU6aR0ZzA9tbhZLNMZFALKJM7FsolzsdQXddPipsUN4IpRJ6tBpAVMjzspAdNfiI1J/oeLAxKu/DNQhdIciZM/ABHC1B7ugEmCAAAAAElFTkSuQmCC) 11 6 0 6/22px 12px 0 12px stretch round}
+.sfa-rk>i.fr{z-index:3;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAkCAYAAAD7PHgWAAABeklEQVR42u2WMUvDQBTH/5WAFFy0FLRNTcnezg7d7Cw4Ca6lfgadXfQrWPwMCoK46GJb7ShVJzlyNAmBkqwd63Slaa/JJaWlw/tNIfdy/3fvXnh/gCAIgiAIglghmcPd7HijE3y5PV+Y4MXNAwDg7vJUeZ1xGwBgGnrkHozbMA09UoNxG9rbx5dUnHvB5FnEcC+Asb83Fzu7R7mQm3sn07FcP3KdewEyZ0cH48FwpFTuUj4L1VhV4vbc+B4kCIJG3bpH3U79Gp1uD89Pj7g61taWiEyXcRva9PwEgCqA359veA4H49uJhSzXR7mQi40zDT1W13J9bMk+bjYbqSuhktzs7BXGQqarMW6HhnYVQKt1PzlBu++s7FrbfQe1ShGW6+OkHtYVZiG2yWqVYuoEFrkf1ZtQSnDZCg6GTqoCiCpqluuHvJ/ohc/3V3AvQCmfTZDMKFH8rO+c1hX7SX8S0QtpvN0yyHQ17gUhw9jp9mCxv8kJ1mFKo3T/AUBVzkg6Dc4mAAAAAElFTkSuQmCC) 0 0/80px 72px}
+.sfa-rk .it>*{scale:var(--cs,1);translate:0 calc((1 - var(--cs,1))*var(--ih,0px)/2)}   /* grow about the bottom edge: scaling is about the centre, so lift by half the growth */
+.sfa-rk .it>.stf{display:block;width:16px;height:60px;background-repeat:no-repeat;background-size:16px 60px;image-rendering:pixelated;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.45))}
+.stf.m{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAeCAYAAAARgF8NAAAAsklEQVR42mNggAIuLYP/Lls3/OfSMvjPgASYkDlu2goMVt0NDMiKmGC671w9xrDr6gOG+2dvMUhGRMEVoZiw28ufgYGBgeHjhUuoVlys/sfAwMDA4LptI1wCJoZiAjbAxMDAwKDfysSw5OEtFAn9VjS9XFoG/7seXPiv3NT1H8MXDAwMDCLPbzLsuvqAIfjcQgaR5zexh0PQ1j6Ghy/eMeAMKJyOHFUwqoA2Ch48e4uhAABd0jjUNJwHAwAAAABJRU5ErkJggg==)}.stf.h{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAeCAYAAAARgF8NAAAA3ElEQVR42mNggAIRCaX/0xdu+S8iofSfAQkwMeABIhJK/5lgjNfP7zIwMDAwNHdOYhCRUPovIqH0v7lzEgMLTPW5608Zjhw5wnDjyiUGBgYGhp37DjH09U9hYEQ2joGBgQFmUkxaJcONK5cQbnjz4h4j18/ncNNgAG7F7aV6/xkYGBjuLNNn4GNgYGBg8EL1hXPObYbdRwUYVKIuMuz504bbm8iO1dDRQ1gBA11JpgzHb35g+MYuyZCSkYU7oN68uMdYW56HPyTfvLjHiFcBwbgYVTCyFTx49hZDAQB/TE2pcc0b+gAAAABJRU5ErkJggg==)}.stf.p{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAeCAYAAAARgF8NAAAAnElEQVR42mNggAIRCaX/0xdu+S8iofSfAQkwMRAAKArMTA0Y3H3DGJBNYYEZ//r5XYaYtEr8JtjY2DAwMDAwyCtqwE3B6gYNHT1ME85df8pw5MgRBgYGBoYbVy5hKjDSlIZbQZI3GRkYGBh2mHj8R5eIeXKL4c2Le4xwATlBzv/Tsuz+h1tI/pcT5PxPXkiOKhhVQJKCB8/eYigAAOrqKTabgoJ0AAAAAElFTkSuQmCC)}
+.sfa-sd{width:40px;height:var(--sh,72px);margin-left:-20px}
+.sfa-sd>i{display:block;width:40px;height:100%;image-rendering:pixelated;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+
+/* ---- Armoury description plaque: same oak plate as the Guild Store chest panel; only shown once a piece is picked ---- */
+.sfz-plq{grid-template-columns:auto minmax(0,1fr) auto;gap:12px;min-height:94px;margin-bottom:0;padding:12px 12px 12px 10px;box-sizing:border-box}
+.sfz-plq[hidden]{display:none}
+.sfz-plq .sfz-di{width:56px;height:56px}
+.sfz-pn{display:grid;gap:4px;min-width:0;align-content:center}
+.sfz-pn b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font:400 11px/1.3 var(--head);color:var(--gold);text-shadow:2px 2px 0 #000}
+.sfz-pn small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font:400 18px/1 var(--body);color:#d9c38c}
+.sfz-pb{display:grid;gap:4px;justify-items:center;align-content:center}
+.sfz-pp{font:400 22px/1 var(--body);color:#f2d98a;text-shadow:1px 1px 0 #000;white-space:nowrap}
+.sfz-pp.poor{color:#ff8f7e}
+.sfz-pb .btn{min-height:38px;min-width:78px;padding:7px 14px;font-size:10px}
+
+/* ---- Armoury: the weapon racks and the armour stand are scaled up (--rs) and moved down (--rdy) by script.js zfFrame() so they fill the floor under the wall ---- */
+.sfa-sd{transform:translateY(var(--rdy,0px)) scale(var(--ss,1));transform-origin:0 100%}
+.sfa-rk{transform:translateY(var(--rdy,0px)) scale(var(--rs,1));transform-origin:0 100%}
+
+/* (stands and racks are scaled evenly, never stretched: script.js zfFrame() sets their own height --sh / --rh, and the posts under the armour and the posts of the rack frame simply get longer) */
+.sfa-sd.l>i{background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAhCAYAAADZPosTAAAC+ElEQVR4nKWUzWsTURTFf28mE5NKsTUo0tSutYWaVlF34qKIi6KuunAhgm5EXPtHuPGrGwNBUVMFTVGkFA3diVLED6juajVJFbUmbWxSO5l5LiaZJM2bqdULA/Pefefcc8+7PIFP9A7skbX/kBSsCGf5/vVb4YUJeCUGYzHZ8WiUYtimvay5+5lkiuhCXuY+f1aSaqrN3oE9suPxKJNd+3neeZBi2HY/gLbzI0R7eqQKq1QYkk5xrSIZ+jZNe7VuJpnyasifEKAYthn6Nk1h+JzrXWkhT9v5EV9CZcsA7WWNwvA5fnz6yK+5OUpfvqIXFyldu/fvCgG0TSEA7N8rvkTrEraXNWa/fvlronVjMBaTqpuM9vQo92vRMkt9u/skwJapOPlECu3WE2Y+zIhaLpKOU9Fg8fAZCsUlctlME4e2lmzH5A0i6TgBx0IKxaWmghUNArZTMHhhhGj3zia1nh4CbDt1gq6Tx+k4clYCRNJxjNUqPiAIWRqrazAtYzN/ZxyjInm2fR/pyF7MgCCSjrNlymkVoBwUfL+ZYkW3W0Q0Ec58mBHarSeYAceWQ/lXTYfDVXX5hEO2euWev4fgeJa5/YCj89MEbDAq0vWtHHSwKmWehLlsRrQlJty1GRDuBTVGW2KiRZ2SsKayHBSuZ40xO/bQPfNXCmuRT6QIr0qMSv3LJ5zXJmR5wrzHZkW3mR17SMjS6p7p9ZxXeD7l0e6dMnhhRKlm6XpS6Z8vYX9/TC78XFDmIlsjvHv3RolVttzfH5OdE9fpXLO/bEg2m85QR3/+kLlstoXU08NlQ/Ki4wAABwsvW/LCVj84noSbTYHQNXZduticOH3MCwL4jA3gkpUv36V0Nenum7pAamr71YQNh0tXk2TncyKXzYrg/acAGJb0bFlNWD1sWGrQfyn0UuIVvgrXhm7W/zfWclWhqTe3ZRnO7RuW3FjLll6v3gjULcGyITF1sTGFugnzt8dbE7akFB/3VagebE00zV1jLI6OAd4e/gH8x0MabkzawgAAAABJRU5ErkJggg==) 50% 0/40px 66px no-repeat,linear-gradient(#1a0f06,#1a0f06) 50% 66px/8px calc(var(--sh,72px) - 71px) no-repeat,linear-gradient(#a8763a,#6b4423) 50% 67px/4px calc(var(--sh,72px) - 73px) no-repeat,linear-gradient(#1a0f06,#1a0f06) 50% 100%/34px 9px no-repeat,linear-gradient(#a8763a,#6b4423) 50% calc(100% - 2px)/30px 5px no-repeat;image-rendering:pixelated}
+/* ---- Armoury: the left armour stand carries the diamond set (helm, chestplate, leggings on a wooden plinth). The right-hand spot is now a barrel of staffs and spears; the steel chestplate hangs from the beam on two chains (see below). ---- */
+
+/* ---- Armoury: the steel chestplate (the original full-detail art) hangs from the beam on two iron chains, between the copper plate and the helm ---- */
+.sfa-ch.c{left:50%;top:5px;width:30px;height:42px;margin-left:-15px}
+.sfa-cs{display:block;width:30px;height:42px;image-rendering:pixelated;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5));background:url(data:image/png;base64,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) 0 0/30px 42px no-repeat}
+
+/* ---- Armoury: the right-hand stand is now a barrel (36px wide, drawn at 1:1 with staves, riveted hoops and an open top). Staffs and spears stand in it (never in the weapon racks); script.js aFill() fills .it ---- */
+.sfa-sd.br{height:40px}
+.sfa-sd.br>i{position:absolute;left:2px;bottom:0;width:36px;height:40px;background-repeat:no-repeat;background-size:36px 40px;image-rendering:pixelated}
+.sfa-sd.br>i.bk{z-index:1;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAoCAYAAACWwljjAAAA0ElEQVR42mNgGGSAkRTFItys/0m14M3X34xUcRA2yxdUuJLs44SO3SQ5khGXQ5Atr5pxmOKoaMuwxXAkNocx4nIINRxByHHYHMYIcww9HILPYTBHscAkFVTlGBgYGBjeff1NNwfB7EQGcAcdOnSN7lkcm50sSHH4n4GBgaEqygwSnMtO0cwhMDuw5TqMVD4tyw4ju9csOE6xI1oSLDHEsqYdYiS6HMLmMGoBbA4hq6Qmx5H4LB8Fo2AUjIJRMApGwSgYBaNgFIyCUTAKRsHwAwA9c0swLDyTLgAAAABJRU5ErkJggg==)}
+.sfa-sd.br>i.fr{z-index:3;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAoCAYAAACWwljjAAACfklEQVR42u1YzUsbQRT/bTo5rT0lFD/AFi2l2B56UBEPKh6ECr3kIEIPHnIRm0NbaP+G0kNOaSmIYG7Bwx5zETTVUkJESMEGsaxWS42tHxRMKCGE7cXZzuzumN1k4wbMO+3O/N6837yPmbcLtKQlLbmuspWY1bYSs5rXNiX6EJT9WmohrE88nP4gNZIIfR4LL+CkWNZtERa4tpbDyEifSckNclbeX0ysm3CEeufWzRs6KQA6MdFi9Qi1AQAXdjXqJSJSmnq+iLfPxrmxg3zBsfHdw1PuPZlWEQkNCvES9dBO/tz1XNnIbtvCPX08AJOH5uOKCThz7z3iO3OWi9iZ+5LNmuaiU5/xcmlYSM4XlP3aqzdxy8nU6h+hoptzE9MvEJT9GgBIQdmvdfWNen4O/sx9xEmxLBEAKP/4xCVaTMmYEi+mZADAlOgA8PrdCoeniZxMqwCAB3faOfzX70eYHOrlEl0PWSN229MZqFmXOAFHQoPC0u/uaOOOhp7OACKhAGJKBrfbZYOHxDZ8aDJpOkLEmIg0/jQETkQUzv2jojceqmUTVQkZ7x7PQsaXquqqB9gqo+Gj9owOqClktdz6VuTqziFKxI1cEaUGcRqO1OZ+Q09zn1uhsCvVjgAfS6beUNjZULUcIk4XtHa1yulednRQD4kwUqPaVyctLNvGElH76lkLe2lFXVELawpZM7WwEvuhSNvKZFq11aqy7S3Fs8kdUzKYHOrlCmH38BTJtMrZ+n1egeWH4n9F1dXdO7mwdUKFUgW5gzMAwHj/XcxFlxF+8ogDsxjj+Oa3YwDA8dlfbnzvF1/BG9t5DNzv0McLpUpzd4zc7xivSLC/Y/4BqcE/d++ALh0AAAAASUVORK5CYII=)}
+.sfa-sd.br .it{position:absolute;inset:0;z-index:2}
+.sfa-sd.br .it>.stf{position:absolute;display:block;width:16px;height:60px;background-repeat:no-repeat;background-size:16px 60px;image-rendering:pixelated;transform-origin:50% 100%;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.45))}
+.stf.s{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAeCAYAAAARgF8NAAAAh0lEQVR42mNgQAIiEkr/RSSU/iOLMSFL7tx3iMHdN4wBWRETTPL187twXciKmBiwgBtXLmFagQswMTAwMLx5cY9RVFKZgSAQkVD6b2zpheETFAVnrz1BUcAIY7zYaYOiS8L9CCOKbjlBzv/Tsuz+h1tI/pcT5PxPmi9GFYwqoI2CB8/eYigAADHUK7SqET8hAAAAAElFTkSuQmCC)}
+.stf.o{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAeCAYAAAARgF8NAAAAqUlEQVR42u2PIQvCQBiGn5OBsCRiEKPZblnQ7n+w+GvEn2DxF2gdBmeYYBfE4DDtDtxEbJfO4h0H02zZW5/n3ns/wSedbt/gpVCZAAgsvMsrhwWk2zMAcyamUJlo2Bc+3F82rskJ3yCA8DcMmzMAjnrpNggLT6seye4JwGjcYjDNneQaVBwZFUfGvyjw/7MNftzIUEserzbrpCTUsir8Si3Uwj+FW15WhDej1EGT6FyuIgAAAABJRU5ErkJggg==)}
+
+/* ---- Armoury: the two weapon racks are now ONE long rack (160px wide, eight sword slots, an iron strap at each end and one in the middle) ---- */
+.sfa-rk.w,.sfa-rk.w>i{width:160px}
+.sfa-rk.w>i.fr{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAkCAYAAAAeor16AAABu0lEQVR42u2YP0/CQBiHf5gmhsRFCYnyxxJ2mB3YZDZxMnE1+Bl0dtGvIPEzaGJiXHQRUEaDOpmmF9qmCWlXRpyOUGmh3J1SzftMBI7fPbzcQd4XIAiCIAiCIAiCIAiCIIg/Q2p7PT2iMkgU8P7iMLKAx+fXAIDLk/3YrxvMAgCU9UKsjKTmGcxCWS/M3M9gFrTH59fQzZnrjx/zNcz1oW9uTK39nlHKZaaeC9sn6Xmm483dL3WwszXqD4axjmsxm0bctf8hL04m/QYSBEEQBEGtHLVyAIC1+hnanS7ubm9wuqstVS7pLgazoE32hwBQBfDx/gbXZjDY6sIbmY6HUi6jRFrWRcavrBfm1sV0PKyEvbnROBIWVFU8FS4yfpO9Lx88hLloBrMCTXMVQLN5Na5wq2f/+nWpVfKJcGn1bNQqeZiOh7160IUPE7S4H0aEqOmITGOvMk/Gr5TLxCug7LfeH9jCJ3A6ayiUJ+MX5cJPoWY6XmD2x+/6y9MDmOujmE0vIDNcaP2skyHrosovyoXnhf6J8LsucsVUI+ryE35hLhpz/cDAsN3pwjQ+xxVWJS6SFeWyjEFslMsXRMo8VmW70fMAAAAASUVORK5CYII=);background-size:160px 72px}
+
+/* ---- Goblin Warrior boss: pixel-art goblin (roughly square, unlike the wide wolf pack), so it gets its own sizes ---- */
+.bxp .px.art.k-goblinband{width:116px;height:auto;margin-bottom:8px}
+@media (max-width:430px){.bxp .px.art.k-goblinband{width:130px}}
+/* the Goblin Warrior stands further left so the open door leaf on the right never covers it (and keeps its own proportions on wide screens) */
+.sprite.boss.art[data-k^="pet:goblinband"]{right:15%}
+.sprite.boss.art[data-k^="pet:goblinband"] .px{width:112px;height:120px}
+@media (max-width:460px){.sprite.boss.art[data-k^="pet:goblinband"] .px{width:100px!important;height:108px!important}}

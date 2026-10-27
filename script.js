@@ -203,12 +203,82 @@ const SHOP_SPR={
     '................',
     '................']},
 };
+/* the 16 axes from the reference sheet, hand-pixelled: rows joined with '|', palette letter -> colour, '.' is clear */
+const AXE_P={"a":"#e1f5f3","b":"#ded8c7","c":"#e1c087","d":"#eca252","e":"#92d1af","f":"#6cab74","g":"#cd7f4f","h":"#bf6761","i":"#736a68","j":"#7a5f63","k":"#427a7b","l":"#52626e","m":"#c84b40","n":"#995257","o":"#7e4b58","p":"#64576e","q":"#64565a","r":"#66475a","s":"#535163","t":"#52445a","u":"#3d5164","v":"#3d4362","w":"#8b3841","x":"#55374e","y":"#453a4f","z":"#442e43","A":"#363554","B":"#35333b","C":"#322b3b","D":"#2e2431","E":"#1a0f06","F":"#172427"};
+const AXE_S=[
+"......................EEEEE..EEE........|.....................EspllpEEoooE.......|.....................EsslpEEEowrE.......|.....................ExEEEExoEnxE.......|.....................EzE.EEoEEopEEEE....|.....................EzpExxEEwEExxxqE...|......................EEppjEorE.EEEEjEE.|......................EqxiiorsE..EbEztsE|.....................ExjiojspE...EbbbisE|....................EExiirrspE...EbbbElE|...................EtpEjrssspE..EbbbbEpE|..................EEppprrpppE...EbbbE.E.|.................EplEEzxxEiE...EbbbEsE..|.................EEErjEEErpE...EEEE.E...|...............EEqEExqE.ExxE.EEbEEsE....|..............EpEEooEE..ErxEEbbbEEE.....|.............EEsEEoqE...EtrEEbEEEiE.....|............EljEoxEE....EsibbbEpEE......|...........EEinEEoE....EEpEbbE.E........|..........EppEnzEE....EozE.EEtE.........|.........EirrojE.......EtpEE.E..........|........EEtooDrE......EpssssE...........|.......EtiEzxEE........EEEEE............|......EEspErxE..........................|.....EspErDEE...........................|....EEppqqqE............................|...EpsEiDEE.............................|..EjrqrqE...............................|.EExorzqE...............................|ErjixxEE................................|ExriqrE.................................|EDzzEE..................................|EqqqE...................................|.EEE....................................",
+".............................EEE..........|...........................EErooE.........|..........................EjnnnojE........|.........................EEwwnnnrpE.......|........................EoEEnowworpE......|.......................EEnnEEorooorEE.....|......................EjoEEwrtttorortE....|......................EEnEnrojooooorrEE...|.....................EwEEortjgghrvtrotrE..|....................EonnnxronhggnnorrtpE..|..................EEtonorzxnhhggghnottpEE.|.................EionooxxonnhhhgddhhhEEojE|................EErrnooxznnnhhggddhggEEwnE|...............ErzrrryzonnnnhgddddhggghwnE|...............ExxrryxonnnnnhgggddEEEhnwjE|..............EzroryzwnnnnnnhgnwddEEnooojE|..............EzxxttonnnnnnhggggddE.EEEEE.|..............EzttrrnnnnnnnhgdddddnE......|..............EzttronnnnnhhggEgnEEnE......|..............ExttronnnnnhhhgEEE..E.......|...............ErzrownnhhEEEnnE...........|..............EEtzxrrohhgnE.EE............|.............EjzxtzzCwgghnE...............|............EqrxxxjEEjjoooE...............|...........EEDxozzE..EyttroE..............|..........EqroxzEE....EEEEE...............|.........EErrwrxE.........................|........EprnnzqE..........................|........EEoooqE...........................|.......ExoEzxE............................|......EjooxEE.............................|....EEtonxzE..............................|...EprEozEE...............................|..EEqonozE................................|.EpxEEzrE.................................|.EEEEErE..................................|EtEdrrE...................................|EtEErpE...................................|EtEErqE...................................|.EjptpE...................................|.EirpE....................................",
+"...................EEEEE..EEE...........|..................EpppppEEpllE..........|..................EsslllEEplpEE.........|..................EpEaaaEpEEbEsE........|................EEEpEbbbEpEbbEEEE.......|...............EsssEEbEE.EaabEEppE......|..............EiAeEE.E..EEbbE..EEEE.....|..............EpFbabE..EaabE....EspE....|..............EiDEbE..EabbE......EEpE...|..............EiCEE..EEabE........EpE...|...............EEqsEEabbE.........EbE...|..............EEEppEEabE.........EEbEE..|.............ECtsEEbbbE........EEbbbbbE.|.............ECsE.EbEE.E......EbbbbbbbE.|.............ECpEEEbEEEsE.....EaabbbbbbE|..............EEpppsstEE.....EbaabEEEEE.|..............EEssstAApE..EEEbaaaE......|.............EtEEtyEECpE.EbbbbaaaE......|............EEEpppqEEiEEEEbbbbbbbE......|...........EspEqCEEsEbbbbbbbbEsEE.......|............EEpqEiEEEbbbbbEEE.E.........|............EEDpEplbbbbbbbtpE...........|...........EysEEEllpppEEEEEE............|..........EEtqE.EppsppE.................|.........EtyEE...EEEEE..................|........EEipE...........................|.......EiDEE............................|.......EEE..............................|.....EEsE...............................|....ElEE................................|..E.ElE.................................|.EbEsE..................................|.EE.E...................................|EpsE....................................|.EE.....................................",
+"...................EEE....................|.................EEwwoE...................|................EjEEEzE...................|................EoodEzEE....EEEEE.........|................EzxggErBE..EoooooE........|...............EEnnhhgnoEE.ExonrqE........|..............EnwEdghggEzyEEDnhxxE........|..............EjxggggghnzzpxxoozxE........|..............ErDhghggnrzzzxoxzzzE........|.............EoEEhhnooxxzzrxxzzEE.........|.............EoEdhnwooxzxxoxzzzEEEEEEEEEE.|.............EzgdwwoxzgdccDxoEEzzzxroroooE|.............EzohrxrxzngccCxnEEwrrwnnhhnwE|.............EDzzCzzzzrohhDwhhghgggdcccEwE|..............EEEEjzzzzxronhgdghggdcccEEE.|................EEEzzzzzzxggdddggdccbcojE.|...............ExtrxxzzzxohhgdddgwwnnoEE..|..............EqzzzrrxzzwngggddddzxoooE...|..............EqzoxzqErzhhggdddccBqEEE....|..............EnrxxzjEqzhggdddcccxjE......|.............EwnEzzzqEqzhgdddccccoE.......|............EEEnrEEEjqonggddcccEEE........|..........EEwnErDE..ECngggdcccbooE........|.........EjoEnzEE...EzngddccbEoEE.........|.........EjnEnxE...EizjhddcccEoE..........|........EwhhzrE.....EBzzrooooEE...........|.......EEnnjrE......ErqqjjjjjE............|......EwEExxE........EEEEEEEE.............|.....EEEnojE..............................|...EEwnEozE...............................|..EjoEExjE................................|EEEnnEjyE.................................|oowEEDrE..................................|onEEEqE...................................|wgdxzE....................................|xwozBE....................................|CzCzxE....................................|EEEEE.....................................",
+"....................E.................|...................EbE................|..................EEabE...............|.................EbabE................|...............E.EbabEE.EEEEEE........|..............EsEabbbbbEbpstvtE.......|.............E.EbbbbEEEEEpqnnwoE......|............EtEabbbE..EtDtrdgmotE.....|...........EEbbaaaE..EypEtxmmoxypE....|..........ErqaaaaaE.EEBEEyywotvAspE...|.........ExbaaaabE.EzpEpysuzzAzAEEpE..|........EjzbaaaaE.EEtpEsAssyyCAyEEpE..|........EjzEEbEE.EyyEECvsAtEEBpEbbE...|.........EqEEE...EppisvvypiEipEEbbEEE.|..........ErxEEEEEEiyylvDEEBtE.EEbbbaE|...........EEjqttttppsApEqpEE.EbaaabE.|............ExxyAAyyipBiEytE.EbaaaaE..|.............EEEpAssAAzyypE.EaaaaalE..|...............EpytstyAAyE.EEaaaaEpE..|..............EApEyyEEApE.EbbbballE...|.............EiqppEiEpiE.EEbbbbEEE....|..........EEEsiEpCEECpE.EbbEbaExE.....|.........EsssEpqjEqqpE..EbbabiEE......|........EpCCyEExEEyAEEEEbbbaEzE.......|........EpAssxjEszEbaaaaaabxjE........|........EEytsxqEqBEEbbbbbbErE.........|.......EyEEtAzsEpCyCBzxzxxxE..........|......E.E.EjijE.EppppiiEjEE...........|.....EsEbExEEE...EEEEEE.E.............|....E.EEqEE...........................|.EEEpEEExE............................|EppsEErEE.............................|EsssEEriE.............................|ECpEAyEE..............................|ECtpyyE...............................|ECCCAyE...............................|.EEEEE................................",
+".......................EEEE............|......................EkkkkE...........|...................EEEEbbeuE...........|.................EEkkkeaabAlE..........|................EkEaaaaatrEE...........|................EEEaaaabtqE............|...............EkaaaaaiCEE.............|..............EEeaaaaafkEE.............|.............EkbaaaaaeeeulE............|.............EkbaaaaelkkulE............|............EEkbaaaeECvvupE.EEE....EE..|...........EkEaaaeeEEBEEEE.EyyyE..EkkE.|...........EkEaaaeeEjBE...EpvAyE.EEkkkE|...........EkeaaaEE.ECE..EAukvyEEvEafkE|...........EkeaaaE.EqyqEEEkklAyEEAEafkE|...........EkeaaeEEqsqyAzuekAAyEEDEafkE|...........EkeaeEqsqqtlkkkkuuttqiEEafkE|...........EvfaEEyyqsukkekvvvstyrEbafkE|...........EukaEyEECukkeuAzysqqEEeaafkE|...........EvkelzEEClkkktttttqjEEeaafkE|...........EzkeuyEEzkeuDEEEiCEE.EaaafkE|...........ECvkkqipvkkkiE.EiAE.EEaaafkE|...........ECzDEEyvkuzEEEEEiCEEeaaaaEkE|............EEEqptyvlE.EstsACEeaaabE.E.|..............EsCstCjE.EyyzzCeeaaaekE..|.............EziiytEE..EzueeeaaaaeekE..|............EqysiqpE...EtlkeaaaaaeeE...|...........ECyqzzEE.....EEAEaaaaekE....|..........EiptyqiE.....EjEEeaaaeEE.....|.........EztEECEE.....EEzseaaaakE......|........EsEEtEE......EitkeeeiEEE.......|.......EpyEECqE......EsAeeefvkE........|......EyEEtsEE.......EpvullEEE.........|.....EEtEEqpE.........EllluE...........|..EEECEbpzEE...........EEEE............|.EiiqiEEEiE............................|EtAAyEECEE.............................|EsAklspE...............................|EsAkkAqE...............................|EszAAzqE...............................|EprssrE................................",
+"........................EEEE...............|.......................EtzCqE..............|.......................EtAvlEEE............|.......................EyAkkzzAEEE.........|......................EplkluvuuurtE........|.....................EpCkkuuvkkvAArEEE.....|.....................EqDuuuvuuuvuekzyBE....|.....................ElBssvvvvvvukkvvvEEEE.|....................EDuklssttvvvuvkkkevByqE|...................EqulklstrttvvuuukkkkkCqE|..................EDAkklsstttttvvvvukkekDxE|..................EBBvussssstvyAAvuvuAuuEE.|..................EBBBvssssssyAAAuuvBDBzE..|...................EEDCysssssyAkkklDEEEE...|....................EDBBsssssyAkkkkBEE.....|....................EFBAusCCzvuvueeektE....|.................EEEpvAzvyAAvvvukkkkltE....|................EyCCvkuAzAAvvvukkFCtttE....|...............EslkkkkyAzAvukkkusEEEEE.....|..............EiCkkkllvAAAvukkkvyE.........|..............EqDtssssyAvvvuukekklE........|..............ElAytttsvAukuuvkkkksjE.......|.............EFuksrAACvukkkkDCDyttpE.......|.............EDvlstzyvukkkulqqqjEEE........|............EEDyrrtBAvkkkkFxEEEE...........|...........EqluvyyxxttuukkkkpE.............|........EEEEDAkuACAttttvkeektE.............|.......EiDDDDBtyAtvkkkuCCztptE.............|.......EqDDCBztyBtlkkklyzxpspE.............|.......EiDyttyyDDkkkkvEEEEEEE..............|........EiyyyyCtqlukptE....................|.........EyCACDqEBCtttE....................|........EtBzBzEE.EEEEE.....................|.......EsCABDtE............................|......EyvvABEE.............................|.....EEyvvAyE..............................|....EBAsBDEE...............................|...EEAAytqE................................|..EtAvvDqE.................................|.EtyvCyEE..................................|EiCttBqE...................................|EiDBBEE....................................|.EyyyE.....................................",
+"..................................EEE.|.................................EbbbE|................................EEaaaE|...............................EaaaEE.|..............................EEaaaE..|.............................EaabEtE..|...........................EEEbbE.E...|..................EEEEE...EseabEsE....|.................EbbbbbEE.EsEbEEE...E.|.................EaaaaaElEEsEbpqE.EEsE|.................EbbbbbEEppEEpEE.EsEbE|................EEccEbbEEppEpsEEE.EEbE|...............EssuuuEEssEisEEsssEabbE|................EEEEE.EipplsppEpEEabbE|....................EEsEEsssssEEbbabbE|...................EiEEEpEEEppEEbbabbE|...................EsEEppE.EisEEbbabbE|....................EEsEE..EisEEbbabbE|....................EEiE...EisEEbbabE.|...................EsEE....EisEEaaaE..|..................E.E......EEE.EaaaE..|.................EsE.....EEtE..EaaaE..|................EEE.....EiEE..EbabE...|...........E...ElpE...EEEsiEEEbbabE...|..........EsE.EsEE...EpspEEbbbbEEE....|.........EEspEEpE...EEpEEEEbbEE.......|........EppEpsEE...EsEEEbbbbE.........|.........EEpEE.....EspE.EEEE..........|..........EsE......EpssE..............|.........EiE........EEE...............|........EppE..........................|.......EpEE...........................|......EEpE............................|.....EtEE.............................|..EEEEE...............................|.EbbsiE...............................|EpppsE................................|EppspE................................|.EEEE.................................",
+"........................EEEEE......EE.....|.......................ElllllE....EllE....|....................EEEEuvuulEE..EuuulE...|...................EpvulfffffvpE.EuufivE..|..................EEEslifffqqvpE.EluffliE.|.................ElvEcfffffDDDqE.EluffflvE|.................EEEddfffqqiiqE..EsuffflvE|...............EEvEdddffftFEEE...EsuffflvE|..............EpiEddiilifBDE.....EluffflvE|.............EEvidddquuqfBDEE...EElldfflvE|............EplffdfuuuuultrBzE.EpuffdddivE|...........EEllfffquuuuuuqqukEEEElifdddivE|..........EpvfffquuuuuuyDqfeeDBvifuldddivE|.........EpllfflyBByBBBBDyqkkDBuuqiffddivE|........EEvlfffsBDDDDDDBCytvvDBuuuffffdivE|.......ElEfffBBDtEEEBDDDDCCCzyuuuuffffflvE|.......EvlfffyzDqEEEzCDDBDDBBuuuuuffffflvE|.......ECBfqDEEEEEqDtyDtEtDuuuuuqfffDqfyDE|.......EBBiqtE..EEtAvtztEiyyyuuuifiqyqiBDE|.......EDDFiE..EiFvvvvtzDEEBDuuufdBBEiFDDE|.......EiiiE..EqtyAAAAyBDEEzBulfddqqqqEijE|........EEE...EDBuADDDDDDiEBBuidddffFyEEE.|.............EpvACiEEEEiDDyuqfddffBBDqE...|...........EEpvuvDE...EEBFBlfdddffBBBqE...|..........EixvvFqE...EBBkffcdDDFFDEEEE....|..........EpsyAqiE...EBBuqqfEytxtzE.......|.........EtsvCDEE....EBDDDDFBEEEEE........|........EpvvApiE......EiiiiiE.............|......EEtsuAFEE........EEEEE..............|.....EjpvvCqE.............................|.....EsvuABE..............................|....EtsuDtE...............................|.EEEEiyyqiE...............................|EuvvlfByEE................................|EvvfiBiE..................................|EvidiFE...................................|ECCyDDE...................................|EzBzBBE...................................|.EEEEE....................................",
+".................EEEE......................|................EitqqEEE...................|................EiqEEByyE..................|................EEqabEDDEEEE...............|...............EtEaabwmwzFDyE..............|...............EtbaabwmwwzDxE..............|...............EtbaabwmwwwDyE...EE.........|..............E.EaachwmwwwiE...EqqE........|.............EqEbbammwwmzDE...ExDFzEEE.....|.............EtEbbammwwwzDE..ExwmwxtyzE....|............EEqEbbbmmmmwzBEEEqBmmmwDzBEEEE.|...........EqibbbgmmmwwqqqBBBwmmmwwwEEiqqiE|...........EqibbEgmmmwrqtyBBDwmmmmwhEEEEqqE|...........EqibEEhmmwFzqBDtyDwmmmwhbbbbbqiE|..........EEEEEEswwzwqtByyzzywmmmhcbEiEEEE.|.........EiqbbEiFFFDyEiByrDBsnmmmEbbEFyqE..|.........EittyziEEEEEztyzzDzwmmcbbEqEEEE...|..........EqBBBqE..EEBytBDBzmmmbaEEqE......|...........EEEEE..EBBtyCDDtrwEaaaiiE.......|.................EEyzyyyBDrwEEabbEE........|................EzBttDqExDwnbbaEtE.........|...............EqzzzyiiqyBEEbbE.E..........|..............EiCttByEiDytbbbEqE...........|.............EBttBBEEEiDEEttEqqE...........|..........EEEEDyqyzE.EiDEEDCqqqE...........|.........EyFDDtyDEE.EDqE.EBxEEE............|.........EyDzzzttE..EDtEEEtqE..............|.........EtDwwDtE...EFDDFFEE...............|.........EjiwxDqE...EiiiiiE................|.......EEtEEBDDqE....EEEEE.................|......EiEEqxEEEE...........................|.....EEqEEqBE..............................|....EqibEDEE...............................|.EEEEiEEixE................................|EjDDFEEDqE.................................|EiDzwxqEE..................................|EiDwwBzE...................................|.EDCzCxE...................................|.EBBzDxE...................................|..EEEEE....................................",
+"........................EEEEE..............|.......................EptsttE.............|.......................EtBBABEE..EEEE......|.......................EtAlulyDEEDDFiE.....|.......................EqtuuuyzEEyBDE......|...................EEE..EEFBupsDDtyDiE.....|..................EiipE..EDBvyBBBByiE......|..................EBACEEEEDBBCCuyDqE.......|..................EBBuuytyyyDytBBBDyE......|..................EBBlBCCDsyDysBDzBBqE.....|...................EEDyuttCCDDCCzABBCBE....|..............EEE...EDBusuBBABDyABAzABEE...|.............ECCDEEEEDBCkkdfkuCvuAACyussE..|.............EDyuqqqtzBDlfiiftDuuAAvuyiiEE.|.............EFBuBDDztzFffCtfqDuuAyuuufftjE|..............EqByytxBCDtukkuBDyuuuulffftE.|..............EqCyutyBDDvukkvADyuuuuiffitE.|..............EqDCABBlBDBDBDDyyuuuqfffqsE..|..............EqDCBBBuFDCBBDByuyyuqffEqE...|..............EqDDBluDDDBzAzBvuDDFBfitE....|..............EqDyyBuqyDBAAyvvBqjiiqiE.....|............EEEqDuuDtEqDCzCyuBDEEEEyE......|...........EttyyuByEEEqDyuuuuBDE...E.......|...........EyzAAuBBE.EqDuuuulBBEE..........|...........EBztzDEE.EFBluqfffffqrE.........|........EEEEyzytxE.EqBuukfffffiiE..........|.......EiCAAtyDqE.EDBkkufffffitE...........|.......EqByxyyiE..EttsusqqqiiEE............|.......EqDytDxE...ErttttttttyE.............|......EtysBzEE.....EEEEEEEEEE..............|.....EEAvszzE..............................|....EBysyDEE...............................|...EEyytytE................................|..EtBsyDEE.................................|.EpuBBtE...................................|EiCulByE...................................|.EDDBDtE...................................|EizBzzqE...................................|.EEEEEE....................................",
+"..............................E............|......................EEEEEEEEiE...........|.................EEEEEitttttqzBEE..........|................EiiiiqEEEeecEEEppE.........|................EqqqqqEbbbbbbbEtyEEE.......|................EqibbbEEEEEEbEoEnCzCE......|................EsqbbEEEEE.EbEE.EtyCE......|................EytbEEsAAAEEbbbE.EEDE.EE...|................EyAE.EittsEEbbE.EqEE.EipE..|................EyACEbEtqqbbbbbEECpEEECAtE.|................EyAAypEEEEEEEEErtAytttkktE.|..............EEEyAACAEEEbEEonEzAzAAAAektE.|.............EqqqyAAAAzyEbbbbEEyAukkkeektE.|.............EyqiiqqqqrpEEEEE.ErtuukkeektE.|.............ECEEbbbbbEEEnrxDE.EoyukkeektE.|..............EiqEEEEEEEEnxyAEEpsAukkeektE.|..............EqCrwEEEooEnCBCpjvvAukkeektE.|..............EpAnnwnEnoxxEEEpyAAvukkeektE.|..............EiyonongnrBvEEEqyBAvkkkeektE.|...............EEtzzohrAvuAqEEEyAvkkkeektE.|................EyAytEjsvvvsEEEvvukkeeekriE|................EtyptzEEtAvvACAvukkeeeektE.|...............EpsvvtiE.EpAAvAyvukkeeekEE..|..............EpCssCpE...ECvvvCuvkkeeespE..|.............EyssAtEE.....EpAvvkkkeeeeppE..|............EEzssytE......EizvukkeeeeeppE..|...........EtpEtBEE........ECkkkkeeekxEE...|..........EEppEptE........EpvkkkkeekkqE....|.........ErtEpCEE........EDukkkeeekxEE.....|.........EppppiE........EpukkkkeekEE.......|.......EEtEECqE......EEEyAkkkeeektE........|......EqEEssEE......EttslkkkeeeklE.........|.....EEspEtsE......EiAAukkkkeeelpE.........|....ExpEsBEE......EAukkeeeekttsEE..........|...EEtsppsE.......EyskkkkkkkjpiE...........|..ErsvvCEE........EtttrtttxjEEE............|.EpEkkuyE..........EEEEEEEEE...............|EpteekkDE..................................|EpBkkAlE...................................|EpxkkypE...................................|.EEyAAtE...................................|..EisqE....................................",
+"....................EEEEEEEE...EEEEEE....|...................EmmmwwwwwEEEwwmmmmE...|...................EwhbcbbcggnggggmmwE...|...................EwEaaaaadgwgdddgmwEEE.|....................EEnbaaadddddjqrEEEwnE|.................EEEEEwbaabdddddottEEEmmn|................EwwwwmdcaddmmmwtEEEEvmgmn|.............EEEhmmmmgdcbddmmmojE..Esgdmn|............EmwwdddddddddddwwvEE..EEygdmn|............EwmgddddggmddggmwtE..EiEEddmn|............EmmdddddwwwgdmmmorEEEEtndddmn|.............EEmdddgmmmmmmhbcdEspomgdgmEE|.............EEmdddgmmmmmmhbcdEtromgdgmEE|............Ewmddgmmmmmmdmmgmmotwmmgdddmn|............Ewmddmmmmmmmmmmgmmwommmgdddmn|............Ewmdgmmmwwwotmmtttwmmmgddddmn|............Emmdmwwnmwowwwnnwtnmmmdddddmn|............Emmdntvrwwtomtodhtmmmmdddddmn|............EmwrEEEErpiptrtrnmmmdddgmgdmn|............EnnsE.EEspiptoronmmwdddgngdmn|.............EEE.ErsEEswmwwmmmwwbbwEEEnwn|................EEppppEowmmmmmgEabwhE.EEE|...............EitEEAqEEvmmmmgbaabwE.....|...............EEEssEEEjvmmmgdbaabwnE....|.............EEppEytE.EpymmgddbaabwE.....|............EqEEpyEE.EphgddddmbaEEE......|...........EEspEpyE..ErmgdddgnEbmwE......|..........ElsEpDEE...EwmwwwwEEEwmnE......|..........EEpppqE.....EEEEEE...EEE.......|........EEsEECpE.........................|.......EiEEptEE..........................|......EEspEtxE...........................|.....EpEEptEE............................|....EEpEEptE.............................|...EpsEpCEE..............................|.EEEEEppqE...............................|EsstEECqE................................|EsEEEEEE.................................|EpEbppE..................................|EtsttrE..................................|EppppE...................................|.EEEE....................................",
+".................EEEEE......................|................EppspiE.....................|................EtrrrjEEEEE............EEEE.|................EtEbcEtttADE..........EqyyqE|................EtEcEEojizAE.EEE......EEospE|...............EiCEE..EEbjAEECACE....EtEErpE|................EEEoEEEEitAqsvAzE....EthhrpE|.................EsAjjpptvzCAvvBE...EEthhrpE|.................EsztttstppzAApE...EqpphhspE|.................EsAttttrppyyCpEEEEErpjhhtpE|.................EtzCAArjjjjpACAtttrEhhccrpE|..................EpptAypppprtyxjojjnhhccoE.|...................EEEzBztttstpjhhhhhhhccE..|...................EqtvAAyyttpprpphhhhcccE..|..................EEyvuvACCtrjrCvvEhhccccE..|.................EqxppApEtAppxpEEEpEbcbEE...|.................ElAppyEEsCnpApE.EpEEccE....|................EzkkAtE.EsAhhvE...EEvEbE....|...............EluullE..EtAhhpEE...EvpE.....|...........EEEECukuzE...EsAhhhEvEE.EypE.....|..........EisrqkuvpE...EprphhhhEEpE.EE......|..........EsAAvkuBE.EEEEzonhhhccEvE.........|..........EpzrrAsE.ElltrphhhhcbbcbE.........|.........EEryrrAtEEEssyrEEhhhcccccE.........|........EiCnhxAAqElvEEhhEccbbcEEEE..........|........EqrojpsqEElvEEjEEEEEEE..............|......EECjgrCEEE.EpuvvutttxpEjE.............|.....EpjEoriE.....EEEEEEEEEE.E..............|....EEyxEoAE................................|...EqzorxjE.................................|...EpxooApE.................................|..ECEEnpCqE.................................|.ElkEErpiE..................................|ECkekkAtE...................................|EzukkkzyE...................................|EBukuvAtE...................................|.EiAACEE....................................|..EtttE.....................................|...EEE......................................",
+"......................................EE..|.....................................EppE.|....................................EEuusE|...................................EuEEluE|...........EEEE....................EvEdllE|..........ElvvlE...................EvEdpsE|..........ElvpEEE...EEE..EEEE.....EiiEdpsE|..........ElsdEDpE.EvvvEEsvvpEEEEEvEdddpuE|..........EludgziEEEkkAEElukkppppEEEdeeluE|..........ElldgCiEsuekCiEsukkvvuuldddfekuE|..........ElldgfqyukekAEEluffkfdfddddfekuE|..........EludgfqBukekCpEildfkfdddddffeklE|..........EluhjuqflkkkBvvfddfkfddddfffekuE|..........EluhhklfqlkuAslfddffffdddfffkuvE|..........EluhhuuuffBzAqfffdddfkfdfffkkvyE|..........EsvhhpppiirsvufqffffkkffffqkkvyE|..........EtzEhjjjjjjpvukuufffkkffffukkvAE|...........EEtyyAyyyytpnhlulqffkffffuBAEE.|............EtyyyyBAyxpnhilulfkkffffkyCE..|.............EEEEEyzrrzABhhuuukkffqkekCE..|...............EEEvyxxpppjniiukkkiukkuzE..|..............ECACvuAtEEEyxEhkuvuuukkvCE..|..............EAxovuzsE..EEtjhpvukfkvlE...|.............EECrnsvArE...ECthpvukekziE...|............EtrnryvsEEyE..ECtnpuukEEAE....|...........EEyxntBvsEEyjE.ECropuliEEzE....|..........EltEoCACluulhoDE.EEzvvhhCsE.....|..........EjqrrqppuuligikEE.EztpjjpE......|........EEunnztEEEvBffffeuBEECnhtBE.......|.......EijjotEE...EEttqukABEECyxjE........|......EEuoExyE.....EtyyyyztEEAyyE.........|.....EsqnrzEE.......EEEEEEE..EEE..........|....EEsqnryE..............................|...EqsnoAEE...............................|...EqqoqqE................................|.EEunEBsE.................................|EtiEjxEE..................................|ECndrBE...................................|ECzyzCE...................................|EtttttE...................................|.EEEEE....................................",
+"................................EE.......|...............................EpiE......|.............................EErttiE.....|............................EprEEtiE.....|....................EEEEEE..EqyEEyiE.....|...................EiCCCCyE.EszddtiE.....|.................EEEErqxyyE.EsAggEEE.....|................EyACjdggxBE.EsyhgdEyE....|................EvyhhgoqiE..EsznhddEiE...|................EyxdgnxAE...EsAnndddExE..|................EyyhnryzE...EpynnnnhptE..|............EEEEExxnotxxEEEEEqxononhErEE.|...........EzCAAzxwwooorzAzzzonwwwnhEEtpE|...........EzyorxoorrxrrxxyyyrorronhEErqE|...........EAodgnwotvBABwwttttstrrhdddtpE|..........EjEEhnrrtAxwmnwxstrrroonhdddtpE|.........EyxdEnqtttAwmggxArroownnngdddtpE|.........EytgnzzyttArmmmxyoonnnnnngdddtpE|.........EyxhotytttzwwmmryoonnnnnnhdddtpE|.........EvzCsEEEtzwryAzEECyttrroonhEEtpE|.........EjipE..EyAwxBtpEECxrrrronhhEEEE.|..........EEE...EyzxxCEE.ECxooownhhhotE..|...............EsxxzyAE.EqxronnggdgdjtE..|..............EpCxxzBBEEtzowwnndddddjtE..|.............EyzxztEEEixjjwnhhhdddEoEE...|............EECxxytE.EpznnonhhhddEEsE....|...........EDyoxDEE.EConddddhEErvtiE.....|..........EpxxxxpE.EqrhhdddgnEEjEpE......|.........EyzoxAiE.ECohdddddEtvtE.E.......|........ErxrxrEE.EjEEdddhjE.EEE..........|.......EpzrrzpE.EtjEEddEjttE.............|......EArrxxEE..EptrrrrrEEE..............|.....EjyxrtqE...EpppppppE................|....EDxnrCEE.....EEEEEEE.................|.EEEExxoopE..............................|EtyADmwDEE...............................|EqBnnxrE.................................|EqAEECpE.................................|EpCzxEE..................................|.EttqE...................................|..EEE...................................."
+];
+/* the 9 weapons from the second sheet: [palette, rows joined with '|'] */
+const WPN=[[{"a":"#ece591","b":"#bddfca","c":"#e2b96f","d":"#69ece0","e":"#68d191","f":"#5cb693","g":"#43b3aa","h":"#eca85b","i":"#ba9481","j":"#9c5844","k":"#34916a","l":"#178e8f","m":"#3d6973","n":"#272730","o":"#1a171f","p":"#0d1d21","q":"#101826","r":"#22151e","s":"#191521","t":"#131525","u":"#250f1c","v":"#1e1121","w":"#1a1222","x":"#161222"},".fe.........tqtqqqqqtqq........|..mn......tqllgggdddddgq.rwuo..|..n......slgfaacccaddgtx.tcaax.|........pkfacdddddgbdp..qllmcaw|.......pkfcvrtqqpedfbdqqlgqqrhw|......okeso......wqdfillggt..uw|......txw..........oegllnw.tw..|....................pelmijoko..|....................qenfnhjs...|....................pe.bohjev..|.................wppelmbvjokew.|.................pkellmibv.pko.|..................omlllmnu..qw.|.................ujqlll.cjox...|...............wrjrtnqquhhcx...|..............ucaw.ts..rhhax...|.............ucajw...vujhhas...|.............ucjv...ujhhhco....|............tirv...ujhhhcr.....|...........tbw.....ujjvvo......|..........qbx......vjv.........|.........tit.......wo..........|.......orjx....................|....usuccr.....................|...uhjvujv.....................|..ocjujwv......................|..xrucujv......................|.soacujcv......................|peocjucr.......................|qgqowwx........................|qglmw..........................|.wtw..........................."],[{"a":"#d0dee9","b":"#c0cedf","c":"#e2b577","d":"#c39d9f","e":"#9a9fc0","f":"#939db9","g":"#b694ee","h":"#817287","i":"#6d6f85","j":"#6d6983","k":"#8a537e","l":"#6c55a8","m":"#75449d","n":"#533956","o":"#3f3d5a","p":"#3f3959","q":"#222237","r":"#191728","s":"#1a142b","t":"#1a1422","u":"#1b1227","v":"#190f27","w":"#151427","x":"#151126"},"..........................sssst|........................sxabffr|.......................vialllfw|......................siaglllfw|.....................sibgglllfr|.....................ralgglleq.|....................weglgglejr.|...................relglgleit..|..................sellgllajs...|................vqemllglbtu....|..............uqbbmmlller......|..............wbnmmmllbw.......|.....us..rt...xfommmlew........|.....sfusdct.rpbepmmet.........|....rvijdkctwbboofppjt.........|...qejpnkcncvfpfpbjjr..........|..xjpp.kccjckjpoepsur..........|..sjjsuhkcccbqiffu.............|..rst.sjnkcbwfsts..............|.......wbpbxdcccut.............|.......sffofccjncct............|.......sqofpkccckjx............|......wbosfbnkckjx.............|.....wiefuuxjkk.ex.............|....wbbor...usooijt............|...qboft.....spfssv............|.vxibfr.....tjpjx..............|xjwsot......xjir...............|xqpsx.......uuu................|.vvpx..........................|..ur..........................."],[{"a":"#f1f4cc","b":"#f3e697","c":"#eec768","d":"#d1e4c8","e":"#a5deaf","f":"#cdc8a0","g":"#dbac79","h":"#e4a166","i":"#a99d88","j":"#41a5b8","k":"#357da2","l":"#a15c3a","m":"#606276","n":"#333d58","o":"#24242c","p":"#2a1b21","q":"#211b26","r":"#1b1927","s":"#14192b","t":"#2d1214","u":"#211220","v":"#1c1323","w":"#15142b","x":"#17131d"},"...........................wrwv|.........................vpaaev|......................nvpacccer|.....................soacfjigiv|.....................xafjkkmgr.|.....................xagkkkgip.|....................nafkkkmix..|..................vrafkkmcfiv..|.................tbcikkmfddr...|.................tfjkkmfdrrq...|................sifjkkfds......|..............snjfadkmgs.......|..............sjfjjachiv.......|...........svojfdejfkvo........|......uvvuvracfjjafjo..........|....rtbbbbgqffdejfjs...........|....tcllhlvvsjeefjsv...........|..xtcbvtcb.gfjjhcr.............|..qbbq..pcb.miwdav.............|...xxv..xtcg.ixvvq.............|........tchll.tgv..............|.......wmgltlhlgr..............|......omknvvtlcgr..............|.....sknns...plgw..............|.xx.rmmnr....tliv..............|xbhuuwnw...rtcgq...............|xblbcvo....tcluq...............|ugpchq.....pgo.................|.pgutlo.....vq.................|..thhgq........................|...vuq........................."],[{"a":"#f7e2d6","b":"#fde88e","c":"#f5d090","d":"#f2bf87","e":"#edab86","f":"#d3986f","g":"#cf8348","h":"#ec6c23","i":"#ae5358","j":"#9b5840","k":"#d4422a","l":"#c54733","m":"#89334a","n":"#a31e26","o":"#6d1a2c","p":"#361119","q":"#340916","r":"#26111b","s":"#270d1d","t":"#1e1427","u":"#1f1419","v":"#171523","w":"#1d1029","x":"#1e101f"},"....................rdbdx.......|...................udbdu........|..................tdbdx.........|..................tdbdu.........|...................ubdu.........|.............wwwq..qgbfr........|............taaalxxjggbjv.......|............waakkistxrrsrr......|...........xaalnnmaasnkkklwu....|...........sagsoimmiatonnhagux..|..........wagrbfvwootosonngaggr.|..........wmqdbbbfsxtwtsssonnkfx|..........xxfqgddbollaahoosrwxxv|............rjqdmjddonnnnnnmx...|...........vfpiaisgddokkkchgat..|...........uqdiaimqgdbonhgdkgau.|..........udjdjfwanrgbbbqohhhggx|..........xdglgwialaqjgddgsxsuvv|...........vsjftwqnaafrwurvv....|...........wewx.snsqlhfrnlr.....|...........woew.slrjqkhcphlv....|...........sjox.skfqgqkhasuv....|..........sjjx..rluudjqhhgw.....|.........rjiox..wx..udvxxxw.....|..tv....rjios........uw.........|..tat.tsojos....................|..rgauasoox.....................|..qhgwewtt......................|.qnhaweew.......................|slkneawv........................|xwqlseav........................|..vr.wtv........................"],[{"a":"#bdc7d5","b":"#9aa5bc","c":"#9e9db4","d":"#9c94ab","e":"#7c7792","f":"#6b6983","g":"#62546d","h":"#7b3e52","i":"#7d2c3d","j":"#464763","k":"#413a59","l":"#3c2a41","m":"#781d30","n":"#4e1b34","o":"#2d1225","p":"#221f33","q":"#211a2c","r":"#201427","s":"#1b192d","t":"#191629","u":"#191527","v":"#1a1427","w":"#191129","x":"#141326"},"...........................rxrtr|.........................rpgbbbr|........................qfacbbx.|.......................vfahbbp..|......................pgdidex...|.....................rfancfr....|....................lfchdjq.....|..............r....qfahckw......|.............pv...qgd.dep.......|............slx..pfchcfw........|..........rrit..ufcndkq.........|........tvkio..pfdndkt..........|..tttvxxglio.usfcnckp...........|..ugac.iiin.qkgmndes............|...sxg.mmo..tgminbkx............|qrtg.hnndr.qliiidjpu............|w.aghopkbwr.mmmkwp..............|.scio..sjcwgmmgp..tr............|.semr..wkfcag.t..sfu............|.oho...tfbabsp..qgfv............|.oix...tspbfcxrongs.............|.omu..onlwekkbbkmp..............|.ro..p.gkxpssjjnhu..............|.xw.oihnp....wongfx.............|.q.onoor.......rswx.............|.kr.oc.x........................|.qwpaep.........................|.saabs..........................|.pbbeu..........................|.kplp..........................."],[{"a":"#dff6b1","b":"#b5ec7c","c":"#d3dd8f","d":"#91e485","e":"#5dd365","f":"#70c86d","g":"#d5b072","h":"#dca569","i":"#b2835f","j":"#71a981","k":"#888c66","l":"#218f38","m":"#305f4a","n":"#264532","o":"#302c23","p":"#052b16","q":"#2e1d1c","r":"#1e1c20","s":"#171c1f","t":"#261217","u":"#1e1423","v":"#1b1622","w":"#141623","x":"#191224"},"...........................vuvuu|.........................vrcaacv|.......................vsaabbjs.|....................mvoaabbdvr..|....................nfbbbbjr....|...................saebbbfr.....|..................rabfbbjr......|.................pfbdfdfr.......|................pefbdejv........|...............peeebefr.........|..............peleeems..........|......muuu.xwnfpleelr...........|.......tgu.wlmpllels............|......ohcv.slplllmw.............|wr....qhcv.slllmww..............|tiu..tgauxxussthiw..............|tigxqgctiitigdj.v...............|thiqivvxvvpjdjmr................|.qhit...smjskms.................|.ocgu..tgkkmxr..................|tgcuu.pmkhgv....................|thu...njjmq.....................|tgv..schkv......................|tiawsmkiu.......................|tigtagmr........................|.xrmjir.........................|.ocgmu..........................|.ohix...........................|..uxx..........................."],[{"a":"#eeedc2","b":"#c7d6e7","c":"#eab36e","d":"#9fa8c3","e":"#9ba1bc","f":"#95a1bd","g":"#ab9497","h":"#94655b","i":"#726d8a","j":"#6f6b89","k":"#4c4c67","l":"#3f3c5b","m":"#3f3b58","n":"#423959","o":"#3f395b","p":"#3b3959","q":"#2c2637","r":"#1b1524","s":"#181421","t":"#1c1220","u":"#1f0e1c","v":"#161125","w":"#101025","x":"#0f0b27"},".........................xxxxxv|........................xfbbbbx|.......................vfjlmmfx|......................wbiooolfx|.....................xbeooolpfx|....................xbejoolpfix|...................wbdjjnopeix.|..................rbepjjlpeix..|.................wbejojjpeiw...|................wblojoipejv....|...............wblooippeix.....|............rvwbpoooipejs......|............wbbonoolpeis.......|..........swbdpooplpeis........|........ruabjllfflpfjr.........|......wvgccnoejfflkes..........|.....xejmhcnoonjlpev...........|.....sveficamopelkev...........|.......sruhcmmnpkdvt...........|........vnuhcanngr.............|........x.puhcchcs.............|.......vjvoorhhhu..............|......vjkmvvveniv..............|.....tjklv..reir...............|....ucumr....wes...............|...usugv.....ss................|.uucarv........................|uachcs.........................|uacct..........................|.uhhs..........................|..us..........................."],[{"a":"#cde6e8","b":"#c0d0dd","c":"#c8c5b8","d":"#9ccbc9","e":"#4db8b9","f":"#7fa6b9","g":"#9c9baa","h":"#a98c7b","i":"#5a7c98","j":"#696273","k":"#38455a","l":"#3c364b","m":"#28222d","n":"#281b27","o":"#1d192d","p":"#141e2d","q":"#131729","r":"#181628","s":"#23121f","t":"#1b1324","u":"#181227","v":"#161328","w":"#11142a","x":"#141025"},"......................n.........|.....................mgt........|.....................wbq........|................nm..lbbgn..mm...|...............lbu..pbdbr..xbm..|..............ubgx.rafdgct.qbgt.|..............rao..wbiejgx..qjr.|..............qax..vkiejku..vju.|..............xbgttbjkkkjbmlbjx.|..............qdfpaekieekebkbiv.|..............wekdfiideeiiigkex.|.............mbmjgkkieeeikkfjkbt|.............wbvootckici.cxvoobt|.............rbr...sh.hkhn...obt|.............vfgro..nllln..tobgt|..............pgxgnmwjgjwtogwgp.|..............owxajsjhchjujbvvx.|.............mh.xajtlhchnwjgt...|..........ttshhoubjulshs.ujgx...|..........obghsq.ogjm.n.ojbm....|.........tjjk.bdtvbjvpirojgr....|........mjjkodegr.pbokdkogv.....|.......q.jlvgqpou..oofdgvr......|.....xlggkoqq.......lpeq........|.....rddgo...........wfx........|....tpedm.............m.........|.trollpqo.......................|urbwgkr.........................|scahoo..........................|..acft..........................|.vshwv..........................|..lnu..........................."],[{"a":"#e5bf73","b":"#db9d68","c":"#c3824c","d":"#966653","e":"#9b533e","f":"#7e5145","g":"#664645","h":"#993631","i":"#6f3e3e","j":"#5a3b3f","k":"#523130","l":"#42353a","m":"#3e2f35","n":"#392b31","o":"#721a24","p":"#451f2b","q":"#38212a","r":"#2e222e","s":"#2b121b","t":"#1e1c2c","u":"#1d1626","v":"#1b1425","w":"#211122","x":"#171228"},".n..........xvvutxvr...........|..gl......tr.g.twohkvm.......ur|.md.....xqgiiii.msohhkxxm..umjx|q......njdccbbbbbbfhhhu.lr.rjm.|......ricbsssssohccihhsg.nrkwt.|.....rfbsq......pessphtji.lr...|.....vsn........ihx.kokqif.rn..|.................oir.jwtjdf.mvr|.................jpxwkcfnddggnv|..................vwaabew.dfdfv|..................vdcabmlqgsqn.|..................radict.wgt...|.................sdabdp..wfr...|................vscesn..tvn....|..............vvujsp...sdu.....|.............lv.lwx...kcbv.....|.............pim.t..lqcbm......|.............phntu..kcck.......|............nksq...lcbk........|...........t.r.....sdq.........|..........l.n......wm..........|.........r.r...................|........rjr....................|......vnkn.....................|...tttrkn......................|...sabjut......................|..uakcfx.......................|..wafifx.......................|.tscegwx.......................|mfkssm.........................|sgjt...........................|wrn............................"]];
+/* the 25 swords from the third sheet: [palette, rows joined with '|'] */
+const SWD=[[{"a":"#fbfcff","b":"#fcfaff","c":"#dcdbe6","d":"#d1cedf","e":"#cccddc","f":"#cda88c","g":"#8a6759","h":"#442f2a","i":"#1c1f29","j":"#301717","k":"#28181e","l":"#231c2a","m":"#241726","n":"#1e1c2b","o":"#1a1b26","p":"#1c1727"},"mm.............|pbo............|lbdp...........|naedn..........|.iadep.........|..oaeen........|...obddn.......|....ibddp..ki..|.....oaedpjgk..|......obdhfgk..|.......lhffj...|.......jffhl...|......kggjk.p..|......lkm..p.n.|............mhn|.............ll"],[{"a":"#fefdff","b":"#fbfdfd","c":"#fafbfd","d":"#faf8fd","e":"#d2d1de","f":"#d0cee3","g":"#cdcae5","h":"#a19eb5","i":"#826176","j":"#431b2b","k":"#241a28","l":"#1f1a2a","m":"#1c1c29","n":"#1b1a29","o":"#1a182a","p":"#1b1426"},"pp........................|pdl.......................|mdfo......................|kafgk.....................|kadego....................|.kcbfgk...................|..nbbefo..................|...nbcefp.................|....laedfl................|.....odchfo...............|......mahdfl..............|.......naahgp.............|........nbhhal............|.........mdhbn............|..........padn............|...........paenno.........|............laacfo........|.............maehgo.......|..............nchghom.....|...............pc.ffm.....|................nfgl......|.............lllgh.k......|.............kfhh.jij.....|..............lllkkjik....|...................jjik...|....................kjjkk.|.....................kkl.k|......................k..k|.......................kl."],[{"a":"#fbfbfe","b":"#f3fef8","c":"#e7fdef","d":"#d3fadf","e":"#dbf5e4","f":"#a4cdab","g":"#9cbca1","h":"#253c2c","i":"#1c2226","j":"#1c1d28","k":"#142123","l":"#161d26","m":"#221924","n":"#291623","o":"#1d1824","p":"#141b1e"},"mom...............|oaap..............|jaaei.............|.jabep............|..oabek...........|...obgdk..........|....jcgek.........|.....ibgdp........|......lbgdk.......|.......jbgdk......|........lbgdpli...|.........icgdel...|..........icggp...|..........jeghm...|..........jlki.o..|..............m.m.|...............n.m|................nm"],[{"a":"#d0d0eb","b":"#d0ceeb","c":"#ceccea","d":"#cacbe9","e":"#a7a9cf","f":"#9b9dc5","g":"#9a9bc5","h":"#908eb5","i":"#797a9d","j":"#726e8f","k":"#2f2536","l":"#1f1a2d","m":"#201929","n":"#251424","o":"#1b192d","p":"#18162b"},"....m...................|...lco..................|..labal.................|.oadiibl................|padifficl...............|ocaifggicm..............|ocdigfggibl.............|.oabiggggibp............|..paaifggfial...........|...odciegffico..........|....odaiffgicop.........|.....oacifgfdddp........|......oaaiffgiboo.......|.......ocaigfgacao......|........lddigffio.......|.........ocdigf.n.......|..........pbci.jkm......|...........lcomkkkm.....|............l..m...m....|................n...m...|.................n..n...|..................mnkn..|....................nm..|.....................mp.|.....................m.m|..................n..m.m|...................mm..m"],[{"a":"#fdfcfe","b":"#dfdef1","c":"#d0cee6","d":"#cdcdd8","e":"#b6b5d1","f":"#806c85","g":"#27212a","h":"#1b1e26","i":"#281b29","j":"#241926","k":"#211929","l":"#2d1324","m":"#1d1b2d","n":"#1d1c23","o":"#1c182d","p":"#17172e"},"...jk................|..nan................|.naan................|jaadan...............|mnhadcm..............|...mceco.............|....ocecm............|.....pcecp...........|......ocecp..........|.......pcecm.........|........mcecn........|.........pcdahhh.....|..........naddan.....|...........mcei......|...........haigl.....|...........mn.lfl....|...............lfl...|................lgio.|.................i.hk|.................jk.j|............kk......j|..............ki....j|..............ki...j.|................jjj.."],[{"a":"#fbfcfd","b":"#e8e7f4","c":"#cdc7d9","d":"#a3a0ae","e":"#9392ab","f":"#5b576f","g":"#211d23","h":"#1b1d2b","i":"#241929","j":"#20192a","k":"#1f182e","l":"#24191c","m":"#291515","n":"#1b1a2c","o":"#17192c","p":"#191629"},"ggi.........................|gacj........................|laacj.......................|.gaaci......................|..gaack.....................|...gadck....................|....jadcp...................|.....gadck..................|......padck.................|.......iadck................|........gadco...............|.........padck..............|..........gadcn..n..........|...........gadcoh...........|............hadfk...........|.............h.eek..nn......|.............pkdefkneo......|............n..oeekdn.......|................hodjg.......|................ndk.l.......|...............nekpi.m......|...............jk...mdm.....|.....................mdm....|......................m.m...|.......................lfii.|........................ij.l|........................j..g|.........................ii."],[{"a":"#fdfefc","b":"#fdfdff","c":"#fcfbfe","d":"#faf9fc","e":"#d8d5e2","f":"#c4aca0","g":"#a38173","h":"#643f3f","i":"#221d24","j":"#2d1a14","k":"#261921","l":"#2c1416","m":"#1d1b2e","n":"#1b1c22","o":"#1f1721","p":"#17162f"},"oinn...............|ibbbi..............|ibddbo.............|ibaacbi............|.nbcedcn....kk.....|..pdaecbi...m.l....|...nadfcem...jgk...|....ncdfdem..jfi...|.....nccfeeojfj....|......naemjfgl.....|.......nejfhfj.....|........jfhhgo.....|....mi..jgfgkm.....|....m.jjflkkmhm....|.....lgfj....php...|......kj......p.io.|...............ml.k|...............i.j.|................l.."],[{"a":"#fcfcff","b":"#f9f8ff","c":"#dad9e7","d":"#d1d0e2","e":"#cfcede","f":"#cfcbdc","g":"#b0b0c3","h":"#292631","i":"#1d1c29","j":"#1e1b28","k":"#211a26","l":"#1b1a2d","m":"#261628","n":"#1f1727","o":"#18182f","p":"#1a1627"},"mj............................|kaj...........................|pafl..........................|kafdn.........................|.kbfdp........................|..jafej.......................|...kafen......................|....kafdn.....................|.....kadel....................|......kaddo...................|.......kbedp..................|........jbedp.................|.........pbfel................|..........iaedl...............|...........ibffo..............|............jbddl.............|.............ibedl............|..............pbffl...........|...............padeo..........|................iaedo.........|.................jaedo........|..................jaedo.li....|...................ibdgogl....|....................jggdo.....|.....................jbg.i....|....................mfkn..m...|....................mm..m..m..|.........................n..n.|..........................m.hk|...........................mmk"],[{"a":"#fcfcfe","b":"#f5f4fc","c":"#cfcfe7","d":"#c0b9d1","e":"#9f9eb6","f":"#9c9cba","g":"#9091b0","h":"#7879a0","i":"#4e4758","j":"#22202a","k":"#221b2a","l":"#1c1b2a","m":"#271720","n":"#201727","o":"#1b1826","p":"#191425"},"...n.....................|..jcp....................|.kaaco...................|naaehck..................|.naefhck.................|..jaefhco................|...oaefhck...............|....oaefhcj..............|.....laefhcl.............|......jaefhcl............|.......laefhcl...........|........oaefhcp..........|.........laffhcl.........|..........laefhck........|...........oaeehcl.......|............pbefhcnk.....|.............jaeem.m.....|..............oameim.....|...............n.imk.....|...............kmnjl.....|.................k.jo....|..................pjjn...|...................l.jnnm|....................lij.m|.....................knm."],[{"a":"#fdfcff","b":"#fcfaff","c":"#faf7ff","d":"#d4d4e5","e":"#cecde1","f":"#bcb1b7","g":"#99909d","h":"#372d33","i":"#1e1d27","j":"#2a1719","k":"#221924","l":"#1f1b27","m":"#1f1725","n":"#1b1a2c","o":"#1b1a24","p":"#1a1729"},"kkkkkkko......................|laaaaaabo.....................|.kkooidgcm....................|......negbk...................|...mkiocegai..................|...maaeeeegcl.................|....nnpnnnegck................|..........negbi...............|......plloicefco..............|......laaaeeeegbo.............|.......lllpppnegci............|..............pdgci...........|..........pionnbegck..........|..........ibabedeegbo.........|...........innnnnnegcn........|..................nefen.......|..............poomocegjj......|..............naaaeeejfhl.....|...............nnilmjffjn.....|...................jggjh.m....|...................ljjklhhk...|........................mhhm..|.........................lhjjm|..........................jfgk|..........................jgjl|..........................kjk."],[{"a":"#fbf8ff","b":"#d1d0e7","c":"#cac0d9","d":"#665e7b","e":"#57556c","f":"#535472","g":"#544455","h":"#2e212f","i":"#1e1d29","j":"#241a29","k":"#1f1927","l":"#281323","m":"#201627","n":"#1b1a2c","o":"#1c1a23","p":"#191528"},"hkmj.....................|mabbn....................|ma.fbp...................|oa..dbj..................|.o..ffbn.................|..i...fbn................|...o..ffbj...............|....k...fbn..............|.....o....bn.............|......o...fbn............|.......kaeffbp...........|........ia..fbp..........|.........i.....j.........|..........oae...n........|...........oae...n.......|............ia...bmn.....|.............i...lgk.....|..............oao.dl.....|...............jedgo.....|...............pmllgk....|...................hgl...|....................lhm..|.....................iiio|......................p.m|......................jmj"],[{"a":"#fcfcff","b":"#ede0d4","c":"#a9a0ab","d":"#9c9eba","e":"#9a9bc5","f":"#9c9bbb","g":"#8988ac","h":"#79799e","i":"#785b55","j":"#322730","k":"#1f1b26","l":"#221a24","m":"#1b192e","n":"#29171f","o":"#2e1518","p":"#1b1629"},"...lkk..............|..laak..............|.laadp..............|.kacfm..............|laadfm..............|ladefm..............|kafeem..............|kadeedk.............|kadeefp.............|kadeefm.............|.kafeem.............|.kadehhm............|.kadhedm............|.pacehhm............|..kadhfdm...........|..kacdhhm...........|...kadhhhm..........|...kachhhm..........|....kadhhhm.........|.....kadhhhlnn......|......madhhiiik.....|.......pahjccil.....|........kfocco......|.........knii.m.....|......ll..ojn..m....|......lioocinm..m...|.......nicio..m..kl.|........non....m.oil|................lc.n|................noo."],[{"a":"#fdfcfe","b":"#ececf5","c":"#ccbbbe","d":"#725e6c","e":"#231f29","f":"#211a2a","g":"#201a23","h":"#1a1b2d","i":"#1b1c24","j":"#241729","k":"#24171e","l":"#211928","m":"#2c121d","n":"#1c182c","o":"#1e1822","p":"#1d152b"},"ff........................|pdl.......................|.fcn......................|..ncg.....................|...oag....................|....gao...................|.....iao..................|......gag.................|.......gae................|........eai...............|.........iai..............|..........iah.............|...........hbh............|............hbh...........|.............hch..........|..............nch.....h...|...............ndnkg.pn...|................hcddnn....|................kccmf.....|................k.mej.....|.................ojjdm....|................phl.mdm...|...............lg.g..mdj..|..................k...jloj|...................ol..p.l|.....................l.fll"],[{"a":"#fdf9fb","b":"#e8e4ef","c":"#bfb0ae","d":"#817177","e":"#282435","f":"#1e1d2b","g":"#261a21","h":"#1d1b2b","i":"#191b2f","j":"#1a1b27","k":"#271820","l":"#1f1927","m":"#28141e","n":"#1a1831","o":"#1a1825","p":"#1a1528"},"hf............................|hdn...........................|.ncl..........................|..lbl.........................|...lag........................|....oao.......................|.....laj......................|......jaj.....................|.......lao....................|........obl...................|.........hbo..................|..........fae.................|...........jah................|............haj...............|.............fbi..ff..........|..............ibh.j...j.......|...............icn.f..n.hj....|................ncn.op.k.p....|..............hh.ndn..mdk.....|..............h.j.hdomcm......|.................i.ladm.......|.................i.gacg.......|...............oi.kckk.n......|.................m.m..n.n.....|................lem....n.n....|................ol......n.n...|.........................i.gg.|..........................mcem|..........................mcdg|...........................mm."],[{"a":"#fcfcff","b":"#faf8ff","c":"#c5c3d0","d":"#a09fb2","e":"#9f9daf","f":"#9692ab","g":"#52394f","h":"#1e1f27","i":"#231a25","j":"#1f1b27","k":"#1e1a2d","l":"#1a1b28","m":"#1a1829","n":"#251629","o":"#2f1020","p":"#1b1628"},"..iiii.....................|...iabl....................|i...jeai...................|ij...keai..................|iak...ndbj.................|iaek...keai................|.hbem...pdbi...............|..ladm...mebi..............|...hbem...kebj.............|....lbdk...kebh............|.....laem...keah...........|......lbek...meah..........|.......lbdk...kdah.........|........mbek...kebp........|.........lbek...meap.......|..........lbek...kdblkk....|...........hbdk..ndgdfp....|............lbdkn.ndfk.....|.............jaedn..kn.....|..............lagd..gn.....|...............kdfnggo.....|...............lfkkoogo....|...............ii....ogo...|......................ogi..|.......................onii|........................i.p|........................jpj"],[{"a":"#fdfcff","b":"#fafafe","c":"#d6d7e6","d":"#cfcee1","e":"#cccce3","f":"#c6c0ce","g":"#ada1a2","h":"#8a88a5","i":"#483b45","j":"#201c25","k":"#241b1f","l":"#1b1a27","m":"#28171a","n":"#1f1628","o":"#19172b","p":"#1b132b"},"jjln.....................|lbddo....................|jbdddp...................|jaadedo..................|.jbadden.................|..jaadeeo................|...labdedl...............|....lbadeeo..............|.....laadedo.............|......laagedo............|.......jbbgedo...........|........jabheeo..........|.........jabheeo....no...|..........jbdhheo..k.l...|...........lbgiggnm.n....|............jbgihigm.....|.............oghigm......|..............nigik......|..............mgmk.o.....|.............m.m..o.o....|............nin....o.o...|............kk......o.p..|.....................p.j.|......................kgm|.......................kk"],[{"a":"#fdfcff","b":"#f9fbfe","c":"#f9f8fe","d":"#d7d6e8","e":"#cecde4","f":"#c9c7e6","g":"#9e9fb6","h":"#9a99b0","i":"#7b7a94","j":"#302e3d","k":"#1e1c29","l":"#1f1a27","m":"#1b1a2d","n":"#211827","o":"#1f141f","p":"#1b182b"},"nnoo........................|nbcco.......................|ocggco......................|oahggck.....................|.oagie.l....................|..oaefecl...................|...k.eggbn..................|....oagie.l.................|.....pceeeao................|......mieghal...............|.......kchif.k..............|........kaffebl.............|.........p.eggbk............|..........kbgid.p...........|...........kbefebk..........|............k.eggam...mm....|.............magieik.pim....|..............pcefeckkp.....|...............m.ehmgm......|................pcmeim......|.................kgijn......|................mmmmljn.....|...............mip...n.n....|...............nm.....o.o...|.......................n.o..|........................njmk|.........................mik|.........................mml"],[{"a":"#fefefe","b":"#fcfefe","c":"#fdfcff","d":"#fcfafc","e":"#d6d5e8","f":"#cecbe7","g":"#bfa794","h":"#a39aaf","i":"#8c604f","j":"#4b3337","k":"#211c26","l":"#1c1c25","m":"#2a181f","n":"#291217","o":"#1d192a","p":"#1c1626"},"kp...........................|kcl..........................|kccl.........................|kaacp........................|kaacl........................|kaabp........................|kaabho.......................|kabbhho......................|kabahfho.....................|kcbchfffp....................|kdcchfffeo...................|.laachfffeo..................|.laddhfffhfo.................|..ldcchffhfeo................|...ldbbffhfhfo...............|....olcaffehhfo..............|......olcafhhhfo.............|........olbcfhhho............|..........llbdfhhnmmk........|............oohhhiiijo.......|..............ojjginmp.......|..............lgggnjjko......|..............lddgnj.jjkk....|..............kddgimmk.jjpool|..............migggijmmk.jnjm|...............niggiiijjmniin|................njiiijnk..nn.|.................mmmmm......."],[{"a":"#b3b1ce","b":"#7c7d9b","c":"#7b7897","d":"#77779b","e":"#58597b","f":"#585778","g":"#56557d","h":"#534260","i":"#31182a","j":"#23192d","k":"#1f1a30","l":"#1e172c","m":"#1b1b32","n":"#181b32","o":"#1a182f","p":"#19152b"},".....j..................|....kj..................|...kcl..................|..kbfl..................|.kbgel..................|jcdge.l.................|.lbdeffl................|..obdgffl...............|...mfeff.p..............|....odbff.p.............|.....obdfefm............|......nbbfefm...........|.......nfbef.o..........|........mcdgf.k.........|.........mdde..om.......|..........mbd.na.n......|...........nbnaaak......|............kaaakj......|...........paaakiii.....|...........k.am.ihhj....|............lcm..iiij...|.............pcm..ihhjml|..............jck..iij.l|...............l.j..jacl|................ol...plj"],[{"a":"#fdfbfe","b":"#d4d4e7","c":"#cecdec","d":"#cecdde","e":"#c9c2d5","f":"#b9a098","g":"#a49bb2","h":"#876e6f","i":"#604443","j":"#231d28","k":"#221a24","l":"#1b1b2a","m":"#2d1519","n":"#221725","o":"#1c1829","p":"#1d1524"},"kkkno.........................|kaaaep........................|kaaaaak.......................|kaaddaak......................|odaddddak.....................|.paadccbap....................|..padcgcddj...................|...padcggadp..................|....padggdaj..................|.....ldadbcgl.................|......ldacgccl................|.......llgcgccl...............|.........lccgccl..............|..........odcgccl.............|...........lccgccl.......ll...|............lddgcgl.....kip...|.............ldbhcgl...khij...|..............lgcgghjmmfhm....|...............lgghihffhm.....|................lhifffhm......|.................lhf.ihm......|.................mffi.ik......|.................mfhh.jin.....|................mfhmmm..jk....|...............mhhm...njiin...|..............piim.....ni..o..|..............njp....p..n..jo.|..................n.n....poj.n|..................k.n....no..j|...................ojjjjn..kn."],[{"a":"#fdfcff","b":"#f0edf7","c":"#cfcde0","d":"#b9b0b8","e":"#9f9eb0","f":"#6f5667","g":"#2b202d","h":"#1b1e2a","i":"#201b2f","j":"#241a1f","k":"#2c151f","l":"#221826","m":"#1c1a2a","n":"#1c182a","o":"#191925","p":"#181628"},"ool.........................|laaj........................|lacal.......................|.jaeao......................|..laeep.....................|...iecin....................|....oaaell..................|....loecao..................|......ioaei.................|.......iecim................|........oaaeii..............|........ioecao.....im.......|..........ipaep....pcm......|...........mecin....mao.....|............maaeoo..pcm.....|............ioecaohmncm.....|..............iicecacem.....|...............neeijji......|................pejd.l......|............in..pajdkl......|............hcmhiclkggk.....|.............haccei.kggl....|..............lmmo...lggk...|......................jggk..|.......................kgkj.|........................ldfk|........................jjfj|..........................jl"],[{"a":"#fafbff","b":"#f1eef9","c":"#d0cfe0","d":"#cecbe1","e":"#aaa8b9","f":"#675561","g":"#42303a","h":"#372c35","i":"#281c29","j":"#201b2d","k":"#1c1b29","l":"#1a1925","m":"#251724","n":"#211424","o":"#1d1724","p":"#1a1422"},"i......................|om.....................|oaj....................|kaep...................|paedj..................|.paecj.................|..laecj................|...kaedj...............|....oaddj..............|.....laecj.............|......oaccj............|.......kbdcj...........|........kacdj..........|.........kaddj.........|..........laedj........|...........kaccl.......|............laedk......|.............paeck.....|..............laeho....|...............j.hhm...|................mggho..|.................mgghl.|..................kgghj|...................mghj|..............in...mghm|..............mhm..nhhm|..............n..mpgghi|...............n...hhm.|................mmmmm.."],[{"a":"#e0ddf2","b":"#cfcce7","c":"#8684a5","d":"#7c7a99","e":"#7b799e","f":"#575572","g":"#1e1d2e","h":"#1e1c2c","i":"#1f1a31","j":"#1c1b2e","k":"#1e1a29","l":"#1a1a2f","m":"#1e182d","n":"#18182e","o":"#1d162b","p":"#19122b"},".k.....................|.k.....................|kbg....................|kbi....................|obeh...................|mbei...................|kbedp..................|kbeei..................|.nbe.h.................|.lbdden................|..jbdefn...............|...nbbddi..............|....ngbefi.............|......ibedg..j.........|.......ibd.ll..o.......|........kbedl...k..jh..|.........lbefi..h.lfk..|.........gjbddip.jdi...|........l..ibpbik.i....|............ka.bkh.....|.........m..kkaag......|..........km.gmo.j.....|............g.o.g.p....|...........i.k...i.m...|..........k.o.....n.m..|..........kk.......i.kk|....................hak|....................ik."],[{"a":"#fdfbfe","b":"#e7e6f2","c":"#d0cfe4","d":"#cdcbe6","e":"#a9a9c3","f":"#8482a4","g":"#413440","h":"#24202b","i":"#211b2d","j":"#221b24","k":"#211928","l":"#1f1b25","m":"#1c1b2f","n":"#1a1b25","o":"#211726","p":"#191526"},"nnlj......................|jaaakk....................|jaedaj....................|oaceecik..................|.kaefdak..................|.hhcceckpj................|...kacccal................|...kkpcecljp..............|.....iacddam..............|.....kilcedcnn...nm.......|.......iadfean..nai.......|.......mncefccmmcal.......|.........nadffddecm.......|.........nldffikfdmmn.....|...........mdiggmeean.....|...........mdm.jhmdi......|..........lcefp.gkk.......|.........naaddemjggi......|.........npmmmeck.g.p.....|.............kal.igggi....|.............jj...ogg.m...|...................jggkok.|....................iko..p|.....................k...p|.....................k...l|......................lph."],[{"a":"#fdf6ff","b":"#ffeffe","c":"#d4c2d7","d":"#d5bcd4","e":"#8c8196","f":"#806f82","g":"#42323b","h":"#21202c","i":"#211b28","j":"#1e1b29","k":"#1c1b2c","l":"#1c1b25","m":"#1c1928","n":"#241828","o":"#261424","p":"#1c1728"},"n.....................|jl....................|lai...................|ladon.................|ladcn.................|lkedepl...............|..ibcbp...............|..jnfcepm.............|....pbcaj.............|....khecejk...........|......mbcam...........|......kkedfmk.........|........kbcbj.........|........kkfdfjk.......|..........kbcbp.......|..........kpednp......|............jbdeh.....|............jaceep....|............lalacgi...|............hl.lg..i..|............p...og.go.|.................oggo.|..................ofgo|..................nghi|..................lael|..................nijj"]];
+/* the 14 upright swords from the fourth sheet: [palette, rows joined with '|'] */
+const VSW=[[{"a":"#f2d290","b":"#efa24e","c":"#e6a44b","d":"#e49e45","e":"#aeaa8c","f":"#e69b43","g":"#df9b42","h":"#d6863f","i":"#c77741","j":"#5284a5","k":"#c26c3c","l":"#c3693b","m":"#c16636","n":"#b7602e","o":"#7b5f55","p":"#874a37","q":"#6b3020","r":"#304061","s":"#190d16","t":"#180a18"},".......ahi......|......anqpi.....|......hshqcs....|......pnqkp.....|.......bgn......|.........s......|.......rrr......|................|.......rr.......|................|.......rr.......|.......r........|.......rr.......|..........t.....|......jjjjr.....|...jjjj.j.rjjj..|..jrjrr.j.jrjrj.|.jrjttr......jrj|ejrt..kp.ppst.rj|jj....gspqhs...j|......ap.ci.....|......aqiqi.....|......appqi.....|......ap.pi.....|......ap.pi.....|......apppi.....|......gappis....|......ggqkk.....|......ggakk.....|......gfffls....|......gfffl.....|......gffnm.....|......gfnbls....|......bnnnl.....|......gbcnl.....|......dnnbl.....|......gbbmm.....|......dnmml.....|......dfnbm.....|......dnbnl.....|......dbnnk.....|......cnnbks....|......cnbck.....|......dfddks....|......gdffls....|......gdffl.....|......gffnk.....|......gfnbk.....|......dnnbm.....|......dnbnk.....|......dbnbk.....|......cnbmks....|......annbk.....|......ammni.....|......amlni.....|......cmmbi.....|......ckbmks....|......aklib.....|......aklkcs....|.......iibs.....|.......akcs.....|.......alct.....|........gqt.....|........cs......"],[{"a":"#fcfcf1","b":"#fafaee","c":"#faf9ee","d":"#dedfda","e":"#b4b9b9","f":"#afadab","g":"#aeaaaa","h":"#a6a8a8","i":"#7a8c97","j":"#62707d","k":"#656a7b","l":"#64687b","m":"#5b6773","n":"#56646f","o":"#55636d","p":"#9c4354","q":"#53626e","r":"#271320","s":"#210a1a","t":"#130919"},".....i.......|.....dj......|.....al......|....iak......|....iaet.....|....akfo.....|....ajgo.....|....bkgq.....|....akgn.....|....akgn.....|....bkgn.....|....ckgq.....|....ckgq.....|....ckfo.....|....ckfo.....|jt..ckfo.....|....ckfo.....|....ckfot....|....clgo.....|....clho.....|....clgo.....|....blgn.....|....blgn.....|....clgq.....|....clgo.....|....ckgo.....|....blgq.....|....blgq.....|....clfot....|....ckfo.....|....ckfot....|....bkfot....|....ckfnt....|....akfn.....|....bkfnt....|....blgnt....|....cldm.....|....blfmt....|....blcnt....|....bkent....|....anmnt....|....ddhqt....|....cihnt....|d...idmit..d.|kd.ieiiii.cme|mqcieakendjj.|ttqqijjmmt.tt|..t.qdft.....|.....prt.....|.....rps.....|.....pr......|.....rp......|.....pr......|.....rp......|.....pr......|.....rp......|.....pp......|....hhhm.....|...oidift....|....fcejt....|.....km......|.....tt......"],[{"a":"#a1bea4","b":"#9aa082","c":"#659b8e","d":"#688782","e":"#4a7d7e","f":"#626d65","g":"#466b68","h":"#436668","i":"#406764","j":"#3a686c","k":"#915a40","l":"#405353","m":"#3b575e","n":"#345d5f","o":"#2f5366","p":"#2b4c58","q":"#424349","r":"#2a4048","s":"#182648","t":"#150a1a"},".....kk......|....babk.....|...kkkkkt....|....akk.t....|....hac......|.....ost.....|.....co......|.....os......|.....eo......|.....os......|.....cj......|.....ept.....|.....opt.....|....dact.....|...irrrgr....|.ccgcdcggcc..|cp..gabf.rgc.|e.t..qq...rde|.tt.d..g...mr|.t..rdrc...rt|....d.d......|....mg.......|....ng.......|....nc.......|....nn.......|....mni......|....ndrq.....|....dip......|....dre......|....re.......|....rml......|....mn.......|....m........|....me.......|....mph......|....le.......|....pee......|....hrp......|....hh.......|....h........|....hg.......|....gip......|....giq......|....ic.......|....ic.......|....icl......|....grl......|....hh.......|....hil......|....ii.......|....ih.......|....ii.......|....ii.......|....ii.......|....ii.......|....i........|....c........|....g.mm.....|....m.om.....|.....dh......|.....dh......|.....po......|.....omt....."],[{"a":"#f2eee3","b":"#e6e1d9","c":"#e3dad0","d":"#bfb7b3","e":"#b9b6b5","f":"#b6b5b0","g":"#b8b2ae","h":"#b5b2aa","i":"#d3a188","j":"#b2b1ab","k":"#8c959f","l":"#d55c52","m":"#797888","n":"#717b91","o":"#6c798c","p":"#5e6e86","q":"#b63842","r":"#97212c","s":"#5c121e","t":"#180a17"},"......k.......|.....pa.......|.....acp......|....oabo......|....kbjot.....|....abjnk.....|....ahjpkt....|....ahhne.....|....ahhne.....|....dhhnn.....|....dghnn.....|....dghne.....|....dghne.....|....bghne.....|....bhhne.....|....bhjne.....|....bhjnf.....|....bhhnf.....|....bhhne.....|....bghne.....|....bghne.....|....bghnf.....|....bghng.....|....dgfnj.....|....bghnj.....|....bgjoe.....|....bfhne.....|....bfhoe.....|....bgjnd.....|....bfjnd.....|....bmjnd.....|....bnjnd.....|....bmfnd.....|....bmonet....|....bmfoet....|....bmpoet....|....bmfoe.....|....bkonet....|....bkeod.....|....bpeoe.....|....bkknet....|....bpjne.....|....bql.et....|....csqsj....l|l...qqqqr...lr|llilrlclrlilrl|rqlqrlilsqqrqt|tt.tqrqsqt....|.....qiqtt....|.....sqtt.....|.....rsrt.....|.....sqt......|.....qrr......|.....rqs......|.....sqr......|.....qrr......|.....sqt......|.....rrr......|.....lll......|....lkbpl.....|....qpkplt....|.....lllt....."],[{"a":"#d4d1ac","b":"#9caca8","c":"#92a1a3","d":"#87a0a9","e":"#8d9fa1","f":"#919da1","g":"#889da7","h":"#cb8642","i":"#829aa3","j":"#52777e","k":"#b45e33","l":"#774d3d","m":"#3d4d60","n":"#2e434f","o":"#2f3243","p":"#491a1d","q":"#190916","r":"#150b1a","s":"#130d1a","t":"#130b19"},"....jdj......|....bjj......|...mjdjh.....|...ojmhqr....|....khnr.....|....t.sr.....|....nm.r.....|......sr.....|....nj.r.....|....s.ss.....|....nj.s.....|.......t.....|....nn.s.....|.....hlq.....|aahahhhhahh..|hhhkkakkkkkh.|hll.hhk..khkq|qqrillljrqppq|q..j.hhjqrqq.|...bmkpdr....|...bbjbbt....|....j.m......|....jji......|....j.i......|....j.i......|....j.d.r....|....j.b.r....|....d.b.r....|....dmd.r....|....djc......|....d.d......|....dod......|....dod......|....dod.r....|....dog.r....|....dog.r....|....dog......|....gog......|....gog.s....|....g.g.s....|....d.d.s....|....gog.s....|....iog.r....|....dog.r....|....dog.s....|k...d.d.t....|kq..gog.r....|q...gog......|....gog......|....gog......|....dog......|....dog......|....dog......|....dog......|....dog......|....dog.s....|....dog.s....|....gog.r....|....god......|....god......|....bog......|....biir.....|.....ai......|.....at......|......s......"],[{"a":"#f9faf1","b":"#f4f7f0","c":"#ccd1c9","d":"#c0c2bb","e":"#afb9b6","f":"#b2a69a","g":"#6a8190","h":"#5b6e7a","i":"#5b6c78","j":"#586875","k":"#db5958","l":"#cc434b","m":"#4d5261","n":"#ad313e","o":"#a12432","p":"#741825","q":"#43506b","r":"#3a3e50","s":"#1f0815","t":"#130a1a"},"....kffo.....|...nkqhkn....|...kjqeqn....|...pkqqks....|....ndkps....|.....pps.....|.....op......|.....lnt.....|.....npt.....|.....ont.....|.....lpt.....|.....oos.....|.....los.....|.....pps.....|...kkllls....|.kkoppppnkk..|.lss.olmtslog|ks..gopgt.sl.|n...gpmgt..pn|s...co.gt....|....c.eh.....|....drcht....|....dreht....|....ereh.....|....ereit....|....arbit....|....amch.....|....drei.....|....dmbi.....|....emeh.....|....ameh.....|....bmeh.....|....cmei.....|....cmbi.....|....cmdh.....|....emdh.....|....emai.....|....dmej.....|....amai.....|....bmah.....|....dmeh.....|....drch.....|....cmdj.....|....ambj.....|....dmaj.....|....dmeht....|....ameh.....|....cmbh.....|....cmeht....|....dmeh.....|....dmdht....|....amei.....|....amai.....|....emcj.....|....emcj.....|....emei.....|....emei.....|....dmej.....|....demj.....|....cemj.....|.....eqt.....|.....egt.....|.....egt.....|.....ftt.....|......t......"],[{"a":"#74a393","b":"#608f79","c":"#5e8d79","d":"#5e8a79","e":"#5d877d","f":"#558871","g":"#5d827a","h":"#51816c","i":"#4d7667","j":"#46695d","k":"#3f6654","l":"#416353","m":"#406452","n":"#3c6352","o":"#406057","p":"#374e54","q":"#1d212a","r":"#130d17","s":"#150b19","t":"#120b18"},"....eeep.....|...ip..j.....|...i.aeo.....|...peopi.....|....paas.....|....t........|....slr......|....s.mr.....|....sk.......|....s.nr.....|....sk.......|....sr.......|.....hnr.....|....s..s.....|....rn.r.....|eeeaaaaaaeee.|o......r..pii|....ip.o.....|....i.jo.....|....i.qgs....|....i..ds....|....iq.dt....|....iijfs....|....ipehr....|....i.pi.....|....ipghs....|....hdqhr....|....hikfr....|....hkkfs....|....fklfr....|....fnldr....|....fnldr....|....ffmd.....|....fmmdr....|....ffldr....|....fmmdr....|...pfflcr....|...pfmldr....|...enhldr....|...enkkbr....|...ckklbr....|...bnknbt....|...bkmncr....|...bnmnbr....|...bhmlcr....|...bhmlcr....|...bnmmcr....|...bkmlcr....|...kkmlbr....|...bnnmbr....|...kfmlbr....|....fmlir....|....fmlir....|....cmlhr....|....cmlhs....|....ckkjs....|....ckkjt....|....ckkpt....|....kjipt....|....fkfr.....|....cnfs.....|....pjfr.....|....paps.....|.....ar......|......s......"],[{"a":"#fbfcf4","b":"#e6f1f1","c":"#d8dbdb","d":"#b0d6ec","e":"#9fd1ef","f":"#9dcdec","g":"#9ccbea","h":"#abc2d3","i":"#8fbdde","j":"#77accc","k":"#75a6c6","l":"#859eac","m":"#6895b8","n":"#6294b4","o":"#618eb3","p":"#5f8ab3","q":"#6f7480","r":"#49658b","s":"#334165","t":"#1e1728"},"........n.......|........a.......|.......hmr......|.......amr......|.......amit.....|......aakje.....|......aakje.....|......akjjn.....|......ajjjo.....|......jjkje.....|......jkkke.....|......akkkk.....|......gkkkk.....|......gkkkd.....|......akkke.....|......akkkk.....|......akkkk.....|......dkkke.....|......dkkke.....|......ckkke.....|......ckdme.....|......cdnme.....|......codme.....|......cdnmf.....|......conne.....|......ceene.....|......coonf.....|......cpenf.....|......cppmf.....|......cpfmf.....|......ifgnf.....|......gppof.....|......gpgmf.....|......gppmg.....|......gpfng.....|......gpgog.....|......gppog.....|......gpppg.....|......gpfog.....|......gpsog.....|......fosog.....|......fpfpg.....|......foosg.....|......fpfsg.....|......goqsg.....|......g.qsi.....|......gltli.....|......g.l.i.....|......gqtqj.....|.ah...k.q.j...ah|cssh..bjajrt.ahs|spsshcsbrcshao.m|..orsscrpchstsqt|..trjmskporrkrtt|....t..........t|.......ss.......|................|.......ss.......|.........st.....|........r.......|.......sss......|.........rt.....|.......ss.t.....|.........s......|.......bkpt.....|......c...r.....|......l...o.....|......sq........"],[{"a":"#b3bb9b","b":"#9b8e60","c":"#5f919e","d":"#717b71","e":"#44738d","f":"#41708a","g":"#92553a","h":"#436175","i":"#3a5b6f","j":"#335a76","k":"#325370","l":"#8b4733","m":"#813f34","n":"#68342d","o":"#622a24","p":"#532421","q":"#35404d","r":"#302c44","s":"#230d19","t":"#140b1a"},".....e.......|.....cq......|....ecf......|....acfj.....|...fcffqt....|...ceffrr....|...cajjjr....|...ic..jr....|...ie..jr....|...ie..kr....|...ce..kr....|...ie..kr....|...ce..kr....|...fe..kr....|...ff..jr...a|...ff..kr..ab|...ff..jk...g|...ff..kk...t|...ff..kj....|...ff..kj....|...ff..kr....|...ff..kr....|...ff..kr....|...ff..k.....|...hf..k.....|...hc..k.....|...icblkk....|i..iclg.k..q.|qh.cqaacqk.q.|.qhqabbmcci..|...bddddq....|ccqmbqbqdqccc|ki.dnbqbq.iic|..trdgbirtttq|....crrctt.t.|....tbg......|....tt.......|....o..o.....|....m..o.....|.....ngo.....|....pgp.t....|....ms.lt....|....p........|....omp.t....|....npmnt....|.......n.....|....ll.......|....p.got....|....n..lt....|....onp.t....|....opmpt....|....omppt....|....g.llt....|....pm..t....|....noont....|....nomnt....|....pppot....|....llos.....|....plop.....|....oogot....|....oopnt....|....gp.nt....|....nl.pt....|.....gp......|.....gp......|.....np......"],[{"a":"#f9f8ec","b":"#f9f4e9","c":"#efd18c","d":"#b1a680","e":"#819d9f","f":"#7f9c9e","g":"#d38642","h":"#e06750","i":"#93735d","j":"#52696f","k":"#44565e","l":"#41555d","m":"#b5453d","n":"#ae2c36","o":"#7d312c","p":"#7a1b27","q":"#41545d","r":"#2f2933","s":"#1d0912","t":"#160b18"},".....cc......|....cggc.....|....gffmt....|....ggmgs....|....oggo.....|.....oos.....|.....ms......|.....oot.....|.....ost.....|.....mot.....|.....prt.....|.....mpt.....|.....mms.....|.....pps.....|..ccccccgc...|cgggmmooggcg.|mmsrgggms.omg|ostt.md...sog|s...qg.f...sm|....j.gj....t|....e.rjt....|....ek.j.....|....ekkjt....|....bkfj.....|....bfke.....|....aqke.....|....afqe.....|....aqqe.....|....afqf.....|....akle.....|....aqqe.....|....aqqf.....|....aqqf.....|i...aqqf.....|ot..bqle.....|o...bqket....|....bqle.....|....aqlft....|....blqf.....|....bklf.....|....bkff.....|....aklf.....|....blqet....|....aqqe.....|....akqft....|....akqe.....|....akqe.....|....akqe.....|....akqe.....|....akqe.....|....akqe.....|....bkket....|....blket....|.o..ekket.o..|nhpmjjjj.nhn.|nnhhhhhhhhnnt|..pmnnmmnpps.|..tsrpppst...|.....nn......|.....pp......|.....pnt.....|.....hns.....|.....pp......|.....mp......|.....pmt.....|.....hpt.....|.....ppt.....|....ommo.....|....hbcn.....|.....mn......"],[{"a":"#f5f1e9","b":"#ede5d6","c":"#ebe4dc","d":"#eae2db","e":"#ebd2a5","f":"#c4af91","g":"#b5a595","h":"#a8a4a5","i":"#a7a2a5","j":"#a6a2a4","k":"#a5a0a0","l":"#a59fa3","m":"#b89472","n":"#ad6d3a","o":"#60696a","p":"#4f4c4e","q":"#504542","r":"#354151","s":"#3c373e","t":"#1a0b14"},"......i.......|.....oak......|.....aad......|....kaaek.....|....hhaah.....|....hhhah.....|....hhhhh.....|....hhhhht....|....hhhhd.....|....hhhhd.....|....iihhd.....|....hjhdd.....|....ijhhd.....|....ijidc.....|....ijjhc.....|....ijlhc.....|....iklhc.....|....iklhc.....|....ickdd.....|....ikkkdt....|....ickcd.....|....lkddd.....|....lcdkc.....|....lkkjd.....|....lckcc.....|....ikckc.....|....ickcc.....|....ikclc.....|....jckdc.....|....jkkkd.....|....neefn.....|....nnnnn.....|....neemn.....|fnnnmqpqmmnmnm|nennnofomnmqfq|tnenmsornnenqm|ntt.enrrmqt.nt|t..tqfemnt..tt|....o..q......|.....mn.......|..............|....s.........|....r.........|....rrr.......|....r..r......|....rrrr......|....r.r.......|....r.........|.....oo.......|....rrrr......|....r.........|....r.........|....r.........|....rro.......|....roor......|....r.s.r.....|....r.r.r.....|.....p........|....rr.r......|....r..r......|.......r......|..............|.......r......|.......r......|....r..p......|....rpsst.....|.....rrr......|......rt......|......t......."],[{"a":"#cdcab8","b":"#8d9da0","c":"#76858a","d":"#58757f","e":"#5f6267","f":"#4c606a","g":"#4b5c65","h":"#485b64","i":"#435760","j":"#963337","k":"#4c3442","l":"#3e4f57","m":"#3e4d56","n":"#3d4752","o":"#3a4c55","p":"#384650","q":"#1c1d2b","r":"#140c1b","s":"#190a17","t":"#130a19"},".....c.......|....fai......|....bbf......|....abb......|....bbb......|....abbr.....|...cacac.....|...cabacr....|...cpbmcr....|...cnancr....|...oobpor....|...oobpor....|...omapor....|...omcpor....|...llmpmt....|...mmanl.....|...mmaplr....|...dmmllr....|...fmmll.....|...fodmlr....|...follmt....|...domllt....|...mmnlir....|...noclir....|...fofiit....|...fomlg.....|...fpfof.....|...fpfofr....|...fffngt....|...f.fnfr....|...g.f.fr....|...g.g.g.....|...g.h.h.....|...g.h.gr....|...g.h.gr....|...g.h.gr....|...g.h.hr....|...h.h.h.....|...h.h.h.....|...h.h.h.....|...i.g.g.....|...h.f.g.....|...h.f.gr....|...h.f.g.....|...h...h.....|...h.g.hr....|...h.p.hr....|....ldpd.....|...ddkcft....|...dkjkbt....|d..ickji...bd|a..i.dnitfcap|cbabblbbabaor|toddddddddr..|.ttr.........|..rsjjk......|....jkj......|....kjks.....|....jkj......|....kjk......|....jkj......|....kjj......|....jkk......|....aaa......|...jkknj.....|...jkccjs....|....bajss....|....sjjs.....|.....ss......"],[{"a":"#ead6a0","b":"#b4d5df","c":"#b8af88","d":"#8aa1a2","e":"#789fb4","f":"#74a2b1","g":"#cc8e43","h":"#9a8467","i":"#6995a3","j":"#5a7e92","k":"#9f5d26","l":"#7d4e34","m":"#445c6d","n":"#355263","o":"#344451","p":"#2d1e23","q":"#140c1a","r":"#160b18","s":"#1b0813","t":"#150a18"},".....cg......|....coog.....|...gobiog....|...goiiog....|...lgoogs....|....lagsr....|.....kkt.....|.....akr.....|.....ggr.....|.....akr.....|.....ggt.....|.....aks.....|.....kks.....|.....aks.....|....gkkk.....|gagkamjgggag.|gsrskankssrgk|lrr..ggsqqrl.|....mpp......|.....kks.....|.....gks.....|.....llr.....|.....ldt.....|.....imq.....|.....miq.....|.....iiq.....|.....ii......|.....iiq.....|.....im......|.....mit.....|.....jmq.....|.....jmq.....|.....jeq.....|.....ef......|.....ef......|.....ef......|.....ef......|.....ef......|.....ef......|.....ef......|.....ef......|.....ef......|.....ef......|.....ef......|.....ef......|.....ef......|.....efq.....|.....efq.....|.....efq.....|.....meq.....|....nbiq.....|....bifi.....|....bijbj....|...iionii....|...bnejne....|...mbmme.....|....mbiiq....|....o...q....|.....ont.....|.......q.....|.....onq.....|.......q.....|.....nnt.....|.....n.q.....|.....nnq.....|.....o.q.....|....njm......|....ebjo.....|....mbfo.....|.....moq....."],[{"a":"#faeab0","b":"#f6e5ac","c":"#f7d781","d":"#f9cd69","e":"#f1cc63","f":"#f4c65d","g":"#edc45e","h":"#ebb559","i":"#de9e4b","j":"#c47f37","k":"#bc6f30","l":"#b1652d","m":"#af592f","n":"#a4552c","o":"#a14e2a","p":"#944327","q":"#653734","r":"#200b0f","s":"#180b17","t":"#190814"},".....i.......|....qcl......|....jdd......|....adc......|....aed......|....beeps....|....beeps....|...meffmt....|...meffmt....|...mfffmt....|...mfffmt....|...bfffmt....|...bgffm.....|...cgflmt....|...aglfmt....|...agflm.....|...agldnt....|...affkmt....|...bgldnt....|...bgffnt....|...bgflmt....|...bgldnt....|...bihkmt....|...cildnt....|...ciddns....|...adeknt....|...aekcot....|...gekdos....|...bgkdos....|...agddot....|...afjjos....|...bfldot....|...bgfdot....|...bgldot....|...egfdos....|...agfkos....|...agkdo.....|...ddkdot....|...ddkdot....|...hdddot....|...gikko.....|...kiccps....|hq.kiicks.pi.|mfnpikkhrehpj|inohjrgfenoir|ricpoccpohit.|.sthhlliirr..|...t...t.....|.......s.....|....s........|....sq.......|....s........|....sq.......|.............|....sq.......|.......r.....|....chhi.....|...hir.cq....|...lg..gr....|....mhhr....."]];
+const BLADES=WPN.concat(SWD,VSW);   /* 48 wall blades; the wall shows a different, never-repeating handful each dawn */
+  function wpnCv(i,k){
+  const P=BLADES[i][0],rows=BLADES[i][1].split('|'),h=rows.length,w=Math.max(...rows.map(r=>r.length)),c=document.createElement('canvas'),x=c.getContext('2d');
+  c.width=w;c.height=h;
+  rows.forEach((r,y)=>{for(let j=0;j<r.length;j++){const col=P[r[j]];if(col){x.fillStyle=col;x.fillRect(j,y,1,1)}}});
+  c.className='sfa-ax';c.style.width=w*k+'px';c.style.height=h*k+'px';return c;
+}
+function axeCv(i,k){
+  const rows=AXE_S[i].split('|'),h=rows.length,w=Math.max(...rows.map(r=>r.length)),c=document.createElement('canvas'),x=c.getContext('2d');
+  c.width=w;c.height=h;
+  rows.forEach((r,y)=>{for(let j=0;j<r.length;j++){const col=AXE_P[r[j]];if(col){x.fillStyle=col;x.fillRect(j,y,1,1)}}});
+  c.className='sfa-ax';c.style.width=w*k+'px';c.style.height=h*k+'px';return c;
+}
+
+/* ---------- Copper / chainmail / iron / diamond / gold gear: pixel sprites (1 char = 1 pixel, '.' = clear) ----------
+   MCSW = the five swords (wood, stone, iron, diamond, gold) - they join SKIN as ids 64-68. MCA = helm, chestplate, leggings and boots in the same five metals. */
+const MCSW=[[{"a":"#7a6129","b":"#433618","c":"#372a14","d":"#2a2110"},".............ccc|............caac|...........caaac|..........caaac.|.........caaac..|........caaac...|..dd...caaac....|..dbd.caaac.....|...dbdaaac......|...dbdaac.......|....dbdd........|...badbbd.......|..bad.ddbd......|ddad....dd......|dbd.............|ddd............."],[{"a":"#a4a4a4","b":"#55534e","c":"#3c3b37"},".............bbb|............baab|...........baaab|..........baaab.|.........baaab..|........baaab...|..cc...baaab....|..cbc.baaab.....|...cbcaaac......|...cbcaab.......|....cbcc........|...cbcbbc.......|..cbc.ccbc......|ccbc....cc......|cbc.............|ccc............."],[{"a":"#ffffff","b":"#fefefe","c":"#fdfdfd","d":"#fcfcfc","e":"#fbfbfb","f":"#fafafa","g":"#d6d6d7","h":"#535049","i":"#292825"},".............hhh|............hfgh|...........hdgdh|..........hegch.|.........hfgah..|........hegbh...|..ii...hdgch....|..ihi.hdgch.....|...igiagdh......|...igigeh.......|....igii........|...ihighi.......|..ihi.iihi......|iihi....ii......|igi.............|iii............."],[{"a":"#3dd6b7","b":"#254c3e","c":"#10251e"},".............bbb|............baab|...........baaab|..........baaab.|.........baaab..|........baaab...|..cc...baaab....|..cbc.baaab.....|...cbcaaab......|...cbcaab.......|....cbcc........|...cbcbbc.......|..bbc.ccbc......|ccbc....cc......|cbc.............|ccc............."],[{"a":"#f7f8e4","b":"#cbd15b","c":"#4e4c2b","d":"#3e3d2c","e":"#3b3828"},".............dde|............dbbe|...........dbbbe|..........ebbbd.|.........dbbbd..|........dbbbd...|..dd...dbbbe....|..ecd.dbbbd.....|...dbdbbbda.....|...dbebbda......|....dbed........|...ecdbce.......|..ece.ddce......|ddce....dd......|dbe.............|ddd............."]];
+const MCA={helm:[[{"a":"#c26037","b":"#bc6036","c":"#c75c36","d":"#ad5330","e":"#8b452b","f":"#562917","g":"#4f291a","h":"#492117","i":"#3b1e13","j":"#2c1c14","k":"#1e130f","l":"#1a0e0a"},"..ffffff..|.faaaabej.|gcbcacadei|gacaabedeh|gbbfffiedi|fcfklkkiei|fcglkkkidi|gaikllkiei|.gi....ii."],[{"a":"#fafafa","b":"#c6c6c6","c":"#aeadae","d":"#716d6e","e":"#595959","f":"#313231","g":"#303030","h":"#2f2f2f","i":"#262626","j":"#1e1d1e","k":"#181412","l":"#191110"},"..gghfhf..|.hdbdbdci.|gdadbdbeci|hbdbdbecej|gdbgghjeci|hbflklkjej|fdhlkkkici|hbilklkjej|.gj....ij."],[{"a":"#fefefe","b":"#fcfcfc","c":"#c6c6c6","d":"#979797","e":"#2e2e2f","f":"#2d2d2d","g":"#232423","h":"#1b1c1c","i":"#1b1b1b","j":"#1c1312","k":"#1c100d"},"..feffff..|.ecccccdi.|ecaacccddi|ecbcccdddh|fcceeehddh|fcekjkjhdh|fcejkjjhdh|ecgjkkkhdj|.ei....ii."],[{"a":"#fbfdfc","b":"#fdf9fb","c":"#35ecc4","d":"#42e3c6","e":"#258a75","f":"#323030","g":"#2a312f","h":"#1b1e1e","i":"#201817","j":"#1e110f"},"..gggfgg..|.fdcdddeh.|gdaaccceeh|fdbdddeeeh|fcdfggheeh|fdfjjijheh|fcfiijjheh|fdijjjjheh|.fh....hh."],[{"a":"#fcfdf9","b":"#fcfaf9","c":"#e8f26f","d":"#e7ef53","e":"#e7eb64","f":"#d7a11f","g":"#2f2f30","h":"#2f3028","i":"#1f1f1c","j":"#201919","k":"#191a1c","l":"#1c110e"},"..gggggg..|.heeeecfla|hdbbddeffk|gdaeedfffi|geegggkffj|hdhllljjfj|hdhllllifj|heillllkfk|.gk....ki."]],armor:[[{"a":"#f8fcfb","b":"#be6136","c":"#c15f38","d":"#c35d36","e":"#a14c2c","f":"#994c2d","g":"#542b18","h":"#3f2316","i":"#401c11"},"..a...........|...gg....gg...|.ggceg..gdcgi.|gccdfi..gcbdfh|gbdcdcggcbcbfh|gfddbdbdddcefh|.gbbbbbcbbfeh.|.iedbcccbdfeh.|..gcbbbcbbfi..|..hdbbcbbfei..|..hfbdccfffi..|..hffefefefi..|...ieffeffh...|....hiiiii...."],[{"a":"#fcfcfc","b":"#c4c4c4","c":"#959595","d":"#727272","e":"#6e6e6e","f":"#5f5f5f","g":"#373737","h":"#2c2c2c","i":"#1f1f1f"},"...gg....hg...|.hgdch..hebgi.|hbebfi..hbebfi|hebdbeghbebeci|hceaebdbebdcfi|.hbdbebebecfi.|.ifbebdbebfch.|..hebebdbech..|..ibebdbecfi..|..ifbdbecfch..|..icfcfcfcfi..|...icfcfcfi...|....iiiiii...."],[{"a":"#fefefe","b":"#fcfcfc","c":"#c7c7c7","d":"#c6c6c6","e":"#c5c5c5","f":"#c4c4c4","g":"#a0a0a0","h":"#969696","i":"#2a2a2a","j":"#1b1b1b"},"...ii....ii...|.iiehi..idcij.|ifdfhj..ifefhj|ifdfdfiicecchj|ihcbafcfccdhhj|.ieafcfeefhhj.|.jhddeddechhj.|..iccfdccfgj..|..jeccccdhhj..|..jhfdcchhhj..|..jhhhhhhhhj..|...jhhhhhhj...|....jjjjjj...."],[{"a":"#fafcfb","b":"#fbf9fa","c":"#3ee6c7","d":"#3ae8c7","e":"#43e2c6","f":"#298776","g":"#218a74","h":"#2b292b","i":"#1b1c1d"},"...hh....hh...|.hhdfh..hcdhi.|heccfi..hdcdgi|hecccehhceecfi|hfeabccddedfgi|.hcadccdeefgi.|.igecedcdeggi.|..heccccdegh..|..iddcccdggi..|..ifeeeefgfi..|..iggfgggggi..|...igfffffi...|....iiiiii...."],[{"a":"#fefefc","b":"#fbfcfc","c":"#f8f9fa","d":"#e7ed61","e":"#e8ee5b","f":"#e4ee57","g":"#d4a31e","h":"#dba01f","i":"#3c382e","j":"#252627","k":"#1e191a"},"...ji....ii...|.iiegi..iefik.|jffegk..ifefgk|ifddddiifdddgk|ihdcbdddfedggk|.jdadddeddhgk.|.kgddfdfdeghk.|.cjdddddddgk..|..kddddedhgk..|..khdeddhhgk..|..khhhhhhhgk..|...kghhhghk...|....kkkkkk...."]],legs:[[{"a":"#c35f37","b":"#bf5f37","c":"#c35c37","d":"#9e4a2b","e":"#954d33","f":"#542919","g":"#50291c","h":"#412319","i":"#3e1d14","j":"#3e1911"},".ffffffgg.|gabbbbbbei|gbbccabaei|gccddddaei|gadejjecei|gbdj..fbei|gbdj..faej|gbdi..fbej|fadi..faej|gbdi..faei|gcdi..fcei|gdei..fdei|gjih..fihh"],[{"a":"#fefefe","b":"#fcfcfc","c":"#cbcbcb","d":"#c4c4c4","e":"#979797","f":"#6d6d6d","g":"#5c5c5c","h":"#313131","i":"#2f2f2f","j":"#272727","k":"#212121","l":"#1b1b1b"},".hihhiijh.|hfdfdfcfek|hdfbfdfdgl|ifagegefek|hdgejlgdgl|ifek..jfek|idgl..idgl|ifek..hfek|idgl..hdgl|hfek..hfek|idgl..hdgl|hgek..hgej|iljk..iljl"],[{"a":"#fefefe","b":"#fafafa","c":"#c6c6c6","d":"#c4c4c4","e":"#989898","f":"#959595","g":"#2f2f2f","h":"#2e2e2e","i":"#2c2c2c","j":"#202020","k":"#1b1b1b","l":"#181818"},".gggghgig.|gdcdcddcfk|icaadccdek|hcbeffedfl|hcffllecfl|hcfk..hcfl|hcfk..idfl|gdek..hcfl|gcel..icfl|idfl..hcfk|hcel..hcfl|hfek..gffk|hkjk..hjkk"],[{"a":"#fdfdfd","b":"#fcfafb","c":"#34eac4","d":"#3fe5c5","e":"#258975","f":"#2a8674","g":"#2b3330","h":"#2e3031","i":"#2e2e30","j":"#1b1c1c","k":"#1c1a1b"},".ihhhihhi.|idddddcdfj|icbbcccdfk|idaeeeecfk|ideekjecej|hdej..gcfk|idfj..gcej|hdfk..gcej|idfk..icek|hdek..gdfj|gdej..hcek|ieej..iffj|hjjj..ijjk"],[{"a":"#fdfdfd","b":"#f8fbfb","c":"#e8ef5a","d":"#e8ec61","e":"#d1a420","f":"#31312c","g":"#2f3028","h":"#1c1c17","i":"#1d1918","j":"#181816"},".fffffgff.|gdcdddddeh|gcbadcddej|gdbeeeedeh|gdeeijecej|gdei..gdej|gcei..gcej|gcei..fdei|gdei..gceh|gdeh..gdeh|gceh..fcej|feei..feej|fhhh..gihi"]],boots:[[{"a":"#c65e39","b":"#bf5f39","c":"#9f4c2c","d":"#974b33","e":"#602d1a","f":"#48271a","g":"#3c1f15","h":"#401d14"},"...eee..eef...|..facg..eadh..|..facg..eadh..|..eacg..eadh..|..facg..ebdg..|..eacg..eadh..|.eaach..eaaaf.|fbbddg..fdbbdg|fdcch....hccdh|fggg......gggg"],[{"a":"#fbfbfb","b":"#bebebe","c":"#969696","d":"#757575","e":"#575757","f":"#383838","g":"#303030","h":"#2e2e2e","i":"#252525","j":"#1e1e1e"},"...hgh..ghh...|..gbej..gbej..|..gdci..hdci..|..gbej..gbej..|..gdci..hdci..|..hbej..gbej..|.gadci..hdbdg.|hbdcei..gcdbej|fecej....iceci|gjij......ijij"],[{"a":"#fefefe","b":"#fbfbfb","c":"#c6c6c6","d":"#c3c3c3","e":"#9a9a9a","f":"#959595","g":"#2e2e2e","h":"#1c1c1c","i":"#1a1a1a"},"...ggg..ggg...|..gcfi..gdfh..|..gbfi..gafh..|..gdfi..gdfh..|..gdfh..gcfi..|..gcfi..gcfh..|.gbcfi..gcdcg.|gcdfeh..gfccfi|gffeh....hfffh|ghhh......hiii"],[{"a":"#fcfdff","b":"#f8fbfa","c":"#3ce7c4","d":"#268973","e":"#2c3130","f":"#312f31","g":"#1d201f","h":"#1d1d1d"},"...fff..efe...|..ecdh..fcdg..|..fbdg..ebdh..|..ecdh..ecdh..|..ecdh..fcdh..|..fcdg..ecdh..|.eacdh..eccce.|eccddg..fdccdh|fdddg....gdddg|ehhg......hhhh"],[{"a":"#fafafc","b":"#fafbf8","c":"#f8f8f6","d":"#e6ed5d","e":"#d6a01f","f":"#30302e","g":"#272826","h":"#1b1c19","i":"#1c191b"},"...fff..fff...|..fdei..fdeh..|..faeh..fbeh..|..fdeh..fdeh..|..fdei..fdeh..|..fdeh..fdei..|.fcdeh..fdddg.|fddeeh..feddei|feeeh....heeei|fhhh......hhih"]]};
+/* every pixel weapon in one list: ids 0-15 axes, 16-24 the second sheet, 25-49 the swords, 50-63 the upright swords, 64-68 the wood / stone / iron / diamond / gold swords */
+const SKIN=AXE_S.map(s=>[AXE_P,s]).concat(BLADES).concat(MCSW);
+const A_=i=>i,W_=i=>16+i,S_=i=>25+i,V_=i=>50+i;
+/* weapon skins by style and tier: tier 0 plain iron, 1 steel, 2 ornate, 3 magical. A weapon's tier is its rarity (3 = Very rare and up). */
+const SKT={
+  warrior:[[5,6,8,10,15,21,0].map(S_).concat([11,6,1].map(V_)),[1,7,12,16,20,23,24].map(S_).concat([3,4,10,5].map(V_)),[9,11,13,14,17,19,22].map(S_).concat([0,2,9,8,12].map(V_)),[1,2,4,5,6].map(W_).concat([7,13].map(V_))],
+  great:[[3,18].map(S_),[0,2,7].map(A_).concat([3].map(V_)),[4,9,13].map(A_).concat([0,9].map(V_)),[8,11,12,14].map(A_)],
+  mage:[[2,12].map(S_),[7,13].map(S_),[0,8].map(W_),[7].map(W_)],
+  rogue:[[0,6].map(S_),[2,4].map(S_),[11,22].map(S_),[2,4].map(W_)],
+  cleric:[[1].map(A_),[6].map(A_),[10].map(A_),[W_(3),A_(15)]]
+};
+function pickSkin(st,r){
+  const t=SKT[st]||SKT.warrior;let k=Math.max(0,Math.min(3,r|0)),p=t[k];
+  while(!p.length&&k>0)p=t[--k];
+  return p[Math.floor(Math.random()*p.length)];
+}
+function skIcon(id,n){return spIcon(SKIN[id],n)}
+function mcIcon(slot,m,n){return spIcon(MCA[slot][m],n)}   /* helm / chestplate / leggings / boots in metal m (0 copper, 1 chainmail, 2 iron, 3 diamond, 4 gold) */
+function spIcon(sp,n){
+  const P=sp[0],rows=sp[1].split('|'),h=rows.length,w=Math.max(...rows.map(r=>r.length)),t=document.createElement('canvas'),tx=t.getContext('2d');
+  t.width=w;t.height=h;
+  rows.forEach((r,y)=>{for(let j=0;j<r.length;j++){const col=P[r[j]];if(col){tx.fillStyle=col;tx.fillRect(j,y,1,1)}}});
+  const m=Math.max(w,h),sc=n>=m?Math.floor(n/m):n/m,dw=Math.round(w*sc),dh=Math.round(h*sc);
+  const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.imageSmoothingEnabled=false;
+  x.drawImage(t,Math.round((n-dw)/2),Math.round((n-dh)/2),dw,dh);c.className='px';c.style.imageRendering='pixelated';return c;
+}
 function sprIcon(sp,n){
   const t=document.createElement('canvas');t.width=t.height=16;const tx=t.getContext('2d');
   sp.r.forEach((row,y)=>{for(let x=0;x<16;x++){const c=sp.p[row[x]];if(c){tx.fillStyle=c;tx.fillRect(x,y,1,1)}}});
   const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(t,0,0,n,n);c.className='px';c.style.imageRendering='pixelated';return c;
 }
-function px(e,n){if(SHOP_SPR[e])return sprIcon(SHOP_SPR[e],n);if(typeof e==='string'&&e.slice(0,4)==='pet:')return petIcon(e.slice(4),n);if(typeof e==='string'&&e.slice(0,5)==='coin:')return coinIcon(e.slice(5));const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.font=Math.round(n*.78)+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,n/2,n/2+1);c.className='px';return c}
+function px(e,n){if(typeof e==='string'&&e.slice(0,4)==='wpn:')return skIcon(+e.slice(4),n);if(typeof e==='string'&&e.slice(0,3)==='mc:'){const q=e.split(':');return mcIcon(q[1],+q[2],n)}if(SHOP_SPR[e])return sprIcon(SHOP_SPR[e],n);if(typeof e==='string'&&e.slice(0,4)==='pet:')return petIcon(e.slice(4),n);if(typeof e==='string'&&e.slice(0,5)==='coin:')return coinIcon(e.slice(5));const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.font=Math.round(n*.78)+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,n/2,n/2+1);c.className='px';return c}
 /* ---------- currency: bronze, silver and gold ----------
    One number is saved (S.gold = the BRONZE count, so old saves keep working). 1 silver = 10 bronze, 1 gold = 100 bronze.
    Everything you see is just that number written as coins: 125 -> '1g 2s 5b'. */
@@ -537,9 +607,149 @@ function direwolfpackCanvas(){   /* 65x38, shown at 3x */
   return c;
 }
 
+/* Goblin Warrior boss: a green goblin with a double-headed axe wreathed in green fire (78x84, shown at 1.6x). Palette letters -> colours, '.' = clear. */
+const GOBSPR={p:{"a":"#0e140a","b":"#d3ef98","c":"#56b438","d":"#a6be74","e":"#667165","f":"#a8d773","g":"#76974e","h":"#82ab3f","i":"#2f4915","j":"#507728","k":"#878980","l":"#97bd39","m":"#98a586","n":"#1c2a0e","o":"#658922","p":"#100d08","q":"#454d41","r":"#c9d790","s":"#47622c","t":"#7f7365","u":"#342e1e","v":"#5b5449","w":"#67d63d","x":"#dfefda","y":"#020001","z":"#000000","A":"#000003"},r:[
+  '......aba.....................................................................',
+  '.......c......................................................................',
+  '..............................................................................',
+  '..............................................................................',
+  '..............................................................................',
+  '..........a..........................a........................................',
+  '.........ada........................aea.......................................',
+  '..........f........................aghga......................................',
+  '......f............................aifjka.....................................',
+  '......cba..........................aiflima....................................',
+  '......cc...........................anflima...........aaaaaaaa.................',
+  '....abcc...........................anhloiea.......aaagiiiiiidaaaaaa...........',
+  '...adccc.........................aaapnnnnnqaa....ajiihfffffrjsssiija..........',
+  '....fccba.......................atuuvttttkvuea..agrrbbbfllnniiiiooija.........',
+  '...fwlw.......................aavuutmddtmdmtvqaaslbrllllnnnnnjoollhosa........',
+  '...wwlw.....................aakgiuuvvvvvvtttvvvgdfflllhinnjjjiiiiiiima........',
+  '....fll....................agggoiuuuuuuuuuvvvvuilllhhoinijoohiqeeeeea.........',
+  '...abwl...................aegohlosssuusssssvtvsiohhojnnijohdostaaaaa..........',
+  '...abfw...................asmrlhhlllssllllsuvvussiiinniiojogvaa...............',
+  '....a.c....................asfdsjlrrrfhghoinuvunupppniioonqqa.................',
+  '.........................aaajdsiigbbfgnnpninnuunmuniijhlhnaa..................',
+  '........................amiifuhlssldhpnlinijjnunmuiijhllmua...................',
+  '.......................agjbxbrfllonnnllbsnsohuvunkgierrmua....................',
+  '......c...wf..........akebxrrlllllgnnnuunglllouunmievnnqa.....................',
+  '....fcc...wf.........atgrbrfllllhoiiiddddbrllhnvuukveaaa......................',
+  '....fwc..fcf........akkbbrllllhjiiijiisrrrrlhivvunueeka.......................',
+  '....wwc..ccwf......akgrbrllllosiijsingojdffloutvunneqea.......................',
+  '...wcww..cccf.f....aedbbflllhiiijoojolhphflhoiqvunneqeaa......................',
+  '...wclf..wwwffcf..agglfflllhoiohhhhhliinhllhojnvunnvqekka.....................',
+  '...fwlc..wwb.fcc..ashlfllhloohggmmkjiypihlloojuvunnqekkkaaa...................',
+  '....fwc..wwbabww..asolllhooommrqyyyyyynhllooojnvunukaxxxeeeaaaaaaa............',
+  '....fwc..wwf.fw...ajoooooofmunnpniiiiinnglhojnuvpnmxxaaaxxxkeeeeeea...........',
+  '.....bc...wcfdw...asmrrrknnnaaaqniillffrujlhjnuvuuuunexxaaaaxxxxmvea..........',
+  '.....a....wf.a.....aqnnnqaaaavsiiijllllrupjhjpuvuqvvquqqqxxxxeqevqa...........',
+  '.................w..aaaaa.aejlllldlllolllllonnnvukkeqqqquqqqqkeuuqa...........',
+  '.........wf......c........aihfffffllooooodenninuummkkkkkkqqkkeqnqa............',
+  '....f...dc.......c........aiolfffllloohmdeinninnnvmrrrrrrmqeeuqvua............',
+  '...ww..fcw......fcf.....f.aioolflhhhhgeeeinnniiiinekkkkkkkunnnseeka...........',
+  '...ww..cc..fwwffcccffwwwcf.jjohhoogjkkqqnniiijooosinnnnnnpniiiigmsma..........',
+  '...fw..ccffwcccccwwccccccc.aejjjjgkvvvaaqijoohllloojsiissynnnnigdjsma.........',
+  '..fcw..cccccwwwwwweeeeeeeka.aquuuuvaaa.aqsoohjlffllllhgrmynnpnijlfsia.........',
+  '..wcw...cwwwlleeeeaaaaaaamea.aaaaaa...asnioohijfflhlhgknmnaauioooffsa.........',
+  '..fccc.bcwlgekaaaaaaaaaamea...........asiniooosllljofenimnaaushlffflia........',
+  '..fcwc.cwjvmaaaaaaeeeeeqva..........aasliinjllhiooodennirmuaaqihlfffia........',
+  '.fcwwcwwjmmaaamekekkkkvva.....aa..aajjdliinjfffhihiiiniisrnqaavihlffnsa.......',
+  '.wcwwcwcmaaameeekkmmmesga..aaagsaasgllhoiijdbbfflfhooojjijkua.avislfksa.......',
+  '.wcwllcmaamkeekkmmmmmvera.asjshlgglllhiinofbbrffffllhoooiifua..avnsffsa.......',
+  '.fwwllkaameeekmmmmmmksga.akgooffhhflhivislbrffflffllooooiifua...aqirfsa.......',
+  '.flwdkaakeekmmmmmmmmqjf.akgxrrfflloosvgohlflhohlffflooosiideea...auflia.......',
+  '.wllkaamvekmmmmmmmmmqjf.ajbbffllloosvashhlllhnollllooojniigrnea..aiflia.......',
+  'abllmaavekkkkmmmmmmmqjf.asdhfllloojqaasoohllhiollllooojnnimmiea..aufljka......',
+  'ablkarvemqunqeemmmmevuvavnnnhlloogmqaasooohllfffllooosnnnnnnjda.aaiflfska.....',
+  '.wckamuuu.hcsuqeekeveqekuqkqnooiggva.arunnnniolloooinnioooohnkaakifllfjma.....',
+  'aekaeqaaa..bdccnuevekmvqkquuningvva..asihoivtnnnnnneeiolllllnnisorfllfjma.....',
+  'aekmka.....a.fcccqkkmmrmvqaaunkenqa.ajddflsvtvvvtvukeslflliiddrlfffflfska.....',
+  '.akka.........wwwumxakvqq...anieaa..aiffllsvmvvtmtukeoflhsnhfbxbfffflfska.....',
+  '..aa..w........iskrkkeqqqf..ateaeeaagifflljvtuuumtukeoffhijohfbrfffflfska.....',
+  '....abcf.....ateueeevekeqgaa.f.kvemaihfflljvtuunmtukeslfhiojhfffbbffhfjma.....',
+  '....abccf...aeqkuniqekmmkekkmjkveekairfllhsvtunnmtukeioflijnllldbbffodsma.....',
+  '......wccb...aqqqqcukmmmmkuuuuuqmmegjfflljnvtunnmtukeiolloinsjjoffllhisa......',
+  '.......cwbwf..aqq.cikmmmmkvvvvvemmeslfllljnvtunnmtukviollolinnnioloomqa.......',
+  '.......cwbwf...aa.cnkmmmmkvvvvvkkkajlflloinvtunnmtuuunuolloonniioofmna........',
+  '.......cwbwcf....anqkmmmkvvvevmakkrjrblooinvtunnktuueenioloolsnnnuuua.........',
+  '......abwbcccwfw.auqkevevvvqraaemadjrbonnnnuvunnvvqueeuanolllogeqaaa..........',
+  '.......ab.cwcwfccqqkmevvvvvxaakkaamiohonninuvunnvvuueevanollooosnuva..........',
+  '........a.fwwcwcwukmmevvekmaakma..agiiinninnunpnttuvmevaeioooisgkkkqa.........',
+  '...........wwlcsjqeeeevvemakkcra...aenisiijqqvvnmtuvmevaaeiiinijeggeea........',
+  '...........flojuqvvvvkkkedkejcf.....anioiigevaapvqpveuva.aeeuiisiijrna........',
+  '.........arfgeeevkkkkmakgljkcw......aqnoiigevaauuuqaeuea..aavjoojiimqea.......',
+  '..........cjkmrakaaarmkjcww..........avjoijeea.aaaa.aaa.....avsoooiirua.......',
+  '..........fwcjkrrrrrkjwwwd............ausiiemqa..............aksjooimqka......',
+  '............fwlveeevwwf..a............aunsiemva...............aenioonmqta.....',
+  '..............fcclcccf.................aqiiemva................aaanoiinka.....',
+  '....................b.............aaaaaqnsiemqa...................annnkqea....',
+  '....................a.........aaaarssssijoogmnqa.................ajhhoimeqa...',
+  '.............................aesssjshhhhhhoogeua..............aaaeslloijgeva..',
+  '..........................aaagsohhhlffflllhogmuaaaaaaaaaaaaaaamejihllojoosqa..',
+  '..............aaaaaaaaaaaaqqqijolllllllhohoooqnqqqqqqqqqqqqeggjjoolllooojsaa..',
+  '.............aqqqqqqqqqqqvyzynijssssssssssjjippzzzzzzzzzAAnjooohllllloojiuqea.',
+  '.........aaaavzzzzzzzzzzzyzzAzpppppppppppppppzzzzzzzzzzzzyilffffffllloonnpzua.',
+  '........aquuuuuuuuuuuuunyyyzAAyyyyyyyyyyyyyyyyzzzzzzzzzzAyiiijjjjjjjjnnpAAzpqa',
+  '.........aaaaaaaaaaaaaavnppppppppppppppppyAAzzzzzzzzzzzyynnnnnuuuuuuunppppnqa.',
+  '.......................aaaaaaaaaaaaaaaaaqyAAAyyyyyyyyyyyuaaaaaaaaaaaaaaaaaaa..',
+  '........................................aaaaaaaaaaaaaaaaa.....................'
+]};
+/* the green fire never stops moving: the fire pixels (palette w/c plus the lighter pixels hugging them on the axe side) are kept apart from the rest of the art and redrawn
+   every ~110 ms by one shared timer. The flames flicker light/dark, the tips grow and shrink, and a few sparks rise off them. Canvases that left the page are dropped. */
+const GOBFX={ready:0,base:null,fire:[],tips:[],cvs:new Set(),timer:0,t:0,still:matchMedia('(prefers-reduced-motion:reduce)').matches};
+function gobMix(a,b,f){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),A=p(a),B=p(b);return 'rgb('+A.map((v,i)=>Math.round(v+(B[i]-v)*f)).join(',')+')'}
+function gobInit(){
+  if(GOBFX.ready)return;GOBFX.ready=1;
+  const R=GOBSPR.r,P=GOBSPR.p,H=R.length,W=R[0].length,core=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&(R[y][x]==='w'||R[y][x]==='c'),fs=new Set();
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const k=R[y][x];if(k==='.')continue;
+    if(core(x,y)){fs.add(y*W+x);continue}
+    if(x<=17&&'fbdl'.indexOf(k)>=0){let n=0;for(let dy=-2;dy<=2&&!n;dy++)for(let dx=-2;dx<=2;dx++)if(core(x+dx,y+dy)){n=1;break}if(n)fs.add(y*W+x)}
+  }
+  const b=document.createElement('canvas');b.width=W;b.height=H;const X=b.getContext('2d');
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const k=R[y][x];if(k==='.')continue;
+    if(fs.has(y*W+x)){const o=P[k];GOBFX.fire.push({x,y,o,l:gobMix(o,'#d3ef98',.45),d:gobMix(o,'#1f5a14',.4)});if(y>=2&&!fs.has((y-1)*W+x)&&R[y-1][x]==='.')GOBFX.tips.push({x,y})}
+    else{X.fillStyle=P[k];X.fillRect(x,y,1,1)}
+  }
+  GOBFX.base=b;
+}
+function gobDraw(c,t){
+  const X=c._x,F=GOBFX.fire,T=GOBFX.tips;X.clearRect(0,0,c.width,c.height);X.drawImage(GOBFX.base,0,0);
+  for(let i=0;i<F.length;i++){
+    const p=F[i],v=Math.sin(t*.9+p.x*.7)+Math.sin(t*1.7-p.y*.35+p.x*.2);
+    X.fillStyle=v>1?p.l:v<-1?p.d:p.o;X.fillRect(p.x,p.y,1,1);
+  }
+  for(let i=0;i<T.length;i++){   /* tongues of flame: the tip stretches up one pixel when it flares */
+    const p=T[i];if(Math.sin(t*1.3+p.x*1.1+p.y*.5)>.72){X.fillStyle='#a8d773';X.fillRect(p.x,p.y-1,1,1)}
+  }
+  for(let i=0;i<4&&T.length;i++){   /* sparks drift up from the flame tips and fade */
+    const q=t*.5+i*2.3,ph=q%9,tp=T[(i*37+Math.floor(q/9)*13)%T.length],ey=tp.y-2-Math.floor(ph);
+    if(ey<0)continue;X.globalAlpha=Math.max(0,1-ph/9);X.fillStyle='#d3ef98';X.fillRect(tp.x+Math.round(Math.sin(ph*.9+i)*1.5),ey,1,1);
+  }
+  X.globalAlpha=1;
+}
+function gobTick(){
+  GOBFX.t++;
+  GOBFX.cvs.forEach(c=>{
+    if(!c.isConnected){if(++c._miss>40)GOBFX.cvs.delete(c);return}
+    c._miss=0;if(c.offsetParent===null)return;   /* on another tab, nothing to redraw */
+    gobDraw(c,GOBFX.t);
+  });
+  GOBFX.timer=GOBFX.cvs.size?setTimeout(gobTick,110):0;
+}
+function goblinbandCanvas(){
+  gobInit();
+  const R=GOBSPR.r,H=R.length,W=R[0].length,c=document.createElement('canvas');c.width=W;c.height=H;c.style.width=Math.round(W*1.6)+'px';c.style.height=Math.round(H*1.6)+'px';
+  c._x=c.getContext('2d');c._miss=0;gobDraw(c,0);
+  if(!GOBFX.still){GOBFX.cvs.add(c);if(!GOBFX.timer)GOBFX.timer=setTimeout(gobTick,110)}
+  return c;
+}
+
 /* companion art registry: a pet whose emoji field is 'pet:<key>' is drawn from code instead of as an emoji */
 const PETART={wendigo:(res,tier)=>wendigoCanvas(res,tier),wolfpup:()=>wolfpupCanvas(0)};
 const PETCROP={wendigo:[0,0,64,64],wolfpup:[20,0,28,28]};
+PETART.goblinband=()=>goblinbandCanvas();PETCROP.goblinband=[16,2,48,48];   /* the goblin's head and shoulders */
 PETART.direwolfpack=()=>direwolfpackCanvas();PETCROP.direwolfpack=[19,4,24,24];   /* which part of the full art becomes the small icon (the head(s)) */
 const petTier=lv=>lv>=14?2:lv>=BIG_LV?1:0;      /* growth: more antler tines at Lv 8, embers at Lv 14 */
 function petSprite(key,res,tier){const c=PETART[key](res,tier);c.className='px';return c}
@@ -1250,10 +1460,12 @@ function initCreator(){
 }
 
 /* ---------- loot: random drops, you decide what to wear ---------- */
-const SLOTS=['helm','armor','weapon','trinket','offhand','companion'];
-const SLOTN={helm:'Helm',armor:'Armor',weapon:'Weapon',trinket:'Trinket',offhand:'Off-hand',companion:'Companion'};
-const NOUN={helm:{warrior:'Helm',mage:'Hat',rogue:'Hood',cleric:'Circlet'},armor:{warrior:'Plate',mage:'Robes',rogue:'Leathers',cleric:'Vestments'},weapon:{warrior:'Sword',great:'Greatsword',mage:'Staff',rogue:'Daggers',cleric:'Mace'},offhand:{warrior:'Shield',mage:'Tome',rogue:'Dagger',cleric:'Lantern'}};
+const SLOTS=['helm','armor','legs','boots','weapon','trinket','offhand','companion'];
+const SLOTN={helm:'Helm',armor:'Armor',legs:'Legs',boots:'Boots',weapon:'Weapon',trinket:'Trinket',offhand:'Off-hand',companion:'Companion'};
+const NOUN={legs:{warrior:'Leggings'},boots:{warrior:'Boots'},helm:{warrior:'Helm',mage:'Hat',rogue:'Hood',cleric:'Circlet'},armor:{warrior:'Plate',mage:'Robes',rogue:'Leathers',cleric:'Vestments'},weapon:{warrior:'Sword',great:'Greatsword',mage:'Staff',rogue:'Daggers',cleric:'Mace'},offhand:{warrior:'Shield',mage:'Tome',rogue:'Dagger',cleric:'Lantern'}};
 const MATN=['Plain','Iron','Steel','Tempered','Mythril','Golden','Dragon','Godforged'];
+/* metal gear (pixel sprites): rarity -> metal. Names use the real metal: Copper, Chainmail, Iron, Diamond, Golden (swords: Wooden, Stone, Iron, Diamond, Golden) */
+const MCN=['Copper','Chainmail','Iron','Diamond','Golden'],MCW=['Wooden','Stone','Iron','Diamond','Golden'],MCR=[0,1,2,2,3,4,4];
 const RNAME=['Common','Uncommon','Rare','Very rare','Epic','Legendary','Mythical','Unique'];
 const VIS=[0,1,2,2,3,4,5,5];                 /* rarity -> how the gear looks on the hero (6 looks) */
 const OLD2NEW=[0,1,2,4,5,6];                 /* old 6-tier saves -> new rarity index */
@@ -1274,7 +1486,7 @@ function eff(it,k){const v=it.b[k]||0;return it.slot==='companion'?Math.round(v*
 const PETQ=['Stray','Tame','Loyal','Clever','Noble','Fabled','Mythic','Spirit'];
 const TNAME=['Bone Charm','Copper Ring','Silver Ring','Jade Ring','Gold Ring','Mythril Ring','Dragon Eye','Eye of the Void'];
 const SUF={xp:'of Insight',gold:'of Fortune',dmg:'of Warding',hp:'of Vitality',bd:'of Slaying'};
-const ICON={helm:{warrior:'\u26d1\ufe0f',mage:'\ud83c\udfa9',rogue:'\ud83e\udd77',cleric:'\ud83d\udc51'},armor:{warrior:'\ud83d\udee1\ufe0f',mage:'\ud83e\udde5',rogue:'\ud83e\udd4b',cleric:'\ud83d\udc58'},weapon:{warrior:'\u2694\ufe0f',great:'\ud83d\udde1\ufe0f',mage:'\ud83e\ude84',rogue:'\ud83d\udd2a',cleric:'\ud83d\udd28'},offhand:{warrior:'🛡️',mage:'📖',rogue:'🗡️',cleric:'🏮'}};
+const ICON={legs:{warrior:'👖'},boots:{warrior:'👢'},helm:{warrior:'\u26d1\ufe0f',mage:'\ud83c\udfa9',rogue:'\ud83e\udd77',cleric:'\ud83d\udc51'},armor:{warrior:'\ud83d\udee1\ufe0f',mage:'\ud83e\udde5',rogue:'\ud83e\udd4b',cleric:'\ud83d\udc58'},weapon:{warrior:'\u2694\ufe0f',great:'\ud83d\udde1\ufe0f',mage:'\ud83e\ude84',rogue:'\ud83d\udd2a',cleric:'\ud83d\udd28'},offhand:{warrior:'🛡️',mage:'📖',rogue:'🗡️',cleric:'🏮'}};
 const RAR=['#8a7862','#58b368','#4a9ae0','#2fc7c0','#a56be0','#e8b93c','#ff7a4a','#ff4fd8'];   /* frame colour per rarity */
 const STAT_TXT={xp:v=>(v<0?'':'+')+v+'% XP',gold:v=>(v<0?'':'+')+v+'% coins',dmg:v=>v<0?'+'+(-v)+'% damage taken':'-'+v+'% damage taken',hp:v=>(v<0?'':'+')+v+' max HP',bd:v=>(v<0?'':'+')+v+'% boss damage'};
 /* Unique gear: hand-made named items, mostly weapons. Quirky rather than strong, some have trade-offs.
@@ -1302,7 +1514,7 @@ const bonusTxt=it=>Object.keys(it.b).map(k=>STAT_TXT[k](eff(it,k))).join(', ');
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 function itemName(it){
   const main=Object.keys(it.b)[0];
-  const base=it.slot==='trinket'?TNAME[it.r]:it.slot==='companion'?PETQ[it.r]+' '+(PETS[it.pet]||PETS.wolfpup).n:MATN[it.r]+' '+NOUN[it.slot][it.st];
+  const base=it.slot==='trinket'?TNAME[it.r]:it.slot==='companion'?PETQ[it.r]+' '+(PETS[it.pet]||PETS.wolfpup).n:(it.ms!=null?(it.slot==='weapon'?MCW:MCN)[it.ms]:MATN[it.r])+' '+NOUN[it.slot][it.st];
   return base+(main?' '+SUF[main]:'');
 }
 /* old saves had gear tiers per slot: turn them into loot items so nothing is lost */
@@ -1337,7 +1549,7 @@ const hpOf=s=>SLOTS.reduce((a,k)=>{const i=wornOf(s,k);return a+(i?eff(i,'hp'):0
 let TRYIT=null,WFX=null;   /* TRYIT: item being tried on in the Hero tab (only set briefly while previewing stats). WFX: slot just worn, for the flash */
 function bsum(k){return SLOTS.reduce((a,s)=>{const i=TRYIT&&TRYIT.slot===s?TRYIT:worn(s);return a+(i?eff(i,k):0)},0)}
 
-function fresh(){return {gems:0,freezes:0,frozen:{},tasks:[],done:{},perfect:{},bonus:{},award:{},xp:0,badges:{},hp:hpBase(1),lastDay:addDays(today(),-1),log:[],defeats:0,gold:0,gAward:{},inv:[],worn:{},rv:2,cls:null,sub:null,chests:0,boss:null,look:null}}
+function fresh(){return {gems:0,freezes:0,pots:0,heals:0,echests:0,frozen:{},tasks:[],done:{},perfect:{},bonus:{},award:{},xp:0,badges:{},hp:hpBase(1),lastDay:addDays(today(),-1),log:[],defeats:0,gold:0,gAward:{},inv:[],worn:{},rv:2,cls:null,sub:null,chests:0,boss:null,look:null}}
 function load(){
   let s={};try{s=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
   s=migrate(s);
@@ -1786,7 +1998,7 @@ function classBox(lv){
 /* weekly bosses: the tier follows your level (goblins and wolves early, dragons much later).
    [name, emoji, base HP at Lv 1]. HP and your hits are both multiplied by the level scale (sc), so every tier stays beatable. */
 const BTIERS=[
-  {min:1,pool:[['Goblin Band','👺',120],['Direwolf Pack','🐺',140],['Bandit Gang','🥷',160]]},
+  {min:1,pool:[['Goblin Warrior','👺',120],['Direwolf Pack','🐺',140],['Bandit Gang','🥷',160]]},
   {min:5,pool:[['Spider Nest','🕷️',190],['Bog Troll','🧌',210],['Skeleton Warband','💀',230]]},
   {min:10,pool:[['Ogre Brute','👹',260],['Stone Golem','🗿',280],['Shadow Wraith','👻',300]]},
   {min:15,pool:[['Ember Drake','🐲',330],['Frost Giant','🧊',350],['Marsh Hydra','🐍',370]]},
@@ -1795,8 +2007,9 @@ const BTIERS=[
 ];
 const BSHARE=[.35,.45,.55,.65,.75,.85];   /* boss HP = this share of what a perfect week of your posted quests would deal, by tier. Board size cancels out; class, subclass and gear are your edge. */
 function weekCap(){let c=0,d=weekKey();for(let i=0;i<7;i++,d=addDays(d,1))S.tasks.forEach(t=>{if(active(t,d))c+=t.xp});return c}   /* every quest scheduled Mon-Sun, at base damage */
-const BART={'Direwolf Pack':'pet:direwolfpack'};   /* bosses drawn as pixel art instead of an emoji */
-const bossOf=b=>b.n?[b.n,BART[b.n]||b.e]:BOSSES[b.idx];   /* old saves only stored an index into BOSSES */
+const BART={'Direwolf Pack':'pet:direwolfpack','Goblin Warrior':'pet:goblinband'};   /* bosses drawn as pixel art instead of an emoji */
+const BALIAS={'Goblin Band':'Goblin Warrior'};   /* saves made before the rename still hold the old name */
+const bossOf=b=>{const n=b.n&&(BALIAS[b.n]||b.n);return n?[n,BART[n]||b.e]:BOSSES[b.idx]};   /* old saves only stored an index into BOSSES */
 function weekKey(){const d=new Date();d.setDate(d.getDate()-(d.getDay()+6)%7);return dkey(d)}
 function ensureBoss(){
   const wk=weekKey(),old=S.boss;if(old&&old.week===wk&&old.n&&old.v===3)return;
@@ -1814,7 +2027,7 @@ function hitBoss(dmg){
 }
 /* ---------- shop: gold and gems ----------
    Gold comes from quests and bosses. Gems are rarer: the weekly boss drops 2+ and every 7th day of a perfect streak gives 2. */
-const FREEZE_MAX=3;
+const FREEZE_MAX=3,POT_MAX=10,HEAL_MAX=5,EPIC_MAX=10;   /* how many of each you can carry in the Hero tab inventory */
 function healHp(f){const m=maxHp(levelOf(S.xp));S.hp=Math.min(m,S.hp+Math.max(1,Math.round(m*f)))}
 function epicChest(){
   S.copened=(S.copened|0)+1;
@@ -1823,14 +2036,14 @@ function epicChest(){
 }
 const SHOP={
   g:[
-    {id:'fz',cost:120,e:'🧊',n:'Streak Freeze',d:'Saves your streak when you miss a day. Used automatically. Hold up to '+FREEZE_MAX+'.',ok:()=>(S.freezes|0)<FREEZE_MAX,full:'Max',buy:()=>{S.freezes=(S.freezes|0)+1;toast('Streak Freeze ready')}},
-    {id:'pot',cost:50,e:'🧪',n:'Healing Potion',d:'Restores 40% of your max HP.',ok:()=>S.hp<maxHp(levelOf(S.xp)),full:'Full',buy:()=>{healHp(.4);toast('Healed')}},
-    {id:'ch',cost:150,e:'🎁',n:'Loot Chest',d:'A random chest. Open it in the Hero tab.',buy:()=>{S.chests++;toast('Bought a chest')}}
+    {id:'fz',cost:120,e:'🧊',n:'Streak Freeze',d:'Saves your streak when you miss a day. It sits in your Hero tab inventory and kicks in by itself at midnight. Hold up to '+FREEZE_MAX+'.',ok:()=>(S.freezes|0)<FREEZE_MAX,full:'Max',buy:()=>{S.freezes=(S.freezes|0)+1;toast('Streak Freeze ready')}},
+    {id:'pot',cost:50,e:'🧪',n:'Healing Potion',d:'Goes into your Hero tab inventory. Use it there to restore 40% of your max HP. Carry up to '+POT_MAX+'.',ok:()=>(S.pots|0)<POT_MAX,full:'Max',buy:()=>{S.pots=(S.pots|0)+1;toast('Healing Potion added to your inventory')}},
+    {id:'ch',cost:150,e:'🎁',n:'Loot Chest',d:'A random chest. Goes into your inventory: open it in the Hero tab (or at the shop counter).',buy:()=>{S.chests++;toast('Bought a chest')}}
   ],
   m:[
     {id:'fz',cost:4,e:'🧊',n:'Streak Freeze',d:'The same freeze, paid in gems.',ok:()=>(S.freezes|0)<FREEZE_MAX,full:'Max',buy:()=>{S.freezes=(S.freezes|0)+1;toast('Streak Freeze ready')}},
-    {id:'heal',cost:3,e:'💖',n:'Full Heal',d:'Restores all your HP.',ok:()=>S.hp<maxHp(levelOf(S.xp)),full:'Full',buy:()=>{healHp(1);toast('Fully healed')}},
-    {id:'epic',cost:6,e:'💠',n:'Epic Chest',d:'Opens at once: loot of Very rare quality or better.',buy:epicChest}
+    {id:'heal',cost:3,e:'💖',n:'Full Heal',d:'Goes into your Hero tab inventory. Use it there to restore all your HP. Carry up to '+HEAL_MAX+'.',ok:()=>(S.heals|0)<HEAL_MAX,full:'Max',buy:()=>{S.heals=(S.heals|0)+1;toast('Full Heal added to your inventory')}},
+    {id:'epic',cost:6,e:'💠',n:'Epic Chest',d:'Goes into your Hero tab inventory. Open it there: loot of Very rare quality or better. Carry up to '+EPIC_MAX+'.',ok:()=>(S.echests|0)<EPIC_MAX,full:'Max',buy:()=>{S.echests=(S.echests|0)+1;toast('Epic Chest added to your inventory')}}
   ]
 };
 function shopBuy(cur,it){
@@ -1917,11 +2130,19 @@ function buildGear(slot,r,st,pet){
   Object.keys(STAT_STEP).sort(()=>Math.random()-.5).slice(0,n).forEach(k=>{b[k]=Math.max(1,Math.round(STAT_STEP[k]*RSC[r]*(.6+Math.random()*.8)))});
   const ks=Object.keys(NOUN[slot]||{});
   const pool=r>=5?['dragon','drake','unicorn','genie','wendigo']:r>=3?['unicorn','genie','golem','troll','drake','wendigo']:['wolfpup','sprite','imp','goblin','wendigo'];
-  const it={id:uid(),slot,r,b,st:st!=null?st:(ks.length?ks[Math.floor(Math.random()*ks.length)]:null),isNew:true};
+  let s0=st!=null?st:(ks.length?ks[Math.floor(Math.random()*ks.length)]:null);
+  /* random drops (no look given) lean toward the metal sets: half of all helms and chestplates, a fifth of all weapons */
+  if(st==null&&((slot==='helm'||slot==='armor')&&Math.random()<.5||slot==='weapon'&&Math.random()<.2))s0='warrior';
+  const it={id:uid(),slot,r,b,st:s0,isNew:true},mi=MCR[Math.min(6,r)];
   if(slot==='companion')it.pet=pet||pool[Math.floor(Math.random()*pool.length)];
+  if(MCA[slot]&&(slot==='legs'||slot==='boots'||s0==='warrior'))it.ms=mi;   /* helm, chestplate, leggings, boots: a metal and its sprite */
+  if(slot==='weapon'){
+    if(s0==='warrior'&&Math.random()<(st==null?1:.5)){it.ms=mi;it.sk=64+mi}   /* the wood / stone / iron / diamond / gold sword */
+    else it.sk=pickSkin(it.st,r);
+  }
   it.n=itemName(it);return it;
 }
-const iicon=it=>it.slot==='trinket'?'\ud83d\udcff':it.slot==='companion'?(PETS[it.pet]||PETS.wolfpup).e:ICON[it.slot][it.st];
+const iicon=it=>it.slot==='trinket'?'\ud83d\udcff':it.slot==='companion'?(PETS[it.pet]||PETS.wolfpup).e:(it.slot==='weapon'&&it.sk!=null&&SKIN[it.sk])?'wpn:'+it.sk:(it.ms!=null&&MCA[it.slot])?'mc:'+it.slot+':'+it.ms:ICON[it.slot][it.st];
 const dicon=k=>k==='trinket'?'\ud83d\udcff':k==='companion'?'🐾':ICON[k][S.cls&&NOUN[k][S.cls]?S.cls:'warrior'];
 const sellVal=it=>it.u?120:10*(it.r+1)*(it.r+1);
 function openChest(){
@@ -1948,6 +2169,55 @@ function sell(id){
   const it=S.inv.find(i=>i.id===id);if(!it||(S.worn||{})[it.slot]===id)return;
   const v=sellVal(it);S.inv=S.inv.filter(i=>i.id!==id);S.gold+=v;
   toast('Sold '+it.n+' for '+coinText(v));save();render();
+}
+/* ---------- inventory (Hero tab): things you buy are kept here and only used when you tap Use / Open ---------- */
+function usePotion(){
+  if((S.pots|0)<1)return;
+  if(S.hp>=maxHp(levelOf(S.xp))){toast('Your HP is already full');return}
+  S.pots--;const b=S.hp;healHp(.4);const g=Math.round(S.hp-b);
+  addLog('Drank a Healing Potion: +'+g+' HP','good');toast('+'+g+' HP');buzz(30);save();render();
+}
+function useFullHeal(){
+  if((S.heals|0)<1)return;
+  if(S.hp>=maxHp(levelOf(S.xp))){toast('Your HP is already full');return}
+  S.heals--;const b=S.hp;healHp(1);const g=Math.round(S.hp-b);
+  addLog('Used a Full Heal: +'+g+' HP','good');toast('Fully healed');buzz([30,40,30]);save();render();
+}
+function openEpic(){
+  if((S.echests|0)<1||CHEST_BUSY)return;
+  S.echests--;epicChest();buzz(40);save();render();
+}
+function openLootChest(){
+  if(S.chests<1||CHEST_BUSY)return;
+  openChest();
+}
+function invRows(){   /* what is in the pack right now: [icon, name, count, text, button label, handler, disabled?, label when disabled] */
+  const fullHp=S.hp>=maxHp(levelOf(S.xp)),r=[];
+  if((S.pots|0)>0)r.push(['🧪','Healing Potion',S.pots|0,'Restores 40% of your max HP.','Use',usePotion,fullHp,'HP full']);
+  if((S.heals|0)>0)r.push(['💖','Full Heal',S.heals|0,'Restores all your HP.','Use',useFullHeal,fullHp,'HP full']);
+  if((S.chests|0)>0)r.push(['🎁','Loot Chest',S.chests|0,'A random chest: gear, coins or a potion.','Open',openLootChest,false]);
+  if((S.echests|0)>0)r.push(['💠','Epic Chest',S.echests|0,'Loot of Very rare quality or better.','Open',openEpic,false]);
+  if((S.freezes|0)>0)r.push(['🧊','Streak Freeze',S.freezes|0,'Held. Saves your streak by itself if you miss a day.',null,null,true]);
+  return r;
+}
+function renderInv(){
+  const box=$('inv');if(!box)return;
+  const rows=invRows(),total=rows.reduce((a,x)=>a+x[2],0);
+  box.replaceChildren();
+  const hd=el('div','invhd');hd.append(el('b','','Pack'),el('span','',total?total+' item'+(total===1?'':'s'):'Empty'));
+  box.appendChild(hd);
+  if(!rows.length){box.appendChild(el('div','invempty','Nothing here yet. Potions, heals and chests you buy in the Shop are kept in this pack until you use them.'));return}
+  const g=el('div','invlist');
+  rows.forEach(([e,n,c,d,lab,fn,off,offLab])=>{
+    const row=el('div','invrow'+(lab?'':' passive')),ic=el('div','invic');ic.appendChild(px(e,32));
+    ic.appendChild(el('i','invn','x'+c));
+    const tx=el('div','invtx');tx.append(el('b','',n),el('small','',d));
+    row.append(ic,tx);
+    if(lab){const b=el('button','btn',off&&offLab?offLab:lab);b.type='button';b.disabled=!!off;b.onclick=fn;row.appendChild(b)}
+    else row.appendChild(el('span','invtag','AUTO'));
+    g.appendChild(row);
+  });
+  box.appendChild(g);
 }
 /* ---------- hero tab: equipment showcase ---------- */
 /* what you wear sets your bonuses and your look. Nothing worn in a slot = plain starter look. */
@@ -2013,7 +2283,7 @@ function setAura(sg,pv){
   }
 }
 /* glowing links: a curve from each slot to the part of the hero it belongs to (x, y as a share of the hero canvas) */
-const LANCH={helm:[.5,.2],armor:[.56,.68],trinket:[.52,.5],weapon:[.88,.52],offhand:[.14,.58],companion:[.3,.93]};
+const LANCH={helm:[.5,.2],armor:[.56,.68],legs:[.5,.82],boots:[.5,.95],trinket:[.52,.5],weapon:[.88,.52],offhand:[.14,.58],companion:[.3,.93]};
 function drawLinks(){
   const sg=document.querySelector('.stage'),sv=$('links'),cv=document.querySelector('#figure canvas');
   if(!sg||!sv||!cv||!sg.offsetParent)return;
@@ -2086,7 +2356,7 @@ function renderGear(){
     };
     return b;
   };
-  $('rack').replaceChildren(slot('helm'),slot('armor'),slot('weapon'),slot('offhand'),slot('trinket'),slot('companion'));
+  $('rack').replaceChildren(slot('helm'),slot('armor'),slot('weapon'),slot('offhand'),slot('trinket'),slot('legs'),slot('boots'),slot('companion'));
   setAura(sg,pv);
   const pk=$('picker'),hd=el('div','pkhead');
   hd.append(el('b','',SLOTN[SEL]),el('span','',(items.length?items.length+(items.length===1?' item':' items')+' · ':'')+coinText(S.gold)));
@@ -2190,7 +2460,7 @@ function renderRPG(){
   if(b){   /* weekly boss card: living portrait scene, name banner, skull-marked HP bar, reward tiles */
     const B=bossOf(b),dead=b.hp<=0,pct=Math.max(0,Math.min(100,b.hp/b.max*100)),rage=!dead&&pct<=30,tr=b.tier||0;
     const pf=el('div','bxp'+(dead?' dead':'')+(rage?' rage':'')),ak=B[1].slice(0,4)==='pet:'&&PETART[B[1].slice(4)]?B[1].slice(4):null;
-    let sp;if(ak){sp=PETART[ak]();sp.removeAttribute('style');sp.className='px art'}else{sp=px(B[1],24);sp.classList.add('em')}
+    let sp;if(ak){sp=PETART[ak]();sp.removeAttribute('style');sp.className='px art k-'+ak}else{sp=px(B[1],24);sp.classList.add('em')}
     pf.append(el('i','bxst'),el('i','bxf'),sp);
     if(!dead)for(let q=0;q<9;q++){const m=el('b','bxe');m.style.setProperty('--x',(8+q*10.5)+'%');m.style.setProperty('--d',(-(q*.47)%4).toFixed(2)+'s');m.style.setProperty('--dx',((q%2?1:-1)*(5+q%3*5))+'px');pf.appendChild(m)}
     pf.appendChild(el('i','bxl'));if(dead)pf.appendChild(el('i','bxs','DEFEATED'));
@@ -2401,6 +2671,7 @@ function render(){
   if(!addTouched)setAdd(!vis.length);   /* open by default only while the board is empty */
 
   renderRPG();
+  renderInv();
   renderShop();
   updatePv();
   const lg=$('log');lg.innerHTML='';
@@ -3345,7 +3616,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     pot:'Healing Potion. Tastes like feet. Works like magic.',
     ch:'A loot chest. Could be a legendary blade. Could be a sock. No refunds.',
     heal:'Full Heal. Dont ask what the gem does inside it. It just works.',
-    epic:'An Epic Chest. Opens right away. Dont shake it. Itl finish.'
+    epic:'An Epic Chest. Open it from your pack. Dont shake it. Itl finish.'
   };
   const BUYL=['Pleasure doing business.','Coin received. Items yours. No refunds.','A fine choice. A very expensive choice, but a fine one.'];
   const BROKE=['Short on coin? The wolves pay well, I hear.','Come back when your purse is heavier brokie. I mean that kindly.'];
@@ -3384,9 +3655,9 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const purse=el('span','sfz-chip cur sfz-purse'+act('g'));purse.title='1 gold = 10 silver = 100 bronze';
     coinParts(S.gold).forEach((v,i)=>{const g=el('span','sfz-pc');g.title=['Gold','Silver','Bronze'][i];g.append(px('coin:'+COIN_U[i],10),el('b','',String(v)));purse.appendChild(g)});
     const gems=chip(px('💎',16),String(S.gems||0));gems.className='sfz-chip cur gem'+act('m');gems.title='Gems';
-    const fz=chip(px('🧊',16),(S.freezes|0)+'/'+FREEZE_MAX),ch=chip(px('🎁',16),String(S.chests));
-    fz.classList.add('sm');ch.classList.add('sm');fz.title='Streak Freezes held';ch.title='Chests to open';
-    zo.querySelector('.sfz-wal').replaceChildren(purse,gems,fz,ch);
+    const fz=chip(px('🧊',16),(S.freezes|0)+'/'+FREEZE_MAX),ch=chip(px('🎁',16),String(S.chests)),po=chip(px('🧪',16),String(S.pots|0));
+    fz.classList.add('sm');ch.classList.add('sm');po.classList.add('sm');fz.title='Streak Freezes held';ch.title='Chests to open';po.title='Healing Potions in your inventory';
+    zo.querySelector('.sfz-wal').replaceChildren(purse,gems,fz,ch,po);
     zChest();
     zo.querySelectorAll('.sfz-tab').forEach(t=>{const on=t.dataset.cat===zcat;t.setAttribute('aria-selected',on?'true':'false');t.tabIndex=on?0:-1});
     /* coin goods on the back shelf at the left of the hatch, gem goods on the right */
@@ -3504,7 +3775,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
   const PET_COST={0:['g',400],1:['g',1200],2:['m',7],3:['m',14],4:['m',28]};   /* by rarity: 'g' = coins (bronze), 'm' = gems */
   const PET_POOL=r=>r>=3?['unicorn','genie','golem','troll','drake','wendigo']:['wolfpup','sprite','imp','goblin','wendigo'];
   const LINES={
-    a:['Steel is honest. My prices, less so.','New stock every dawn. Early heroes get the good plate.','Try the shield. Everyone looks braver behind one.','Mind the edges. Mind the prices more.'],
+    a:['Steel is honest. My prices, less so.','New stock every dawn. Early heroes get the good plate.','Try the shield. Everyone looks braver behind one.','Mind the edges. Mind the prices more.','Bring more levels and I will bring out better steel.'],
     p:['They bite. Mostly the ones that do not.','Feed them. Pat them. Do not name them until you have paid.','Every one is house trained. Mostly.','A companion fights harder when it likes you.'],
     buy:['Pleasure doing business.','Sold. It is yours now, along with all its problems.','A fine choice.'],
     poor:['Your purse says no. Your quests say yes.','Come back with more coin.']
@@ -3512,12 +3783,14 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
   const pick=a=>a[Math.floor(Math.random()*a.length)];
   const price=e=>e.cur==='g'?coinText(e.cost,2):e.cost+'\u{1F48E}';
   const stk=k=>k==='a'?S.sa.s:S.sp.s;
+  const stkAll=k=>k==='a'?S.sa.s.concat((S.sv&&S.sv.s)||[]):S.sp.s;   /* the armoury's four bays, then the three vault pieces (index 4-6) */
 
   /* ---- stock ---- */
+  const armCap=()=>{const l=levelOf(S.xp);return l>=22?3:l>=12?2:l>=5?1:0};   /* best rarity (and weapon skin tier) the shelves carry: Lv 1 plain, Lv 5 steel, Lv 12 ornate, Lv 22 rare */
   function armRarity(){   /* Common..Very rare; the odds slide toward the better stuff as you level */
-    const p=Math.min(1,(levelOf(S.xp)-1)/39),w=[50-30*p,30,15+15*p,5+15*p];
+    const p=Math.min(1,(levelOf(S.xp)-1)/39),w=[50-30*p,30,15+15*p,5+15*p].slice(0,armCap()+1);
     let r=Math.random()*w.reduce((a,b)=>a+b,0);
-    for(let i=0;i<4;i++){if((r-=w[i])<0)return i}
+    for(let i=0;i<w.length;i++){if((r-=w[i])<0)return i}
     return 0;
   }
   function genArm(){
@@ -3526,6 +3799,19 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       const st=own&&Math.random()<.7?own:ks[Math.floor(Math.random()*ks.length)];   /* mostly gear that suits your class */
       const it=buildGear(slot,r,st);delete it.isNew;
       return {it,cur:'g',cost:ARM_COST[r],sold:false};
+    });
+  }
+  /* the Vault: three pieces from above your station, hanging on the rail. One costs a lot of coin, two cost gems. */
+  const VG=r=>Math.round([80,260,700,1600,4000,9000][r]*1.6),VM=[0,5,9,14,22,34];
+  function genVault(){
+    const cap=armCap(),rs=[Math.min(5,cap+1),Math.min(5,cap+2),Math.min(5,cap+2)],cur=['g','m','m'];
+    const other=['helm','armor','offhand','weapon'],sl=['weapon',other[Math.floor(Math.random()*3)],null];
+    sl[2]=other.filter(s=>s!==sl[1])[Math.floor(Math.random()*3)];
+    return sl.map((slot,j)=>{
+      const r=rs[j],ks=Object.keys(NOUN[slot]),own=S.cls&&NOUN[slot][S.cls]?S.cls:null;
+      const st=own&&Math.random()<.7?own:ks[Math.floor(Math.random()*ks.length)];
+      const it=buildGear(slot,r,st);delete it.isNew;
+      return {it,cur:cur[j],cost:cur[j]==='g'?VG(r):VM[r],sold:false,vault:true};
     });
   }
   function genPets(){
@@ -3540,7 +3826,8 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
   }
   function ensure(){
     const d=today();let ch=false;
-    if(!S.sa||S.sa.d!==d||!Array.isArray(S.sa.s)||S.sa.s.length!==4){S.sa={d,s:genArm()};ch=true}
+    if(!S.sa||S.sa.d!==d||!Array.isArray(S.sa.s)||S.sa.s.length!==4||S.sa.g!==2){S.sa={d,g:2,s:genArm()};ch=true}
+    if(!S.sv||S.sv.d!==d||!Array.isArray(S.sv.s)||S.sv.s.length!==3||S.sv.g!==2){S.sv={d,g:2,s:genVault()};ch=true}
     if(!S.sp||S.sp.d!==d||!Array.isArray(S.sp.s)||S.sp.s.length!==4){S.sp={d,s:genPets()};ch=true}
     if(ch)save();
   }
@@ -3646,7 +3933,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     if(!zf)return;
     const room=document.getElementById('sfroom');if(!room||!room.classList.contains('done'))return;   /* only once the camera has arrived */
     const t=e.target;if(!t||!t.closest)return;
-    if(t.closest('[data-i],.fz-c,.sfz-det,.sfz-chip'))return;
+    if(t.closest('[data-i],[data-sm],.fz-c,.sfz-det,.sfz-chip,.sfz-plq'))return;
     if(t.closest('#sfroom,.sfz-bot')||t===document.body||t===document.documentElement||t.tagName==='MAIN')zfClose();
   };
   function zfSay(t){
@@ -3654,102 +3941,119 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     clearTimeout(zf._h);b.querySelector('.sf-say-in').textContent='\u201C'+t+'\u201D';b.classList.add('on');
     zf._h=setTimeout(()=>b.classList.remove('on'),2400+t.length*30);
   }
-  /* pixel-art props for the walls (viewBox 100 x 170, drawn flat like the rest of the shop) */
-  const SW=(x,y,l,c)=>'<rect x="'+(x-.6)+'" y="'+(y-.6)+'" width="3.2" height="'+(l+1.2)+'" fill="#1a0f06"/><rect x="'+x+'" y="'+y+'" width="2" height="'+l+'" fill="'+(c||'#d6dde8')+'"/><rect x="'+(x+1)+'" y="'+y+'" width=".6" height="'+l+'" fill="#fff" opacity=".45"/><rect x="'+(x-2)+'" y="'+(y+l)+'" width="6" height="1.8" fill="#e8b93c" stroke="#1a0f06" stroke-width=".5"/><rect x="'+(x+.4)+'" y="'+(y+l+1.8)+'" width="1.2" height="4" fill="#6b4423"/><rect x="'+(x+.1)+'" y="'+(y+l+5.6)+'" width="1.8" height="1.6" fill="#e8b93c"/>';
-  const SP=(x,y,l)=>'<rect x="'+(x+.2)+'" y="'+(y+5)+'" width="1.2" height="'+l+'" fill="#6b4423" stroke="#1a0f06" stroke-width=".4"/><path d="M'+(x+.8)+' '+y+'L'+(x+2.6)+' '+(y+5.4)+'L'+(x-1)+' '+(y+5.4)+'Z" fill="#d6dde8" stroke="#1a0f06" stroke-width=".5"/>';
-  const AX=(x,y)=>'<rect x="'+x+'" y="'+y+'" width="1.6" height="24" fill="#6b4423" stroke="#1a0f06" stroke-width=".4"/><path d="M'+(x+1.6)+' '+(y+1)+'Q'+(x+8)+' '+(y-1)+' '+(x+7)+' '+(y+8)+'Q'+(x+4)+' '+(y+6)+' '+(x+1.6)+' '+(y+7)+'Z" fill="#b9c2d0" stroke="#1a0f06" stroke-width=".5"/>';
-  const SH=(cx,cy,r,c)=>'<circle cx="'+cx+'" cy="'+cy+'" r="'+(r+.8)+'" fill="#1a0f06"/><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+c+'"/><rect x="'+(cx-.7)+'" y="'+(cy-r)+'" width="1.4" height="'+(2*r)+'" fill="#e8b93c"/><rect x="'+(cx-r)+'" y="'+(cy-.7)+'" width="'+(2*r)+'" height="1.4" fill="#e8b93c"/><circle cx="'+cx+'" cy="'+cy+'" r="'+(r*.28)+'" fill="#ffd75a" stroke="#1a0f06" stroke-width=".4"/>';
-  const HM=(cx,cy)=>'<path d="M'+(cx-5)+' '+(cy+5)+'V'+cy+'Q'+(cx-5)+' '+(cy-6)+' '+cx+' '+(cy-6)+'Q'+(cx+5)+' '+(cy-6)+' '+(cx+5)+' '+cy+'V'+(cy+5)+'Z" fill="#b9c2d0" stroke="#1a0f06" stroke-width=".7"/><rect x="'+(cx-3.4)+'" y="'+(cy-.5)+'" width="6.8" height="1.6" fill="#1a0f06"/><rect x="'+(cx-.5)+'" y="'+(cy-6)+'" width="1" height="5" fill="#a8283a"/>';
-  /* hanging versions for the wall rail: pommel on a peg, blade pointing down */
-  const SWH=(x,y,l,c)=>'<rect x="'+(x+.4)+'" y="'+y+'" width="1.2" height="4" fill="#6b4423"/><rect x="'+(x+.1)+'" y="'+(y-1.6)+'" width="1.8" height="1.6" fill="#e8b93c"/><rect x="'+(x-2)+'" y="'+(y+4)+'" width="6" height="1.8" fill="#e8b93c" stroke="#1a0f06" stroke-width=".5"/><rect x="'+(x-.6)+'" y="'+(y+5.8)+'" width="3.2" height="'+(l+1.2)+'" fill="#1a0f06"/><rect x="'+x+'" y="'+(y+6)+'" width="2" height="'+l+'" fill="'+(c||'#d6dde8')+'"/><rect x="'+(x+1)+'" y="'+(y+6)+'" width=".6" height="'+l+'" fill="#fff" opacity=".45"/>';
-  const AXH=(x,y)=>'<rect x="'+x+'" y="'+y+'" width="1.6" height="11" fill="#6b4423" stroke="#1a0f06" stroke-width=".4"/><path d="M'+(x+1.6)+' '+(y+5)+'Q'+(x+7.5)+' '+(y+3)+' '+(x+6.8)+' '+(y+11.5)+'Q'+(x+4)+' '+(y+9.5)+' '+(x+1.6)+' '+(y+10)+'Z" fill="#b9c2d0" stroke="#1a0f06" stroke-width=".5"/>';
-  const MCH=(x,y)=>'<rect x="'+(x+.3)+'" y="'+y+'" width="1.4" height="9" fill="#6b4423" stroke="#1a0f06" stroke-width=".4"/><circle cx="'+(x+1)+'" cy="'+(y+10.6)+'" r="3.2" fill="#8a92a0" stroke="#1a0f06" stroke-width=".6"/><path d="M'+(x+1)+' '+(y+6.6)+'v-1.2M'+(x+1)+' '+(y+14.6)+'v1.2M'+(x-3)+' '+(y+10.6)+'h-1.2M'+(x+5)+' '+(y+10.6)+'h1.2" stroke="#1a0f06" stroke-width="1.1"/>';
-  const CH=(x,y1,y2)=>{let s='<rect x="'+(x-2)+'" y="'+(y1-1.6)+'" width="4" height="2" fill="#6a7384" stroke="#1a0f06" stroke-width=".4"/>';for(let y=y1;y<y2;y+=2.6)s+='<rect x="'+(x-.7)+'" y="'+y+'" width="1.4" height="1.9" fill="#aab3c2" stroke="#1a0f06" stroke-width=".3"/>';return s};
+  /* pixel-art decor for the companion pens (viewBox 100 x 170, drawn flat like the rest of the shop). The Armoury has none: it is an HTML wall of displays. */
+    function aShuffle(n){
+    let h=2166136261;for(const ch of today()){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}
+    let s=h>>>0;const rnd=()=>{s=(s+0x6D2B79F5)>>>0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+    const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a;
+  }
+  /* fill the two wall boards with as many different blades as fit (each blade appears once) */
+  function aPack(wall){
+    const L=wall&&wall.querySelector('.sfa-col.l'),R=wall&&wall.querySelector('.sfa-col.r');if(!L||!R)return;
+    const hh=L.clientHeight;if(!hh||L._h===hh)return;L._h=hh;
+    const used=new Set(aRack().map(j=>34+j)),ord=aShuffle(BLADES.length).filter(i=>!used.has(i));let p=0;
+    [L,R].forEach(col=>{
+      col.replaceChildren();let used=0,n=0;const room=hh-14;
+      while(p<ord.length){const c=wpnCv(ord[p],1),h=parseFloat(c.style.height),need=h+(n?5:0);if(used+need>room)break;col.appendChild(c);used+=need;n++;p++}
+    });
+  }
+  const SV=(vb,w,h,b)=>'<svg viewBox="'+vb+'" width="'+w+'" height="'+h+'" shape-rendering="crispEdges" aria-hidden="true">'+b+'</svg>';
+  const IK='#1a0f06',ST='#aab3c2',SD='#6a7384',SL='#eef3fa',GD='#e8b93c',RD='#a8283a',WD='#8a5a2a',WK='#6b4423';
+  /* Armoury decor: chained plate and helm up top, an axe rail between the rows, and the floor: weapon rack, armour stand with axes behind it, barrel of axes */
+  /* Armoury decor: every piece is a hand-built pixel sprite (see style.css): beam, hanging plate and helm, vault rail, axe crates on a shelf, flagstone floor with a runner, upright racks, armour stand */
+  const RK=s=>'<div class="sfa-rk '+s+'"><i class="bk"></i><div class="it"></div><i class="fr"></i></div>';
+  const ADEC='<div class="sfa-dec" aria-hidden="true">'
+    +'<i class="sfa-beam"></i>'
+    +'<div class="sfa-ch l"><i class="sfa-cu"></i></div><div class="sfa-ch c"><i class="sfa-cs"></i></div><div class="sfa-ch r"><i class="sfa-hm"></i></div>'
+    +'<div class="sfa-rail"><i></i><b class="p l"></b><b class="p r"></b><div class="sfa-rowx"></div></div>'
+    +'<div class="sfa-shelf"><i class="sfa-sbr l"></i><i class="sfa-sbr r"></i>'+'<div class="sfa-cr"><div class="ax"></div><i class="sfa-crf"></i></div>'.repeat(3)+'</div>'
+    +'<div class="sfa-floor"><i class="sfa-run"></i></div>'
+    +'<div class="sfa-sd l"><i></i></div>'+RK('w')
+    +'<div class="sfa-sd r br"><i class="bk"></i><div class="it"></div><i class="fr"></i></div></div>';
+  const aRack=()=>aShuffle(14).slice(0,8);   /* the eight upright swords standing in the racks today (four a rack, swords only; never repeated on the boards) */
+  function aFill(sc){
+    const o=aShuffle(16);
+    sc.querySelectorAll('.sfa-cr .ax').forEach((h,c)=>[0,1,2,3].forEach(q=>{const cv=axeCv(o[c*4+q],1);cv.style.left=q*12+'px';cv.style.bottom='5px';h.appendChild(cv)}));
+    const vs=aRack();
+    /* ONE long rack: eight swords, every one pommel up and point down in the trough. VSW sprites 1,3,7,8,10,11,13 are drawn blade-up, so those are flipped; the rest are already drawn pommel-up. */
+    const VF=[0,1,0,1,0,0,0,1,1,0,1,1,0,1];
+    const it=sc.querySelector('.sfa-rk.w .it');
+    if(it)vs.forEach((v,q)=>{
+      const e=wpnCv(34+v,.9);if(VF[v])e.style.transform='scaleY(-1)';const w=parseFloat(e.style.width);
+      e.style.setProperty('--ih',e.style.height||'60px');e.style.position='absolute';e.style.bottom='6px';e.style.left=(20.5+q*17-w/2).toFixed(1)+'px';it.appendChild(e);
+    });
+    /* the barrel on the right of the floor: the staffs and spears (red-banded pike, halberd, diamond staff, plain spear, orb staff), leaning out of it at different angles */
+    const bi=sc.querySelector('.sfa-sd.br .it');
+    if(bi)[['p',9,-11,0],['h',15,-5,5],['m',21,1,1],['s',27,7,6],['o',32,12,2]].forEach(([kd,cx,rot,up])=>{
+      const e=document.createElement('i');e.className='stf '+kd;
+      e.style.left=(cx-8)+'px';e.style.bottom=(24+up)+'px';e.style.transform='rotate('+rot+'deg)';bi.appendChild(e);
+    });
+  }
   const ZD={
-    a:'<rect x="0" y="102" width="100" height="1.6" fill="#1a0f06" opacity=".5"/>'
-      /* upper wall: two big banners, a crest on crossed spears with an axe and spears either side, a row of round shields and a shelf of helmets */
-      +SP(7,30,34)+SP(92,30,34)+AX(31,26)+SP(66,26,36)
-      +'<g stroke="#1a0f06" stroke-width=".6"><rect x="14" y="22" width="18" height="2" fill="#8a5a2a"/><path d="M16 24H30V57L23 50L16 57Z" fill="#a8283a"/><path d="M18 26H28V54L23 48L18 54Z" fill="none" stroke="#e8b93c" stroke-width=".8"/><rect x="21" y="35" width="4" height="4" fill="#ffd75a" transform="rotate(45 23 37)"/>'
-      +'<rect x="68" y="22" width="18" height="2" fill="#8a5a2a"/><path d="M70 24H84V57L77 50L70 57Z" fill="#a8283a"/><path d="M72 26H82V54L77 48L72 54Z" fill="none" stroke="#e8b93c" stroke-width=".8"/><rect x="75" y="35" width="4" height="4" fill="#ffd75a" transform="rotate(45 77 37)"/></g>'
-      +'<path d="M36 20L64 62M64 20L36 62" stroke="#1a0f06" stroke-width="3.4"/><path d="M36 20L64 62M64 20L36 62" stroke="#8a5a2a" stroke-width="1.6"/>'
-      +'<g fill="#d6dde8" stroke="#1a0f06" stroke-width=".5"><circle cx="36" cy="20" r="2"/><circle cx="64" cy="20" r="2"/></g>'
-      +SH(50,43,11,'#7a1c2a')
-      +SH(16,67,5.5,'#2a4a8a')+SH(34,67,5.5,'#7a1c2a')+SH(66,67,5.5,'#7a1c2a')+SH(84,67,5.5,'#2a4a8a')
-      +'<rect x="3" y="85.5" width="94" height="2.4" fill="#8a5a2a" stroke="#1a0f06" stroke-width=".5"/>'
-      +HM(14,80)+HM(32,80)+HM(50,80)+HM(68,80)+HM(86,80)
-      /* row 1: pennants either side of a heraldic shield on crossed swords, helmets on pegs at the edges */
-      +'<g stroke="#1a0f06" stroke-width=".6"><rect x="22" y="104" width="13" height="1.8" fill="#8a5a2a"/><path d="M24 105.8H33V122L28.5 118L24 122Z" fill="#a8283a"/><path d="M25.6 107.4H31.4V118.6L28.5 116L25.6 118.6Z" fill="none" stroke="#e8b93c" stroke-width=".7"/><rect x="27.4" y="109.6" width="2.2" height="2.2" fill="#ffd75a" transform="rotate(45 28.5 110.7)"/>'
-      +'<rect x="65" y="104" width="13" height="1.8" fill="#8a5a2a"/><path d="M67 105.8H76V122L71.5 118L67 122Z" fill="#a8283a"/><path d="M68.6 107.4H74.4V118.6L71.5 116L68.6 118.6Z" fill="none" stroke="#e8b93c" stroke-width=".7"/><rect x="70.4" y="109.6" width="2.2" height="2.2" fill="#ffd75a" transform="rotate(45 71.5 110.7)"/></g>'
-      +'<path d="M41 105L59 124M59 105L41 124" stroke="#1a0f06" stroke-width="3.6"/><path d="M41 105L59 124M59 105L41 124" stroke="#d6dde8" stroke-width="1.8"/>'
-      +'<g fill="#e8b93c" stroke="#1a0f06" stroke-width=".5"><circle cx="41" cy="105" r="1.7"/><circle cx="59" cy="105" r="1.7"/><circle cx="41" cy="124" r="1.7"/><circle cx="59" cy="124" r="1.7"/></g>'
-      +SH(50,114.5,7,'#7a1c2a')
-      +HM(10,115)+HM(90,115)+'<rect x="8" y="121" width="4" height="1.6" fill="#6a7384" stroke="#1a0f06" stroke-width=".4"/><rect x="88" y="121" width="4" height="1.6" fill="#6a7384" stroke="#1a0f06" stroke-width=".4"/>'
-      /* row 2: the weapons are mounted on the wall on ONE rail (iron brackets at both ends); swords, hand axes and a mace hang from pegs.
-         The two round shields hang from the wall by chains. */
-      +'<g stroke="#1a0f06" stroke-width=".5"><rect x="-22" y="126" width="144" height="2.4" fill="#8a5a2a"/><rect x="-24" y="123.6" width="3" height="8" fill="#6a7384"/><rect x="121" y="123.6" width="3" height="8" fill="#6a7384"/></g>'
-      +SWH(11,128.4,6)+SWH(18,128.4,7,'#aab3c2')+AXH(27,128.4)+SWH(40,128.4,7)+SWH(46,128.4,6,'#aab3c2')+MCH(56,128.4)+AXH(66,128.4)+SWH(78,128.4,7)+SWH(85,128.4,6,'#aab3c2')
-      +SWH(-17,128.4,6)+SWH(-10,128.4,7,'#aab3c2')+AXH(-5,128.4)+SWH(97,128.4,6,'#aab3c2')+SWH(104,128.4,7)+AXH(111,128.4)
-      +CH(-13,98,107)+SH(-13,113,6,'#2a4a8a')+CH(113,98,107)+SH(113,113,6,'#2a4a8a')
-      /* row 3: ONE row on the floor (drawn a little smaller so the hanging weapons clear it): crate, barrel of spears, armour stand, grindstone, anvil, strongbox */
-      +'<g transform="translate(50 168) scale(.88) translate(-50 -168)">'
-      +'<g stroke="#1a0f06" stroke-width=".8"><rect x="-22" y="156" width="14" height="12" fill="#a8764a"/><path d="M-22 156L-8 168M-8 156L-22 168" stroke="#4a2e16" fill="none"/><rect x="102" y="155" width="18" height="13" fill="#6b4423"/><path d="M102 155Q111 147 120 155Z" fill="#8a5a2a"/><rect x="102" y="159" width="18" height="2" fill="#e8b93c"/><rect x="109.5" y="158" width="3" height="4" fill="#ffd75a"/></g>'
-      +'<g><rect x="6" y="147" width="20" height="21" rx="4" fill="#6b4423" stroke="#1a0f06" stroke-width="1"/><rect x="6" y="152" width="20" height="2" fill="#aab3c2"/><rect x="6" y="161" width="20" height="2" fill="#aab3c2"/></g>'
-      +SP(10,141,13)+SP(15,139,15)+SP(20,142,12)
-      +'<g stroke="#1a0f06" stroke-width=".7"><rect x="31" y="165.4" width="14" height="2.6" fill="#6b4423"/><rect x="37.2" y="157" width="1.6" height="9" fill="#8a5a2a"/><path d="M32 154H44L43 165H33Z" fill="#8a92a0"/><path d="M32.5 155H37V164H33.4Z" fill="#b8c0cc" stroke="none"/><rect x="33" y="160.6" width="10" height="1.8" fill="#e8b93c"/><rect x="36.4" y="156" width="2.6" height="2.6" fill="#ffd75a"/><ellipse cx="31" cy="154.6" rx="3.4" ry="2.6" fill="#aab3c2"/><ellipse cx="45" cy="154.6" rx="3.4" ry="2.6" fill="#8a92a0"/></g>'
-      +HM(38,150)
-      +'<g stroke="#1a0f06" stroke-width=".8"><rect x="47.5" y="163" width="13" height="4.6" fill="#6b4423"/><circle cx="54" cy="158.4" r="5.8" fill="#aab3c2"/><circle cx="54" cy="158.4" r="2" fill="#6a7384"/><path d="M54 152.8V164M48.4 158.4H59.6" stroke="#6a7384" stroke-width=".6"/></g>'
-      +'<ellipse cx="78" cy="153" rx="15" ry="9" fill="#ff9a3a" opacity=".2"/>'
-      +'<g><rect x="66" y="158" width="24" height="10" fill="#4a2e16" stroke="#1a0f06" stroke-width="1"/><rect x="63" y="150" width="31" height="6.4" fill="#6a7384" stroke="#1a0f06" stroke-width="1"/><rect x="62" y="146" width="14" height="5" fill="#8a93a3" stroke="#1a0f06" stroke-width=".8"/><rect x="69" y="143" width="6" height="3" fill="#ff9a3a"/><rect x="70" y="143" width="4" height="1.2" fill="#ffd75a"/><rect x="88.6" y="141" width="1.6" height="11" fill="#6b4423" stroke="#1a0f06" stroke-width=".4"/><rect x="86" y="139.8" width="6.6" height="3" fill="#8a93a3" stroke="#1a0f06" stroke-width=".5"/></g>'
-      +'</g>'
-      +'<rect x="-30" y="167.6" width="160" height="2.4" fill="#1a0f06" opacity=".55"/>',
     p:'<rect x="0" y="116" width="100" height="1.6" fill="#1a0f06" opacity=".5"/>'
       +'<g stroke="#1a0f06" stroke-width=".8"><path d="M50 0V14" fill="none" stroke="#8a93a3"/><rect x="45" y="14" width="10" height="13" fill="#ffe9a8" opacity=".95"/><rect x="44" y="12" width="12" height="3" fill="#6b4423"/><rect x="44" y="26" width="12" height="3" fill="#6b4423"/></g><ellipse cx="50" cy="21" rx="14" ry="12" fill="#ffb04a" opacity=".22"/>'
       +'<g stroke="#1a0f06" stroke-width="1"><rect x="6" y="124" width="30" height="20" rx="3" fill="#d9a848"/><rect x="6" y="132" width="30" height="2" fill="#a8782c" stroke="none"/><rect x="38" y="130" width="26" height="14" rx="3" fill="#c89838"/><rect x="66" y="122" width="28" height="22" rx="3" fill="#d9a848"/><rect x="66" y="132" width="28" height="2" fill="#a8782c" stroke="none"/></g>'
       +'<g stroke="#1a0f06" stroke-width="1"><rect x="10" y="150" width="30" height="14" fill="#6b4423"/><rect x="12" y="152" width="26" height="6" fill="#4a8ac8" stroke="none"/><rect x="62" y="146" width="12" height="16" fill="#8a5a2a"/><rect x="62" y="146" width="12" height="3" fill="#aab3c2"/><rect x="78" y="150" width="16" height="14" fill="#a8764a"/><path d="M78 150L94 164M94 150L78 164" stroke="#4a2e16" fill="none"/></g>'
       +'<path d="M0 120C12 116 24 118 38 120M62 116C76 118 88 116 100 120" stroke="#c9a46a" stroke-width="1.2" fill="none"/>'
   };
-  /* The Armoury wall IS the shop: the props are the tap targets. i = which of today's four wares (0 helm, 1 weapon, 2 armour, 3 shield);
-     boxes are in the artwork's own units (lower scene, viewBox y 100-170); tag = where the price tag hangs. Weapons are listed first so the shields sit on top of the crossed swords behind them. */
-  const ZH_A=[
-    {i:1,tag:[49,146.5],box:[[-24,123,148,20],[9,141,22,27],[40,104,20,21],[36,19,28,44],[29,24,11,28],[63,24,8,44],[3,28,8,42],[89,28,7,42]]},   /* wall rail with its weapons, barrel of spears, crossed swords, crossed spears, axe, spears */
-    {i:2,tag:[38.5,166.6],box:[[31.5,145,16,23]]},                                                                                                        /* the armour stand */
-    {i:0,tag:[10,104.6],box:[[3,106,14,17],[83,106,14,17],[8,73,12,13],[26,73,12,13],[44,73,12,13],[62,73,12,13],[80,73,12,13]]},                        /* the helmets */
-    {i:3,tag:[50,103.4],box:[[42,106,16,17],[-20,106,14,14],[106,106,14,14],[38,30,24,25],[10,61,12,12],[28,61,12,12],[60,61,12,12],[78,61,12,12]]}      /* the shields */
-  ];
   const ZSAY={
     helm:['Heads are fragile. Helmets are not.','Dented in all the right places.'],
     weapon:['Sharp end away from you. Always.','That blade has opinions. Mostly about goblins.'],
     armor:['Fits better than it looks. Mostly.','Heavy. But so is regret.'],
     offhand:['Everyone looks braver behind a shield.','Hold it higher. Now you are a wall.'],
+    vault:['Vault piece. Not for the faint of purse.','Above your station, for now. Save up.','Only the best steel hangs on the rail.'],
     gone:['That one is already gone. New stock every dawn.','Sold. Early heroes get the good plate.']
   };
-  function zfHot(list){
-    const g=zf&&zf._wall&&zf._wall.querySelector('.zhl');if(!g)return;
-    let a='',b='';
-    ZH_A.forEach(h=>{
-      const e=list[h.i];if(!e)return;
-      const cl=(zfSel===h.i?' sel':'')+(e.sold?' sold':''),tx=e.sold?'SOLD':price(e),w=Math.max(10,tx.length*2.2+3.4);
-      h.box.forEach(r=>{a+='<rect class="zb'+cl+'" data-i="'+h.i+'" x="'+r[0]+'" y="'+r[1]+'" width="'+r[2]+'" height="'+r[3]+'" rx="1.2"/>'});
-      b+='<g class="zt'+cl+'" data-i="'+h.i+'" transform="translate('+h.tag[0]+' '+h.tag[1]+')">'
-        +'<rect x="'+(-w/2-.7)+'" y="-3.7" width="'+(w+1.4)+'" height="7.4" fill="#1a0f06"/>'
-        +'<rect class="zp" x="'+(-w/2)+'" y="-3" width="'+w+'" height="6" style="stroke:'+RAR[e.it.r]+'"/>'
-        +'<text x="0" y="1.9" text-anchor="middle">'+tx+'</text></g>';
-    });
-    g.innerHTML=a+b;
+  /* ---- the Armoury wall: four display bays, one for each of today's wares (0 helm, 1 weapon, 2 armour, 3 shield).
+     Every bay shows the real item mounted on its own fixture (pedestal, peg rail, mannequin stand, hook and chain) with its price tag under it.
+     Tap a bay to select it; its details and Buy button appear under the wall. The shopkeeper stays at the main counter. ---- */
+  function aBay(e,i){
+    const it=e.it,n=el('div','sfw-s s'+i+(zfSel===i?' sel':'')+(e.sold?' sold':'')),b=el('button','sfa-b');
+    b.type='button';b.dataset.i=i;b.style.setProperty('--rar',RAR[it.r]);
+    b.setAttribute('aria-pressed',zfSel===i?'true':'false');
+    b.setAttribute('aria-label',(e.sold?'Sold: ':'')+it.n+', '+(SLOTN[it.slot]||it.slot)+(e.sold?'':', '+price(e)));
+    const ic=el('span','sfa-it');ic.dataset.k=it.slot;ic.appendChild(el('i','sfa-prop'));
+    if(!e.sold){const g=el('span','sfa-gl'),p=px(iicon(it),64);ic.append(g,p)}
+    const tg=el('span','sfa-tag'+(e.sold?' gone':''),e.sold?'SOLD':price(e));
+    b.append(el('span','sfa-k',SLOTN[it.slot]||it.slot),ic,tg);
+    b.onclick=()=>{if(zfSel===i){zfSel=null;zfRender();return}zfSel=i;kind='a';zfSay(e.sold?pick(ZSAY.gone):pick(ZSAY[it.slot]||LINES.a));zfRender()};
+    n.appendChild(b);return n;
+  }
+  function vBtn(e,i){
+    const it=e.it,b=el('button','sfa-v'+(zfSel===i?' sel':'')+(e.sold?' sold':''));
+    b.type='button';b.dataset.i=i;b.style.setProperty('--rar',RAR[it.r]);
+    b.setAttribute('aria-pressed',zfSel===i?'true':'false');
+    b.setAttribute('aria-label','Vault piece: '+(e.sold?'sold, ':'')+it.n+', '+price(e));
+    if(!e.sold){b.appendChild(px(iicon(it),30));const cb=el('i','sfa-cur');cb.appendChild(e.cur==='g'?px('coin:'+COIN_U[0],8):px('\u{1F48E}',10));b.appendChild(cb)}
+    b.onclick=()=>{if(zfSel===i){zfSel=null;zfRender();return}zfSel=i;kind='a';zfSay(e.sold?pick(ZSAY.gone):pick(ZSAY.vault));zfRender()};
+    return b;
   }
   function zfBuild(k){
     const sc=el('div','sfw-scene sfw-'+k),A=k==='a';
     sc.innerHTML='<div class="sfw-wall"></div><div class="sfw-ceil"></div><i class="sfw-post l"></i><i class="sfw-post r"></i>'
-      +'<div class="sfw-in">'+(A?'<div class="sfw-floor"></div>':'<svg class="sfw-decor up" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges" aria-hidden="true">'+ZD[k]+'</svg>')
-      +'<svg class="sfw-decor lo" viewBox="0 100 100 70" preserveAspectRatio="xMidYMax meet" shape-rendering="crispEdges"'+(A?'':' aria-hidden="true"')+'>'+ZD[k]+(A?'<g class="zhl"></g>':'')+'</svg>'
-      +'<div class="sfw-sign fz-sign">'+(k==='a'?'Armoury':'Companions')+'</div>'
+      +'<div class="sfw-in">'+(A?ADEC:'<svg class="sfw-decor up" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges" aria-hidden="true">'+ZD[k]+'</svg><svg class="sfw-decor lo" viewBox="0 100 100 70" preserveAspectRatio="xMidYMax meet" shape-rendering="crispEdges" aria-hidden="true">'+ZD[k]+'</svg>')
+      +'<div class="sfw-sign fz-sign">'+(A?'Armoury':'Companions')+'</div>'
       +'<i class="sfw-torch l"></i><i class="sfw-torch r"></i><div class="sfw-slots"></div></div><div class="sfw-shade"></div>';
-    if(A)sc.querySelector('.sfw-decor.lo').addEventListener('click',ev=>{
-      const h=ev.target.closest&&ev.target.closest('[data-i]');if(!h||!zf||zfK!=='a')return;
-      const i=+h.dataset.i,e=stk('a')[i];if(!e)return;
-      zfSel=i;kind='a';zfSay(e.sold?pick(ZSAY.gone):pick(ZSAY[e.it.slot]||LINES.a));zfRender();
-    });
+    if(A)aFill(sc);
     return sc;
+  }
+  /* ---- the Armoury's description plaque (oak, like the Guild Store's chest panel). Hidden until you pick a piece; tap the same piece again to put it away. ---- */
+  function zfDock(){
+    const pl=zf.querySelector('.sfz-plq');if(!pl)return;
+    const all=stkAll('a'),e=zfSel!=null?all[zfSel]:null,ic=el('span','sfz-di');
+    pl.hidden=!e;
+    if(!e){pl.replaceChildren();return}
+    const it=e.it,have=e.cur==='g'?S.gold:(S.gems||0),poor=have<e.cost;
+    ic.style.setProperty('--rar',RAR[it.r]);if(!e.sold)ic.appendChild(px(iicon(it),36));
+    const t=el('div','sfz-pn');
+    t.append(el('b','',e.sold?'Sold out':it.n),el('small','',e.sold?'New stock every dawn.':RNAME[it.r]+' \u00B7 '+(SLOTN[it.slot]||it.slot)+'. '+bonusTxt(it)));
+    const buyb=el('button','btn',e.sold?'Sold':'Buy');buyb.type='button';buyb.disabled=e.sold||poor;
+    if(poor&&!e.sold)buyb.title='Not enough '+(e.cur==='g'?'coin':'gems');
+    buyb.onclick=()=>{if(e.sold||poor)return;kind='a';confirmBuy(it,price(e),()=>buy(zfSel))};
+    const r=el('div','sfz-pb');
+    if(!e.sold)r.appendChild(el('span','sfz-pp'+(poor?' poor':''),price(e)));
+    r.appendChild(buyb);
+    pl.replaceChildren(ic,t,r);
   }
   function zfRender(){
     if(!zf)return;
@@ -3760,13 +4064,14 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const gem=el('span','sfz-chip cur gem');gem.title='Gems';gem.append(px('\u{1F48E}',16),el('b','',String(S.gems||0)));
     zf.querySelector('.sfz-wal').replaceChildren(purse,gem);
     const box=zf._wall.querySelector('.sfw-slots');
-    if(zfK==='a'){box.replaceChildren();zfHot(list)}
+    if(zfK==='a'){box.replaceChildren(...list.map((e,i)=>aBay(e,i)));const rl=zf._wall.querySelector('.sfa-rowx');if(rl)rl.replaceChildren(...S.sv.s.map((e,j)=>vBtn(e,4+j)))}
     else box.replaceChildren(...list.map((e,i)=>{
       const n=el('div','sfw-s s'+i+(zfSel===i?' sel':'')+(e.sold?' sold':'')),b=cell(zfK,i,e,()=>{zfSel=i;kind=zfK;if(!e.sold)zfSay(e.it.slot==='companion'?'A good one. Keep it fed.':pick(LINES.a));zfRender()});
       n.appendChild(b);return n;
     }));
+    if(zfK==='a'){zfDock();zfFit();return}
     const det=zf.querySelector('.sfz-det'),ft=zf.querySelector('.sfz-ft');det.replaceChildren();
-    const e=zfSel!=null?list[zfSel]:null;
+    const e=zfSel!=null?stkAll(zfK)[zfSel]:null;
     det.hidden=!e;ft.hidden=!!e;
     if(e){
       const it=e.it,have=e.cur==='g'?S.gold:(S.gems||0),poor=have<e.cost,t=el('div','sfz-dt');
@@ -3783,6 +4088,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
   /* the four stands are drawn for a 70px-wide cell; scale them to the niche so they fill it on any phone */
   function zfFit(){
     if(!zf||!zf._wall)return;
+    if(zfK==='a')aPack(zf._wall);
     const n=zf._wall.querySelector('.sfw-s');if(!n||!n.clientWidth)return;
     const z=Math.max(.8,Math.min(2.5,(n.clientWidth-10)/70,(n.clientHeight-8)/68));
     zf._wall.style.setProperty('--zf',z.toFixed(3));
@@ -3809,15 +4115,28 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const cx=rc.width/2,cy=rc.height/2,vw=window.innerWidth,vh=window.innerHeight;
     const toX=x=>cx+(x-rc.left-cx)/ZS,toY=y=>cy+(y-rc.top-cy)/ZS;
     const x0=Math.max(0,toX(Math.max(rc.left,10))),x1=Math.min(rc.width,toX(Math.min(rc.right,vw-10)));
-    const y0=Math.max(0,toY(105)),y1=Math.min(rc.height,toY(vh-165));
+    /* the wall box ends 150px above the screen bottom: the floor, the weapon racks and the armour stand are drawn below the box, so they need that strip to be seen.
+       The description plaque floats over that strip only while a piece is picked. */
+    const yb=zfK==='a'?Math.min(rc.bottom,vh)-150:vh-165;
+    const y0=Math.max(0,toY(105)),y1=Math.min(rc.height,toY(yb));
     const aw=x1-x0,ah=y1-y0;if(aw<80||ah<120)return;
     const s=inn.style;
     s.left=x0.toFixed(1)+'px';s.top=y0.toFixed(1)+'px';s.width=aw.toFixed(1)+'px';s.height=ah.toFixed(1)+'px';s.right='auto';s.bottom='auto';
     /* the lower artwork (rack, shelves, floor) fills the bottom 40% edge to edge: widen what it shows to match, up to the 140 units drawn */
     const lo=inn.querySelector('.sfw-decor.lo');
-    if(wall.querySelector('.sfw-a')){   /* Armoury: all 170 units of the wall, from the banners down to the floor; the floor strip takes the bottom 43 */
-      const bh=Math.max(120,ah-43),W=Math.max(100,Math.min(150,170*aw/bh));
-      if(lo)lo.setAttribute('viewBox',(50-W/2).toFixed(1)+' 0 '+W.toFixed(1)+' 170');
+    if(wall.querySelector('.sfw-a')){   /* the Armoury is plain HTML bays and needs no artwork re-crop. Its racks and armour stand are scaled up and set down to fill the strip of floor under the wall. */
+      const vis=Math.max(60,(Math.min(rc.bottom,vh)-yb)/ZS),base=Math.min(vis-20,150);   /* floor showing under the wall box (wall px) and where the feet of the racks go */
+      /* everything is scaled evenly (never stretched). The racks' posts and the stands' poles get longer instead: --rh / --sh are their own heights. */
+      const hr=base+34;   /* height a rack needs to reach the top of the shelf plank it leans on (shelf 22px up, plank 12px thick) */
+      const hs=hr+16;     /* the stands rise a little past that, so they are always the tallest */
+      const sc=Math.max(.8,Math.min(1.2,aw/240));   /* racks: even scale */
+      const ss=Math.max(.8,Math.min(1.6,(aw+30-160*sc)/80));   /* stands: even scale, what is left of the width (the stands may tuck 6px behind the racks) */
+      const rh=Math.max(72,hr/sc);s.setProperty('--rs',sc.toFixed(3));s.setProperty('--rh',rh.toFixed(1)+'px');
+      s.setProperty('--cs',Math.max(1,Math.min(1.6,(rh-12)/66)).toFixed(3));   /* the weapons in the racks grow evenly with the taller frame (about their own feet) */
+      s.setProperty('--ss',ss.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-44).toFixed(1)+'px');
+      /* lay the three out evenly across the floor, left to right: armour stand (diamond set), the long weapon rack, barrel of staffs and spears */
+      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[40*ss,160*sc,40*ss],gap=Math.max(-6,(aw-ws.reduce((p,q)=>p+q,0))/4);
+      let x=gap;its.forEach((n,i)=>{n.style.left=x.toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});
       return;
     }
     const W=Math.max(100,Math.min(140,70*aw/(ah*.4)));
@@ -3831,7 +4150,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     r.classList.remove('in');r.classList.add('closing');
     /* the same camera move, played backwards: turn back to the counter, then pull out of the middle of the room */
     room.classList.remove('done','go');room.classList.add('back');
-    setTimeout(()=>{room.classList.remove('moving','back','turn-l','turn-r');if(wall)wall.classList.remove('on')},zfReduce()?30:1200);
+    setTimeout(()=>{room.classList.remove('moving','back','turn-l','turn-r');if(room.firstChild)room.firstChild.style.paddingBottom='';if(wall)wall.classList.remove('on')},zfReduce()?30:1200);
     setTimeout(()=>r.remove(),zfReduce()?30:900);
   }
   const zfResize=()=>{const room=document.getElementById('sfroom');if(room&&zf){zfDims(room);zfFrame(room,zf._wall);zfFit()}};
@@ -3844,6 +4163,8 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     /* the wall you are about to face (built once, then reused) */
     let wall=world.querySelector('.sf-rwall.'+(k==='a'?'l':'r'));
     if(!wall){wall=el('div','sf-rwall '+(k==='a'?'l':'r'));wall.appendChild(zfBuild(k));world.appendChild(wall)}
+    /* the Armoury's floor, racks and armour stand hang BELOW the wall box, and the room box clips everything outside it (it stops at the nav bar): stretch the room down to the screen bottom while it is open */
+    if(k==='a')world.style.paddingBottom=Math.max(0,Math.round(window.innerHeight-room.getBoundingClientRect().bottom))+'px';
     zfDims(room);zfFrame(room,wall);
     /* the coin purse, the keeper's words and the ware card sit above the room; the room itself is the real shop */
     const root=el('div','sfz sfw-root');
@@ -3851,9 +4172,10 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const hud=el('div','sfz-hud'),sayrow=el('div','sfz-sayrow'),sayEl2=el('div','sfz-say'),box=el('div','sf-say-box');
     box.appendChild(el('span','sf-say-in'));sayEl2.appendChild(box);sayrow.appendChild(sayEl2);
     hud.append(el('div','sfz-wal'),sayrow);
-    const bot=el('div','sfz-bot'),det=el('div','sfz-det'),ft=el('div','sfz-ft',k==='a'?'Fresh stock every dawn. Tap a helm, weapon, armour or shield. Tap the wall to leave.':'Fresh stock every dawn. Tap a pen to see it. Tap the wall to leave.');
+    const bot=el('div','sfz-bot'),det=el('div','sfz-det'),ft=el('div','sfz-ft','Fresh stock every dawn. Tap a pen to see it. Tap the wall to leave.');
     det.hidden=true;
-    bot.append(det,ft);
+    if(k==='a'){const pq=el('div','sfz-plq');pq.hidden=true;bot.append(pq)}   /* Armoury: nothing under the wall until you pick a piece */
+    else bot.append(det,ft);
     root.append(hud,bot);
     document.addEventListener('keydown',zfKey);window.addEventListener('resize',zfResize);
     document.body.appendChild(root);
@@ -3871,7 +4193,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
 
   /* ---- buying: the item goes into your bag (the Hero tab shows a "!" until you look at it) ---- */
   function buy(i){
-    ensure();const e=stk(kind)[i];if(!e||e.sold)return;
+    ensure();const e=stkAll(kind)[i];if(!e||e.sold)return;
     const have=e.cur==='g'?S.gold:(S.gems||0);
     if(have<e.cost){say(pick(LINES.poor));return}
     if(e.cur==='g')S.gold-=e.cost;else S.gems=(S.gems||0)-e.cost;
