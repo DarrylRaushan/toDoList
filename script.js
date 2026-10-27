@@ -746,9 +746,76 @@ function goblinbandCanvas(){
   return c;
 }
 
+/* Wise Wizard Frog companion: a frog in a purple wizard hat and cloak with a gnarled staff (56x56, drawn 1:1 and zoomed in whole numbers by PETS.px). Palette letters -> colours, '.' = clear. */
+const WIZFROG={p:{"a":"#020103","b":"#d1b285","c":"#0b050e","d":"#6a9c18","e":"#b65a21","f":"#0d0820","g":"#8f2a83","h":"#122014","i":"#260820","j":"#7d8266","k":"#87d11d","l":"#34073b","m":"#8ee612","n":"#4f1d1e","o":"#245119","p":"#d88933","q":"#2b224f","r":"#471647","s":"#f9f9b8","t":"#3d6d11","u":"#542457","v":"#ce51b4","w":"#7c3325","x":"#48800f","y":"#5d5a27","z":"#3f4375"},r:[
+  '........................................................',
+  '.........fccf...........................................',
+  '.......qipppwf..........................................',
+  '......lipppewnf.........................................',
+  '......cleeeepwc.........................................',
+  '......cweewweei.................facccccf................',
+  '......cwenwwinwl................ffuuuuuuff..............',
+  '......qniewwncwl.............fluuuuuuulruuff............',
+  '.......cnwwwnnnf............ilnuuuuuuuaicrurf...........',
+  '.......anwnnnwnc..........cailerrpruuuaaacruf...........',
+  '.......fcnncceif..cfiiiiiiiiiiilnpwuuiaccaairf..........',
+  '........ccaawnf.filllllfccccfllllliriic..faar...........',
+  '........fwiwwizflaaaaaaaaaaaaaaccciccac...aac...........',
+  '.........cnwni.ccaaaaaahxxtaaacmkocilfc....fc...........',
+  '.........cwwwc.caaaaaaaccxxtxodosotacflf................',
+  '........fwnwwc..caaaaaaahkmmddpaaceahaflcccccf..........',
+  '.........innni..faaaaaakmmmmmmdnaaoooaacfffflff.........',
+  '........fwciin...aaaaakmmmmmmmmdeeoooaaaaaaaccccf.......',
+  '........cwccwn....ccchkjjjjjjxxkmkxxxhaaaaaaaaflc.......',
+  '.........i.cww.......cjssssssssbxhkxxoaaaaaaaaacc.......',
+  '.........f.cww.......ffbsssssssssbxxhcciaaaaaaaf........',
+  '...........cwn.........fbsssssssstcfguriaaaaaaf.........',
+  '............in.........fcbsssssbigvvvgllc...............',
+  '............cw........fuccbsssbiugggrlllc...............',
+  '............cw........cuglcssblguiiiffllf...............',
+  '...........fwwf.......ucircbbigrlcuullcf................',
+  '...........hnnah...qqilliccbciicluuuull.................',
+  '...........htcmkcfacfullluiynwclrruuurrf................',
+  '...........otomhcddflaiilgcnncrgucuuuuurf...............',
+  '..........ctxocctxxclaaagrcwwccggcluuucccf..............',
+  '..........ctccktaaaalaalglnwwwcugcclucthlif.............',
+  '...........coctccaaalailuciccnwcglcircomccc.............',
+  '............cccf.aaalaigucpnypccglclioomdepd............',
+  '.............cnf.aaalclgiipccencgllindopeinyy...........',
+  '.............cwc.aaalclgaacbpeccgrlceexeppppc...........',
+  '.............cwc.aaalfrgccccciwcgulcecxceeecc...........',
+  '.............iww..aallgcnciwwiiwuuuacyoycecc............',
+  '.............cwc..aallgacwwohnciwvulcaaaaaf.............',
+  '.............cwwc.faligcwwtaahwwcvuulaaafac.............',
+  '.............fwwc..caigcwttaahwwivvuulurcaf.............',
+  '..............awf...aiuoxxcaaaawocvuuruuulf.............',
+  '..............cwn...cuqoxxaaaaaaoouguuuuuuf.............',
+  '..............cwn...fgcxxxaaaaaatocvuuuuuulc............',
+  '...............cn..ccgcaxxaaaaaahoovguuuuulcc...........',
+  '...............cn..cigcahxcaaaaaahohvuuuuullic..........',
+  '...............cn..ivvcaaocaaaaaaaxogvuuuullcf..........',
+  '...............wc..rgicaahxcaaaaaxxoavvuuulff...........',
+  '..............ric...cc.fchxtaaaaaxooacurulf.............',
+  '..............ninq.....qhkxt.....odof...................',
+  '..............fwncccottkmmtc.....omtf...................',
+  '..........zqqlcchcttttdmmxcaaaaaaxkmxccaaaacffzz........',
+  '..........f..zqchxtchtxdhaaaaaacoodmmtttaaaffcj.........',
+  '...............fcchdktaaccaaactmoaahmhcxkccccf..........',
+  '.................ffttccf......hxocccdoctxhq.............',
+  '...................ff..........ff..aff.ff...............',
+  '........................................................'
+]};
+function wizfrogCanvas(){
+  const R=WIZFROG.r,H=R.length,W=R[0].length,c=document.createElement('canvas');c.width=W;c.height=H;
+  const X=c.getContext('2d');
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const k=R[y][x];if(k!=='.'){X.fillStyle=WIZFROG.p[k];X.fillRect(x,y,1,1)}}
+  return c;
+}
+
 /* companion art registry: a pet whose emoji field is 'pet:<key>' is drawn from code instead of as an emoji */
 const PETART={wendigo:(res,tier)=>wendigoCanvas(res,tier),wolfpup:()=>wolfpupCanvas(0)};
 const PETCROP={wendigo:[0,0,64,64],wolfpup:[20,0,28,28]};
+PETART.wizfrog=()=>wizfrogCanvas();PETCROP.wizfrog=[11,3,38,38];   /* the hat and face become the small icon */
 PETART.goblinband=()=>goblinbandCanvas();PETCROP.goblinband=[16,2,48,48];   /* the goblin's head and shoulders */
 PETART.direwolfpack=()=>direwolfpackCanvas();PETCROP.direwolfpack=[19,4,24,24];   /* which part of the full art becomes the small icon (the head(s)) */
 const petTier=lv=>lv>=14?2:lv>=BIG_LV?1:0;      /* growth: more antler tines at Lv 8, embers at Lv 14 */
@@ -1469,7 +1536,7 @@ const MCN=['Copper','Chainmail','Iron','Diamond','Golden'],MCW=['Wooden','Stone'
 const RNAME=['Common','Uncommon','Rare','Very rare','Epic','Legendary','Mythical','Unique'];
 const VIS=[0,1,2,2,3,4,5,5];                 /* rarity -> how the gear looks on the hero (6 looks) */
 const OLD2NEW=[0,1,2,4,5,6];                 /* old 6-tier saves -> new rarity index */
-const PETS={wolfpup:{e:'pet:wolfpup',n:'Fire Wolf Cub',sm:1,px:49,fire:1},sprite:{e:'🧚',n:'Sprite'},imp:{e:'😈',n:'Imp'},goblin:{e:'👺',n:'Goblin'},unicorn:{e:'🦄',n:'Unicorn'},golem:{e:'🗿',n:'Golem'},genie:{e:'🧞',n:'Genie'},troll:{e:'🧌',n:'Troll'},drake:{e:'🐲',n:'Drake'},dragon:{e:'🐉',n:'Dragon'},wendigo:{e:'pet:wendigo',n:'Wendigo',still:1}};
+const PETS={wolfpup:{e:'pet:wolfpup',n:'Fire Wolf Cub',sm:1,px:49,fire:1},sprite:{e:'🧚',n:'Sprite'},imp:{e:'😈',n:'Imp'},goblin:{e:'👺',n:'Goblin'},unicorn:{e:'🦄',n:'Unicorn'},golem:{e:'🗿',n:'Golem'},genie:{e:'🧞',n:'Genie'},troll:{e:'🧌',n:'Troll'},drake:{e:'🐲',n:'Drake'},dragon:{e:'🐉',n:'Dragon'},wendigo:{e:'pet:wendigo',n:'Wendigo',still:1},wizfrog:{e:'pet:wizfrog',n:'Wise Wizard Frog',sm:1,px:56,right:1}};
 const PETMAP={cat:'imp',frog:'goblin',bunny:'sprite',turtle:'golem',bat:'wolfpup',wisp:'wolfpup',cinderpup:'wolfpup',owl:'genie',fox:'drake',wolf:'troll',duck:'sprite'};   /* old real-animal companions in saves become fantasy ones */
 /* companion levels: a worn companion earns XP from every quest you finish (and loses it if you undo the quest); stronger and bigger each level */
 const PMAX=60,BIG_LV=8;                                   /* from BIG_LV on it is big enough to stand behind the hero instead of beside it */
@@ -2129,7 +2196,7 @@ function buildGear(slot,r,st,pet){
   const n=Math.min(4,1+(r>=2?1:0)+(r>=4?1:0)),b={};
   Object.keys(STAT_STEP).sort(()=>Math.random()-.5).slice(0,n).forEach(k=>{b[k]=Math.max(1,Math.round(STAT_STEP[k]*RSC[r]*(.6+Math.random()*.8)))});
   const ks=Object.keys(NOUN[slot]||{});
-  const pool=r>=5?['dragon','drake','unicorn','genie','wendigo']:r>=3?['unicorn','genie','golem','troll','drake','wendigo']:['wolfpup','sprite','imp','goblin','wendigo'];
+  const pool=r>=5?['dragon','drake','unicorn','genie','wendigo','wizfrog']:r>=3?['unicorn','genie','golem','troll','drake','wendigo','wizfrog']:['wolfpup','sprite','imp','goblin','wendigo','wizfrog'];
   let s0=st!=null?st:(ks.length?ks[Math.floor(Math.random()*ks.length)]:null);
   /* random drops (no look given) lean toward the metal sets: half of all helms and chestplates, a fifth of all weapons */
   if(st==null&&((slot==='helm'||slot==='armor')&&Math.random()<.5||slot==='weapon'&&Math.random()<.2))s0='warrior';
@@ -2339,7 +2406,7 @@ function renderGear(){
   }
   {   /* companion beside the hero (a dev preview overrides what is worn; a companion being tried on shows too) */
     const cw=pv&&pv.slot==='companion'?pv:worn('companion'),fk2=PVP||(cw?(PETS[cw.pet]?cw.pet:'wolfpup'):null),fp=$('fpet'),cl=PVP?PVL:(cw?plv(cw):1);
-    if(fk2){fp.hidden=false;fp.title=(PVP?PETS[fk2].n:cw.n)+' (Lv '+cl+')';const vl=vlv(fk2,cl);fp.classList.toggle('solid',!!PETS[fk2].sm);fp.classList.toggle('still',!!PETS[fk2].still);fp.classList.toggle('big',vl>=BIG_LV);fp.parentNode.style.setProperty('--pz',psz(fk2,vl));setSprite('fpet',PETS[fk2].e,pres(vl),vl);fp.classList.toggle('fire',!!PETS[fk2].fire)}else fp.hidden=true;
+    if(fk2){fp.hidden=false;fp.title=(PVP?PETS[fk2].n:cw.n)+' (Lv '+cl+')';const vl=vlv(fk2,cl);fp.classList.toggle('solid',!!PETS[fk2].sm);fp.classList.toggle('rside',!!PETS[fk2].right);fp.classList.toggle('still',!!PETS[fk2].still);fp.classList.toggle('big',vl>=BIG_LV);fp.parentNode.style.setProperty('--pz',psz(fk2,vl));setSprite('fpet',PETS[fk2].e,pres(vl),vl);fp.classList.toggle('fire',!!PETS[fk2].fire)}else fp.hidden=true;
   }
   /* gear mounts: six plaques in an arc around the hero, each with an iron hook; what you wear hangs from it */
   const slot=k=>{
@@ -2484,14 +2551,25 @@ function renderRPG(){
 }
 
 /* ---------- arena, character sheet, tabs ---------- */
-function setSprite(id,emoji,n,lv){const e=$(id),art=emoji.slice(0,4)==='pet:',res=lv<BIG_LV?64:96,tier=petTier(lv||1),key=art?emoji+res+tier:emoji+n;if(e.dataset.k===key)return;e.dataset.k=key;e.replaceChildren(art?petSprite(emoji.slice(4),res,tier):px(emoji,n))}
+function setSprite(id,emoji,n,lv){const e=$(id),art=emoji.slice(0,4)==='pet:',res=lv<BIG_LV?64:96,tier=petTier(lv||1),key=art?emoji+res+tier:emoji+n;if(e.dataset.k===key)return;e.dataset.k=key;e.replaceChildren(art?petSprite(emoji.slice(4),res,tier):px(emoji,n));if(emoji==='pet:wizfrog')manaOrbs(e)}
+/* Wise Wizard Frog: seven glowing mana orbs fly around it (pure CSS motion; each orb gets its own speed, offset and flight path). Some pass behind the frog. Replaced with the sprite when another pet is shown. */
+function manaOrbs(box){
+  for(let i=0;i<7;i++){
+    const o=el('i','mana'+(i%3===2?' back':'')),st=o.style;
+    st.setProperty('--mt',(2.4+(i*.55)%1.9).toFixed(2)+'s');st.setProperty('--md',(-i*.83).toFixed(2)+'s');
+    st.setProperty('--x0',(-18+(i%3)*5)+'%');st.setProperty('--x1',(112+(i%4)*5)+'%');st.setProperty('--y0',(-4+(i%2)*8)+'%');st.setProperty('--y1',(78+(i%3)*10)+'%');
+    st.setProperty('--mz',(6+(i%3)*1.6).toFixed(1)+'%');
+    if(i===6){st.setProperty('--x0','0%');st.setProperty('--x1','26%');st.setProperty('--y0','-6%');st.setProperty('--y1','20%');st.setProperty('--mt','1.9s')}   /* one circles the head of the staff */
+    box.appendChild(o);
+  }
+}
 function renderArena(){
   const lv=levelOf(S.xp),R=rk(lv);
   const ah=$('ahero'),hk=(PV?'pv'+PV.n:Object.values(eqLook()).join('.'))+(S.look?Object.values(S.look).join(','):'');if(ah.dataset.k!==hk){ah.dataset.k=hk;ah.replaceChildren(heroPx(lv))}
   $('atag').textContent='Lv '+lv+' '+(S.cls?clsName():R[0]);
   {const mh=maxHp(lv),hp=Math.max(0,Math.round(S.hp)),hb=$('ahbar');$('ahfill').style.width=(hp/mh*100)+'%';$('ahtxt').textContent=hp+' / '+mh;hb.classList.toggle('low',hp/mh<.3)}   /* your own HP in the fight */
   const pt=worn('companion'),ap=$('apet'),pk=PVP||(pt?(PETS[pt.pet]?pt.pet:'wolfpup'):null),al=PVP?PVL:(pt?plv(pt):1);
-  if(pk){ap.hidden=false;ap.title=(PVP?PETS[pk].n:pt.n)+' (Lv '+al+')';const vl=vlv(pk,al);ap.classList.toggle('solid',!!PETS[pk].sm);ap.classList.toggle('still',!!PETS[pk].still);ap.classList.toggle('big',vl>=BIG_LV);ap.style.setProperty('--pz',PETS[pk].px?PETS[pk].px/.4737:psize(vl));setSprite('apet',PETS[pk].e,pres(vl),vl);ap.classList.toggle('fire',!!PETS[pk].fire)}else ap.hidden=true;
+  if(pk){ap.hidden=false;ap.title=(PVP?PETS[pk].n:pt.n)+' (Lv '+al+')';const vl=vlv(pk,al);ap.classList.toggle('solid',!!PETS[pk].sm);ap.classList.toggle('rside',!!PETS[pk].right);ap.classList.toggle('still',!!PETS[pk].still);ap.classList.toggle('big',vl>=BIG_LV);ap.style.setProperty('--pz',PETS[pk].px?PETS[pk].px/.4737:psize(vl));setSprite('apet',PETS[pk].e,pres(vl),vl);ap.classList.toggle('fire',!!PETS[pk].fire)}else ap.hidden=true;
   const b=S.boss;if(!b)return;
   const B=bossOf(b);setSprite('aboss',B[1],24);$('aboss').classList.toggle('art',B[1].slice(0,4)==='pet:');
   $('abname').textContent=B[0];{const pc=(b.hp/b.max*100)+'%';$('abfill').style.width=pc;$('abghost').style.width=pc;const ar=$('arena');ar.classList.toggle('rage',b.hp>0&&b.hp/b.max<=.3);ar.classList.toggle('won',b.hp<=0)}$('abtxt').textContent=b.hp+' / '+b.max;   /* abghost = the pale trail that lags behind the real bar; rage = boss under 30%; won = defeated */
@@ -3773,7 +3851,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
   const ARM_SLOTS=['helm','weapon','armor','offhand'];            /* the four stands, in order */
   const ARM_COST=[80,260,700,1600];                                /* bronze, by rarity 0-3 (Common ... Very rare) */
   const PET_COST={0:['g',400],1:['g',1200],2:['m',7],3:['m',14],4:['m',28]};   /* by rarity: 'g' = coins (bronze), 'm' = gems */
-  const PET_POOL=r=>r>=3?['unicorn','genie','golem','troll','drake','wendigo']:['wolfpup','sprite','imp','goblin','wendigo'];
+  const PET_POOL=r=>r>=3?['unicorn','genie','golem','troll','drake','wendigo','wizfrog']:['wolfpup','sprite','imp','goblin','wendigo','wizfrog'];
   const LINES={
     a:['Steel is honest. My prices, less so.','New stock every dawn. Early heroes get the good plate.','Try the shield. Everyone looks braver behind one.','Mind the edges. Mind the prices more.','Bring more levels and I will bring out better steel.'],
     p:['They bite. Mostly the ones that do not.','Feed them. Pat them. Do not name them until you have paid.','Every one is house trained. Mostly.','A companion fights harder when it likes you.'],
@@ -4115,9 +4193,9 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const cx=rc.width/2,cy=rc.height/2,vw=window.innerWidth,vh=window.innerHeight;
     const toX=x=>cx+(x-rc.left-cx)/ZS,toY=y=>cy+(y-rc.top-cy)/ZS;
     const x0=Math.max(0,toX(Math.max(rc.left,10))),x1=Math.min(rc.width,toX(Math.min(rc.right,vw-10)));
-    /* the wall box ends 150px above the screen bottom: the floor, the weapon racks and the armour stand are drawn below the box, so they need that strip to be seen.
+    /* the wall box ends 140-176px above the screen bottom (taller screens get more): the floor, the weapon racks and the armour stand are drawn below the box, so they need that strip to be seen.
        The description plaque floats over that strip only while a piece is picked. */
-    const yb=zfK==='a'?Math.min(rc.bottom,vh)-150:vh-165;
+    const yb=zfK==='a'?Math.min(rc.bottom,vh)-Math.max(140,Math.min(176,Math.round(vh*.205))):vh-165;   /* the strip grows with the screen height, so short phones keep room for the four wall bays */
     const y0=Math.max(0,toY(105)),y1=Math.min(rc.height,toY(yb));
     const aw=x1-x0,ah=y1-y0;if(aw<80||ah<120)return;
     const s=inn.style;
@@ -4129,14 +4207,16 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       /* everything is scaled evenly (never stretched). The racks' posts and the stands' poles get longer instead: --rh / --sh are their own heights. */
       const hr=base+34;   /* height a rack needs to reach the top of the shelf plank it leans on (shelf 22px up, plank 12px thick) */
       const hs=hr+16;     /* the stands rise a little past that, so they are always the tallest */
-      const sc=Math.max(.8,Math.min(1.2,aw/240));   /* racks: even scale */
-      const ss=Math.max(.8,Math.min(1.6,(aw+30-160*sc)/80));   /* stands: even scale, what is left of the width (the stands may tuck 6px behind the racks) */
+      /* the three pieces (armour stand 40 wide, weapon rack 160, barrel of staffs 40) share ONE even scale, picked so that all of them fit inside the wall with a small margin
+         on each side and room on the right for the spears that lean out of the barrel. Nothing is ever pushed past the edge of the room. */
+      const M=4,RV=26,avail=Math.max(120,aw-2*M-RV);
+      const sc=Math.max(.5,Math.min(1.2,avail/240)),ss=sc;
       const rh=Math.max(72,hr/sc);s.setProperty('--rs',sc.toFixed(3));s.setProperty('--rh',rh.toFixed(1)+'px');
       s.setProperty('--cs',Math.max(1,Math.min(1.6,(rh-12)/66)).toFixed(3));   /* the weapons in the racks grow evenly with the taller frame (about their own feet) */
       s.setProperty('--ss',ss.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-44).toFixed(1)+'px');
       /* lay the three out evenly across the floor, left to right: armour stand (diamond set), the long weapon rack, barrel of staffs and spears */
-      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[40*ss,160*sc,40*ss],gap=Math.max(-6,(aw-ws.reduce((p,q)=>p+q,0))/4);
-      let x=gap;its.forEach((n,i)=>{n.style.left=x.toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});
+      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[40*ss,160*sc,40*ss],gap=Math.max(0,(avail-ws.reduce((p,q)=>p+q,0))/2);
+      let x=M;its.forEach((n,i)=>{n.style.left=x.toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});
       return;
     }
     const W=Math.max(100,Math.min(140,70*aw/(ah*.4)));

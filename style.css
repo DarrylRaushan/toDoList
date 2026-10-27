@@ -3819,3 +3819,18 @@ body.sfz-open{background-color:#0d0a09!important}
 .sprite.boss.art[data-k^="pet:goblinband"]{right:15%}
 .sprite.boss.art[data-k^="pet:goblinband"] .px{width:112px;height:120px}
 @media (max-width:460px){.sprite.boss.art[data-k^="pet:goblinband"] .px{width:100px!important;height:108px!important}}
+
+/* ---- Wise Wizard Frog: stands on the hero's RIGHT (mirror of the Fire Wolf Cub), with mana orbs flying around it ---- */
+.stage .fpet.solid.rside{left:min(calc(100% - var(--cw) + 16px - var(--S)),calc(50% - .5 * var(--S) + .5 * var(--hw) - .17 * var(--hw)))}   /* a little right of centre, overlapping the hero's legs without hiding them */
+.stage .fpet.solid.rside::after{left:4%;right:12%}
+.stage:has(.fpet.solid.rside:not([hidden])) .figure{transform:translateX(calc(var(--hw) * -.12))}   /* the hero steps left to make room */
+.sprite.pet.solid.rside{left:calc(10% + 89px - .5 * var(--aw))}   /* Realm arena: the same distance to the right of the hero that the wolf cub stands to its left */
+.mana{position:absolute;left:0;top:0;width:max(4px,var(--mz,7%));aspect-ratio:1;translate:-50% -50%;border-radius:50%;pointer-events:none;z-index:2;
+  background:radial-gradient(circle,#fff 0 24%,#a8ecff 42%,rgba(90,160,255,0) 74%);
+  box-shadow:0 0 5px 2px rgba(120,200,255,.8),0 0 12px 4px rgba(160,110,255,.5);
+  animation:manax var(--mt,3s) ease-in-out var(--md,0s) infinite alternate,manay var(--mt,3s) ease-in-out calc(var(--md,0s) - var(--mt,3s) * .5) infinite alternate,managlow .9s ease-in-out infinite alternate}
+.mana.back{z-index:-1}
+@keyframes manax{from{left:var(--x0,-18%)}to{left:var(--x1,112%)}}
+@keyframes manay{from{top:var(--y0,-4%)}to{top:var(--y1,80%)}}
+@keyframes managlow{from{scale:.7;opacity:.65}to{scale:1.25;opacity:1}}
+@media (prefers-reduced-motion:reduce){.mana{display:none}}
