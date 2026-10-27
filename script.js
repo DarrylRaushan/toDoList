@@ -4062,7 +4062,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     });
     /* the barrel on the right of the floor: the staffs and spears (red-banded pike, halberd, diamond staff, plain spear, orb staff), leaning out of it at different angles */
     const bi=sc.querySelector('.sfa-sd.br .it');
-    if(bi)[['p',9,-11,0],['h',15,-5,5],['m',21,1,1],['s',27,7,6],['o',32,12,2]].forEach(([kd,cx,rot,up])=>{
+    if(bi)[['p',9,-11,0],['h',15,-5,5],['m',21,1,1],['s',27,7,6],['ostaff',32,12,2]].forEach(([kd,cx,rot,up])=>{
       const e=document.createElement('i');e.className='stf '+kd;
       e.style.left=(cx-8)+'px';e.style.bottom=(24+up)+'px';e.style.transform='rotate('+rot+'deg)';bi.appendChild(e);
     });
@@ -4206,16 +4206,18 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       const vis=Math.max(60,(Math.min(rc.bottom,vh)-yb)/ZS),base=Math.min(vis-20,150);   /* floor showing under the wall box (wall px) and where the feet of the racks go */
       /* everything is scaled evenly (never stretched). The racks' posts and the stands' poles get longer instead: --rh / --sh are their own heights. */
       const hr=base+34;   /* height a rack needs to reach the top of the shelf plank it leans on (shelf 22px up, plank 12px thick) */
-      const hs=hr+16;     /* the stands rise a little past that, so they are always the tallest */
-      /* the three pieces (armour stand 40 wide, weapon rack 160, barrel of staffs 40) share ONE even scale, picked so that all of them fit inside the wall with a small margin
-         on each side and room on the right for the spears that lean out of the barrel. Nothing is ever pushed past the edge of the room. */
-      const M=4,RV=26,avail=Math.max(120,aw-2*M-RV);
-      const sc=Math.max(.5,Math.min(1.2,avail/240)),ss=sc;
+      const hs=hr+30;     /* the stands rise a little past that, so they are always the tallest */
+      /* the armour stand (40 wide) and the barrel of staffs (40 wide, its spears lean out ~27px to the right) are drawn bigger than the weapon rack (160 wide): the stands scale KS times the rack.
+         All three are sized together so they exactly fit inside the wall; the stands tuck OV px behind the rack's ends, and nothing is pushed past the edge of the room. */
+      const M=4,KS=1.35,OV=2,LEAN=24;
+      /* the diamond set fills the armour stand: it is drawn as tall as the stand minus a short pole and the base, and the stand is exactly as wide as that armour (the art is 20x33 with 14px of armour in it). These are screen sizes; they are divided by ss below because the stand itself is scaled by ss. */
+      const hArm=Math.max(60,hs-13),wArm=hArm*14/33;
+      const sc=Math.max(.5,Math.min(1.2,(aw-2*M+2*OV-wArm)/(160+(40+LEAN)*KS))),ss=Math.min(1.8,sc*KS);
       const rh=Math.max(72,hr/sc);s.setProperty('--rs',sc.toFixed(3));s.setProperty('--rh',rh.toFixed(1)+'px');
       s.setProperty('--cs',Math.max(1,Math.min(1.6,(rh-12)/66)).toFixed(3));   /* the weapons in the racks grow evenly with the taller frame (about their own feet) */
-      s.setProperty('--ss',ss.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-44).toFixed(1)+'px');
-      /* lay the three out evenly across the floor, left to right: armour stand (diamond set), the long weapon rack, barrel of staffs and spears */
-      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[40*ss,160*sc,40*ss],gap=Math.max(0,(avail-ws.reduce((p,q)=>p+q,0))/2);
+      s.setProperty('--ss',ss.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--sw',(wArm/ss).toFixed(1)+'px');s.setProperty('--aah',(hArm/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-44).toFixed(1)+'px');
+      /* lay the three out left to right: armour stand (diamond set), the long weapon rack, barrel of staffs and spears */
+      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[wArm,160*sc,40*ss],gap=Math.max(-OV,(aw-2*M-ws.reduce((p,q)=>p+q,0)-LEAN*ss)/2);
       let x=M;its.forEach((n,i)=>{n.style.left=x.toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});
       return;
     }
