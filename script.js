@@ -4184,20 +4184,58 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
   }
   /* the axes hang on two upright wall rails, one in each free column under the torches (they used to stand in the crates): three to a rail, each hung from an iron peg.
      The axes are drawn as big as the shorter rail allows (never more than 0.9x), the same size on both sides, and may overlap a little like real hung tools. */
+  /* a mace drawn on a 40x40 art grid (same scale and tilt as the axe sprites: head top-left, haft running down to the lower right). t = 0 spiked morningstar, 1 flanged gold mace, 2 ruby war-mace */
+  function maceCv(t,k){
+    const c=document.createElement('canvas'),x=c.getContext('2d');c.width=c.height=40*HQ;
+    const P=(px,py,col)=>{x.fillStyle=col;x.fillRect(px*HQ,py*HQ,HQ,HQ)};
+    const disc=(cx,cy,r,col)=>{for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++)if(Math.hypot(dx,dy)<=r+.4)P(cx+dx,cy+dy,col)};
+    const IK='#1a0f06',cx=13,cy=13,len=22;
+    /* haft: dark outline first, then the wood, a lit edge, leather wraps near the butt, and a pommel */
+    for(let i=0;i<=len;i++)for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=2;dx++)P(cx+i+dx,cy+i+dy,IK);
+    for(let i=0;i<=len;i++){P(cx+i,cy+i,'#8a5a2a');P(cx+i+1,cy+i,'#6b4423');P(cx+i,cy+i-1<0?0:cy+i-1,'#8a5a2a')}
+    for(let i=0;i<=len;i++)P(cx+i,cy+i,i%2?'#b07a42':'#9a6a34');
+    for(let i=len-9;i<=len-2;i++)if(i%3===0){P(cx+i,cy+i,'#2a1a0a');P(cx+i+1,cy+i,'#2a1a0a')}
+    disc(cx+len+2,cy+len+2,2,IK);disc(cx+len+2,cy+len+2,1,'#e8b93c');
+    const ball=(r,base,hi,sh)=>{disc(cx,cy,r+1,IK);disc(cx,cy,r,base);
+      for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){const d=Math.hypot(dx,dy);if(d>r+.4)continue;
+        if(dx+dy<=-r*.7&&d>r*.35)P(cx+dx,cy+dy,hi);else if(dx+dy>=r*.8)P(cx+dx,cy+dy,sh)}};
+    const spike=(dx,dy,n,col)=>{for(let i=0;i<n;i++){P(cx+dx*i,cy+dy*i,IK);P(cx+dx*i+1,cy+dy*i,IK);P(cx+dx*i,cy+dy*i+1,IK)}for(let i=0;i<n-1;i++)P(cx+dx*i,cy+dy*i,col)};
+    if(t===0){          /* iron ball with eight spikes */
+      const R=5;[[-1,0],[0,-1],[1,0],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([dx,dy])=>{for(let i=0;i<4;i++){const px=cx+dx*(R+i),py=cy+dy*(R+i);P(px,py,i===3?IK:'#dfe6f0');if(i<3){P(px+(dy?1:0),py+(dx?1:0),'#6a7384')}}});
+      ball(R,'#8d96a6','#e6edf6','#4a5266');P(cx,cy,'#c9d1de');
+    }else if(t===1){    /* gold-banded steel head with four flanges */
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([dx,dy])=>{for(let i=3;i<8;i++){const px=cx+dx*i,py=cy+dy*i;P(px-1,py,IK);P(px+1,py,IK);P(px,py-1,IK);P(px,py+1,IK)}for(let i=3;i<7;i++)P(cx+dx*i,cy+dy*i,i%2?'#e8b93c':'#fbe08a')});
+      ball(5,'#aab3c2','#eef3fa','#5a6478');disc(cx,cy,2,'#e8b93c');P(cx-1,cy-1,'#fff2b8');
+      for(let i=0;i<3;i++){P(cx+6+i,cy+3-i+1,IK)}
+    }else{              /* dark iron head, ruby core, four short horns */
+      [[-1,0],[0,-1],[1,0],[0,1]].forEach(([dx,dy])=>spike(dx,dy,9,'#b9c2d0'));
+      ball(5,'#4a4f5e','#8a93a6','#23262f');disc(cx,cy,2,IK);disc(cx,cy,1,'#e0364a');P(cx-1,cy-1,'#ff9aa6');
+    }
+    c.className='sfa-ax';c.style.imageRendering='auto';c.style.width=c.style.height=40*k+'px';return c;
+  }
+  /* the weapons hang on two upright wall rails, one in each free column under the torches: six hooks to a rail, an axe, a mace, an axe, a mace, an axe, a mace (three of each per side),
+     each hung from an iron peg. They are drawn as big as the shorter rail allows (never more than 1.05x), the same size on both sides, and may overlap a little like real hung tools.
+     Only the axes are wares (the maces are wall decoration, so they have no tap target). */
   function aAxR(sc){
     const rs=[...sc.querySelectorAll('.sfa-vr')];if(!rs.length)return;
     if(rs.some(r=>!r.clientWidth||r.clientHeight<40))return;
-    const N=3,k=Math.max(.5,Math.min(.9,Math.min(...rs.map(r=>((r.clientHeight-12)/N+8)/40))));
+    const N=3,M=6,k=Math.max(.5,Math.min(1.05,Math.min(...rs.map(r=>((r.clientHeight-12)/M+8)/40))));
     const o=aShuffle(16);let p=0;
-    rs.forEach(r=>{
-      const h=r.querySelector('.ax'),W=r.clientWidth,H=r.clientHeight,key=W+'x'+H+'x'+k.toFixed(3);if(!h)return;
+    rs.forEach((r,ri)=>{
+      const h=r.querySelector('.ax'),W=r.clientWidth,H=r.clientHeight,key='m'+W+'x'+H+'x'+k.toFixed(3);if(!h)return;
       if(r._k===key){p+=N;return}
       r._k=key;h.replaceChildren();r.querySelectorAll('.pk').forEach(x=>x.remove());
-      const sz=40*k,step=(H-12)/N;
-      for(let q=0;q<N;q++){
-        const aid=o[p++],cv=axeCv(aid,k),t=6+q*step+(step-sz)/2;
-        cv.dataset.pk='ax'+aid;cv.tabIndex=0;cv.setAttribute('role','button');cv.setAttribute('aria-label','Inspect the wall axe');cv.onclick=()=>zfPickKey('ax'+aid);cv.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();zfPickKey('ax'+aid)}};
-        if((q+p)%2)cv.style.transform='scaleX(-1)';
+      const sz=40*k,step=(H-12)/M,right=r.classList.contains('r');
+      for(let s=0;s<M;s++){
+        const isAxe=s%2===0,t=6+s*step+(step-sz)/2;let cv;
+        if(isAxe){
+          const aid=o[p++];cv=axeCv(aid,k);
+          cv.dataset.pk='ax'+aid;cv.tabIndex=0;cv.setAttribute('role','button');cv.setAttribute('aria-label','Inspect the wall axe');cv.onclick=()=>zfPickKey('ax'+aid);cv.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();zfPickKey('ax'+aid)}};
+          if((s/2+p)%2)cv.style.transform='scaleX(-1)';
+        }else{
+          cv=maceCv(((s-1)/2+ri)%3,k);cv.setAttribute('aria-hidden','true');
+          if(right)cv.style.transform='scaleX(-1)';   /* the right-hand maces face the other way, so the two columns mirror each other */
+        }
         cv.style.left=((W-sz)/2).toFixed(1)+'px';cv.style.top=t.toFixed(1)+'px';h.appendChild(cv);
         const pk=document.createElement('i');pk.className='pk';pk.style.top=(t+sz*.25).toFixed(1)+'px';r.appendChild(pk);
       }
