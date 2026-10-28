@@ -238,17 +238,18 @@ const BLADES=WPN.concat(SWD,VSW);   /* 48 wall blades; the wall shows a differen
     const m=Math.max(0,Math.min(rows.length-1,down?g+Math.round(side*.6):g-Math.round(side*.6)));
     const o=rows.slice();o.splice(m,0,...Array(n).fill(rows[m]));return o;
   }
+  const HQ=8;   /* sword / axe sprites are drawn 8x8 device blocks per art pixel */
   function wpnCv(i,k,extra){
   const P=BLADES[i][0],rows=longBlade(BLADES[i][1].split('|'),extra||0),h=rows.length,w=Math.max(...rows.map(r=>r.length)),c=document.createElement('canvas'),x=c.getContext('2d');
-  c.width=w;c.height=h;
-  rows.forEach((r,y)=>{for(let j=0;j<r.length;j++){const col=P[r[j]];if(col){x.fillStyle=col;x.fillRect(j,y,1,1)}}});
-  c.className='sfa-ax';c.style.width=w*k+'px';c.style.height=h*k+'px';return c;
+  c.width=w*HQ;c.height=h*HQ;
+  rows.forEach((r,y)=>{for(let j=0;j<r.length;j++){const col=P[r[j]];if(col){x.fillStyle=col;x.fillRect(j*HQ,y*HQ,HQ,HQ)}}});
+  c.className='sfa-ax';c.style.imageRendering='auto';c.style.width=w*k+'px';c.style.height=h*k+'px';return c;
 }
 function axeCv(i,k){
   const rows=AXE_S[i].split('|'),h=rows.length,w=Math.max(...rows.map(r=>r.length)),c=document.createElement('canvas'),x=c.getContext('2d');
-  c.width=w;c.height=h;
-  rows.forEach((r,y)=>{for(let j=0;j<r.length;j++){const col=AXE_P[r[j]];if(col){x.fillStyle=col;x.fillRect(j,y,1,1)}}});
-  c.className='sfa-ax';c.style.width=w*k+'px';c.style.height=h*k+'px';return c;
+  c.width=w*HQ;c.height=h*HQ;
+  rows.forEach((r,y)=>{for(let j=0;j<r.length;j++){const col=AXE_P[r[j]];if(col){x.fillStyle=col;x.fillRect(j*HQ,y*HQ,HQ,HQ)}}});
+  c.className='sfa-ax';c.style.imageRendering='auto';c.style.width=w*k+'px';c.style.height=h*k+'px';return c;
 }
 
 /* ---------- Copper / chainmail / iron / diamond / gold gear: pixel sprites (1 char = 1 pixel, '.' = clear) ----------
@@ -4109,7 +4110,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     VF=VF||[0,1,0,1,0,0,0,1,1,0,1,1,0,1];
     const e=wpnCv(34+v,k||.9);if(VF[v])e.style.transform='scaleY(-1)';const w=parseFloat(e.style.width);
     e.dataset.v=v;e.dataset.q=q;e.dataset.rows=BLADES[34+v][1].split('|').length;e.dataset.pk='sw'+q;e.onclick=()=>zfPickKey('sw'+q);   /* each sword is its own ware */
-    e.style.setProperty('--ih',e.style.height||'60px');e.style.position='absolute';e.style.bottom='6px';e.style.left=(24.1+q*14.2-w/2).toFixed(1)+'px';   /* centres spread across the inner frame (rack is 176 wide) so the guards of the end swords stay inside the posts */
+    e.style.setProperty('--ih',e.style.height||'60px');e.style.position='absolute';e.style.bottom=(q%2?0:6)+'px';   /* every other sword sits 6px lower, so each hilt and guard reads on its own instead of piling up */e.style.left=(24.1+q*14.2-w/2).toFixed(1)+'px';   /* centres spread across the inner frame (rack is 176 wide) so the guards of the end swords stay inside the posts */
     return e;
   }
   /* zfFrame() calls this with the rack's height: the tallest sword is stretched (by adding blade rows, never by squashing pixels) until its pommel sits just under the top beam; the others keep their natural differences in length */
@@ -4123,7 +4124,24 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     cvs.forEach((c,i)=>c.replaceWith(rackSword(+c.dataset.v,+c.dataset.q,ks[i])));
   }
   const aRack=()=>aShuffle(14).slice(0,10);   /* the eight upright swords standing in the racks today (four a rack, swords only; never repeated on the boards) */
+  const hqDone=new Set();
+  function aHQ(root){
+    root.querySelectorAll('.sfa-run').forEach(e=>e.style.display='none');
+    root.querySelectorAll('.sfa-rk>i,.sfa-sd.br>i').forEach(el=>{
+      const cs=getComputedStyle(el),bk=el.classList.contains('bk'),src=bk&&cs.borderImageSource!=='none'?cs.borderImageSource:cs.backgroundImage;
+      const m=/url\(["']?(data:image\/png[^"')]+)["']?\)/.exec(src);if(!m)return;
+      const key=m[1].slice(-60)+el.className;if(hqDone.has(el))return;hqDone.add(el);
+      const im=new Image();im.onload=()=>{
+        const c=document.createElement('canvas');c.width=im.width*HQ;c.height=im.height*HQ;
+        const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(im,0,0,c.width,c.height);
+        const u='url('+c.toDataURL('image/png')+')';
+        if(bk&&cs.borderImageSource!=='none')el.style.borderImageSource=u;else el.style.backgroundImage=u;
+        el.style.imageRendering='auto';
+      };im.src=m[1];
+    });
+  }
   function aFill(sc){
+    aHQ(sc);
     const o=aShuffle(16);
     sc.querySelectorAll('.sfa-cr .ax').forEach((h,c)=>[0,1,2,3].forEach(q=>{const cv=axeCv(o[c*4+q],1);cv.style.left=q*12+'px';cv.style.bottom='5px';h.appendChild(cv)}));
     const vs=aRack();
@@ -4328,18 +4346,14 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       const M=4,KS=1.35,OV=2,LEAN=24,BK=1.3;   /* BK: the barrel is drawn 1.3x bigger (taller and wider) than the other stands */
       /* the diamond set fills the armour stand: it is drawn as tall as the stand minus a short pole and the base, and the stand is exactly as wide as that armour (the art is 20x33 with 14px of armour in it). These are screen sizes; they are divided by ss below because the stand itself is scaled by ss. */
       const hArm=Math.max(60,hs/(1+10/33)),wArm=hArm*14/33,us=hArm/33;   /* 10 art pixels are left under the armour for the diamond boots and the plinth; the slab is 1 pixel wider than the armour on each side (us) */
-      const sc=Math.max(.5,Math.min(1.2,(aw-2*M+2*OV-wArm-2*us)/(160+(80+LEAN)*KS*BK))),ss=Math.min(1.8,sc*KS),bs=Math.min(2.4,sc*KS*BK);
+      const BX=70,BO=10;   /* barrel sprite width and how far the spears lean past it (barrel px) */
+      const sc=Math.max(.3,Math.min(1.2,(aw-2*M-8-wArm-2*us)/(176+(BX+BO)*KS*BK))),ss=Math.min(1.8,sc*KS),bs=Math.min(2.4,sc*KS*BK);
       const rh=Math.max(72,hr/sc);s.setProperty('--rs',sc.toFixed(3));s.setProperty('--rh',rh.toFixed(1)+'px');
       const csv=Math.max(1,Math.min(1.6,(rh-12)/66));s.setProperty('--cs',csv.toFixed(3));aRackFit(inn,rh,csv);   /* the weapons in the racks grow evenly with the taller frame (about their own feet) */
-      s.setProperty('--ss',ss.toFixed(3));s.setProperty('--bs',bs.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--sw',(wArm/ss).toFixed(1)+'px');s.setProperty('--aah',(hArm/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-44).toFixed(1)+'px');
+      s.setProperty('--ss',ss.toFixed(3));s.setProperty('--bs',bs.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--sw',(wArm/ss).toFixed(1)+'px');s.setProperty('--aah',(hArm/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-56).toFixed(1)+'px');
       /* lay the three out left to right: armour stand (diamond set), the long weapon rack, barrel of staffs and spears */
-      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[wArm+2*us,160*sc,80*bs],gap=Math.max(-OV,(aw-2*M-ws.reduce((p,q)=>p+q,0)-LEAN*bs)/2);
-      let x=M;its.forEach((n,i)=>{n.style.left=(x+(i===0?us:0)).toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});
-      /* nudge the barrel to the right (only the barrel: the rack and armour stand keep their size and spots), never past the right edge of the wall */
-      const bn=its[2],rk=its[1];if(bn){const l0=parseFloat(bn.style.left)||0;let nl=l0+Math.max(0,Math.min(18,aw-M-(l0+ws[2])));const rr=(parseFloat(rk.style.left)||0)+176*sc+3;   /* the rack is 176 wide but laid out as 160, so it grows rightwards; keep the barrel clear of it */
-        bn.style.left=(Math.max(nl,rr)+5*bs).toFixed(1)+'px';
-        /* then slide the rack a little to the right, towards the barrel, using only the gap left between them (8px at most, 4px kept clear) */
-        const rl=parseFloat(rk.style.left)||0,bl=parseFloat(bn.style.left)||0,dx=Math.max(0,Math.min(8,bl-(rl+176*sc)-4));rk.style.left=(rl+dx).toFixed(1)+'px'}   /* the barrel sprite is 70 wide but keeps its 80-wide slot, so centre it in the slot */
+      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[wArm+2*us,176*sc,(BX+BO)*bs],gap=Math.max(-OV,(aw-2*M-ws.reduce((p,q)=>p+q,0))/2);
+      let x=M;its.forEach((n,i)=>{n.style.left=(x+(i===0?us:0)).toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});   /* real widths (rack 176, barrel 70 + lean), so the right-hand barrel and its spears always end inside the wall */
       return;
     }
     const W=Math.max(100,Math.min(140,70*aw/(ah*.4)));
