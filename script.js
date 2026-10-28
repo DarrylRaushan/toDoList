@@ -255,15 +255,20 @@ function axeCv(i,k){
    MCSW = the five swords (wood, stone, iron, diamond, gold) - they join SKIN as ids 64-68. MCA = helm, chestplate, leggings and boots in the same five metals. */
 const MCSW=[[{"a":"#7a6129","b":"#433618","c":"#372a14","d":"#2a2110"},".............ccc|............caac|...........caaac|..........caaac.|.........caaac..|........caaac...|..dd...caaac....|..dbd.caaac.....|...dbdaaac......|...dbdaac.......|....dbdd........|...badbbd.......|..bad.ddbd......|ddad....dd......|dbd.............|ddd............."],[{"a":"#a4a4a4","b":"#55534e","c":"#3c3b37"},".............bbb|............baab|...........baaab|..........baaab.|.........baaab..|........baaab...|..cc...baaab....|..cbc.baaab.....|...cbcaaac......|...cbcaab.......|....cbcc........|...cbcbbc.......|..cbc.ccbc......|ccbc....cc......|cbc.............|ccc............."],[{"a":"#ffffff","b":"#fefefe","c":"#fdfdfd","d":"#fcfcfc","e":"#fbfbfb","f":"#fafafa","g":"#d6d6d7","h":"#535049","i":"#292825"},".............hhh|............hfgh|...........hdgdh|..........hegch.|.........hfgah..|........hegbh...|..ii...hdgch....|..ihi.hdgch.....|...igiagdh......|...igigeh.......|....igii........|...ihighi.......|..ihi.iihi......|iihi....ii......|igi.............|iii............."],[{"a":"#3dd6b7","b":"#254c3e","c":"#10251e"},".............bbb|............baab|...........baaab|..........baaab.|.........baaab..|........baaab...|..cc...baaab....|..cbc.baaab.....|...cbcaaab......|...cbcaab.......|....cbcc........|...cbcbbc.......|..bbc.ccbc......|ccbc....cc......|cbc.............|ccc............."],[{"a":"#f7f8e4","b":"#cbd15b","c":"#4e4c2b","d":"#3e3d2c","e":"#3b3828"},".............dde|............dbbe|...........dbbbe|..........ebbbd.|.........dbbbd..|........dbbbd...|..dd...dbbbe....|..ecd.dbbbd.....|...dbdbbbda.....|...dbebbda......|....dbed........|...ecdbce.......|..ece.ddce......|ddce....dd......|dbe.............|ddd............."]];
 const MCA={helm:[[{"a":"#c26037","b":"#bc6036","c":"#c75c36","d":"#ad5330","e":"#8b452b","f":"#562917","g":"#4f291a","h":"#492117","i":"#3b1e13","j":"#2c1c14","k":"#1e130f","l":"#1a0e0a"},"..ffffff..|.faaaabej.|gcbcacadei|gacaabedeh|gbbfffiedi|fcfklkkiei|fcglkkkidi|gaikllkiei|.gi....ii."],[{"a":"#fafafa","b":"#c6c6c6","c":"#aeadae","d":"#716d6e","e":"#595959","f":"#313231","g":"#303030","h":"#2f2f2f","i":"#262626","j":"#1e1d1e","k":"#181412","l":"#191110"},"..gghfhf..|.hdbdbdci.|gdadbdbeci|hbdbdbecej|gdbgghjeci|hbflklkjej|fdhlkkkici|hbilklkjej|.gj....ij."],[{"a":"#fefefe","b":"#fcfcfc","c":"#c6c6c6","d":"#979797","e":"#2e2e2f","f":"#2d2d2d","g":"#232423","h":"#1b1c1c","i":"#1b1b1b","j":"#1c1312","k":"#1c100d"},"..feffff..|.ecccccdi.|ecaacccddi|ecbcccdddh|fcceeehddh|fcekjkjhdh|fcejkjjhdh|ecgjkkkhdj|.ei....ii."],[{"a":"#fbfdfc","b":"#fdf9fb","c":"#35ecc4","d":"#42e3c6","e":"#258a75","f":"#323030","g":"#2a312f","h":"#1b1e1e","i":"#201817","j":"#1e110f"},"..gggfgg..|.fdcdddeh.|gdaaccceeh|fdbdddeeeh|fcdfggheeh|fdfjjijheh|fcfiijjheh|fdijjjjheh|.fh....hh."],[{"a":"#fcfdf9","b":"#fcfaf9","c":"#e8f26f","d":"#e7ef53","e":"#e7eb64","f":"#d7a11f","g":"#2f2f30","h":"#2f3028","i":"#1f1f1c","j":"#201919","k":"#191a1c","l":"#1c110e"},"..gggggg..|.heeeecfla|hdbbddeffk|gdaeedfffi|geegggkffj|hdhllljjfj|hdhllllifj|heillllkfk|.gk....ki."]],armor:[[{"a":"#f8fcfb","b":"#be6136","c":"#c15f38","d":"#c35d36","e":"#a14c2c","f":"#994c2d","g":"#542b18","h":"#3f2316","i":"#401c11"},"..a...........|...gg....gg...|.ggceg..gdcgi.|gccdfi..gcbdfh|gbdcdcggcbcbfh|gfddbdbdddcefh|.gbbbbbcbbfeh.|.iedbcccbdfeh.|..gcbbbcbbfi..|..hdbbcbbfei..|..hfbdccfffi..|..hffefefefi..|...ieffeffh...|....hiiiii...."],[{"a":"#fcfcfc","b":"#c4c4c4","c":"#959595","d":"#727272","e":"#6e6e6e","f":"#5f5f5f","g":"#373737","h":"#2c2c2c","i":"#1f1f1f"},"...gg....hg...|.hgdch..hebgi.|hbebfi..hbebfi|hebdbeghbebeci|hceaebdbebdcfi|.hbdbebebecfi.|.ifbebdbebfch.|..hebebdbech..|..ibebdbecfi..|..ifbdbecfch..|..icfcfcfcfi..|...icfcfcfi...|....iiiiii...."],[{"a":"#fefefe","b":"#fcfcfc","c":"#c7c7c7","d":"#c6c6c6","e":"#c5c5c5","f":"#c4c4c4","g":"#a0a0a0","h":"#969696","i":"#2a2a2a","j":"#1b1b1b"},"...ii....ii...|.iiehi..idcij.|ifdfhj..ifefhj|ifdfdfiicecchj|ihcbafcfccdhhj|.ieafcfeefhhj.|.jhddeddechhj.|..iccfdccfgj..|..jeccccdhhj..|..jhfdcchhhj..|..jhhhhhhhhj..|...jhhhhhhj...|....jjjjjj...."],[{"a":"#fafcfb","b":"#fbf9fa","c":"#3ee6c7","d":"#3ae8c7","e":"#43e2c6","f":"#298776","g":"#218a74","h":"#2b292b","i":"#1b1c1d"},"...hh....hh...|.hhdfh..hcdhi.|heccfi..hdcdgi|hecccehhceecfi|hfeabccddedfgi|.hcadccdeefgi.|.igecedcdeggi.|..heccccdegh..|..iddcccdggi..|..ifeeeefgfi..|..iggfgggggi..|...igfffffi...|....iiiiii...."],[{"a":"#fefefc","b":"#fbfcfc","c":"#f8f9fa","d":"#e7ed61","e":"#e8ee5b","f":"#e4ee57","g":"#d4a31e","h":"#dba01f","i":"#3c382e","j":"#252627","k":"#1e191a"},"...ji....ii...|.iiegi..iefik.|jffegk..ifefgk|ifddddiifdddgk|ihdcbdddfedggk|.jdadddeddhgk.|.kgddfdfdeghk.|.cjdddddddgk..|..kddddedhgk..|..khdeddhhgk..|..khhhhhhhgk..|...kghhhghk...|....kkkkkk...."]],legs:[[{"a":"#c35f37","b":"#bf5f37","c":"#c35c37","d":"#9e4a2b","e":"#954d33","f":"#542919","g":"#50291c","h":"#412319","i":"#3e1d14","j":"#3e1911"},".ffffffgg.|gabbbbbbei|gbbccabaei|gccddddaei|gadejjecei|gbdj..fbei|gbdj..faej|gbdi..fbej|fadi..faej|gbdi..faei|gcdi..fcei|gdei..fdei|gjih..fihh"],[{"a":"#fefefe","b":"#fcfcfc","c":"#cbcbcb","d":"#c4c4c4","e":"#979797","f":"#6d6d6d","g":"#5c5c5c","h":"#313131","i":"#2f2f2f","j":"#272727","k":"#212121","l":"#1b1b1b"},".hihhiijh.|hfdfdfcfek|hdfbfdfdgl|ifagegefek|hdgejlgdgl|ifek..jfek|idgl..idgl|ifek..hfek|idgl..hdgl|hfek..hfek|idgl..hdgl|hgek..hgej|iljk..iljl"],[{"a":"#fefefe","b":"#fafafa","c":"#c6c6c6","d":"#c4c4c4","e":"#989898","f":"#959595","g":"#2f2f2f","h":"#2e2e2e","i":"#2c2c2c","j":"#202020","k":"#1b1b1b","l":"#181818"},".gggghgig.|gdcdcddcfk|icaadccdek|hcbeffedfl|hcffllecfl|hcfk..hcfl|hcfk..idfl|gdek..hcfl|gcel..icfl|idfl..hcfk|hcel..hcfl|hfek..gffk|hkjk..hjkk"],[{"a":"#fdfdfd","b":"#fcfafb","c":"#34eac4","d":"#3fe5c5","e":"#258975","f":"#2a8674","g":"#2b3330","h":"#2e3031","i":"#2e2e30","j":"#1b1c1c","k":"#1c1a1b"},".ihhhihhi.|idddddcdfj|icbbcccdfk|idaeeeecfk|ideekjecej|hdej..gcfk|idfj..gcej|hdfk..gcej|idfk..icek|hdek..gdfj|gdej..hcek|ieej..iffj|hjjj..ijjk"],[{"a":"#fdfdfd","b":"#f8fbfb","c":"#e8ef5a","d":"#e8ec61","e":"#d1a420","f":"#31312c","g":"#2f3028","h":"#1c1c17","i":"#1d1918","j":"#181816"},".fffffgff.|gdcdddddeh|gcbadcddej|gdbeeeedeh|gdeeijecej|gdei..gdej|gcei..gcej|gcei..fdei|gdei..gceh|gdeh..gdeh|gceh..fcej|feei..feej|fhhh..gihi"]],boots:[[{"a":"#c65e39","b":"#bf5f39","c":"#9f4c2c","d":"#974b33","e":"#602d1a","f":"#48271a","g":"#3c1f15","h":"#401d14"},"...eee..eef...|..facg..eadh..|..facg..eadh..|..eacg..eadh..|..facg..ebdg..|..eacg..eadh..|.eaach..eaaaf.|fbbddg..fdbbdg|fdcch....hccdh|fggg......gggg"],[{"a":"#fbfbfb","b":"#bebebe","c":"#969696","d":"#757575","e":"#575757","f":"#383838","g":"#303030","h":"#2e2e2e","i":"#252525","j":"#1e1e1e"},"...hgh..ghh...|..gbej..gbej..|..gdci..hdci..|..gbej..gbej..|..gdci..hdci..|..hbej..gbej..|.gadci..hdbdg.|hbdcei..gcdbej|fecej....iceci|gjij......ijij"],[{"a":"#fefefe","b":"#fbfbfb","c":"#c6c6c6","d":"#c3c3c3","e":"#9a9a9a","f":"#959595","g":"#2e2e2e","h":"#1c1c1c","i":"#1a1a1a"},"...ggg..ggg...|..gcfi..gdfh..|..gbfi..gafh..|..gdfi..gdfh..|..gdfh..gcfi..|..gcfi..gcfh..|.gbcfi..gcdcg.|gcdfeh..gfccfi|gffeh....hfffh|ghhh......hiii"],[{"a":"#fcfdff","b":"#f8fbfa","c":"#3ce7c4","d":"#268973","e":"#2c3130","f":"#312f31","g":"#1d201f","h":"#1d1d1d"},"...fff..efe...|..ecdh..fcdg..|..fbdg..ebdh..|..ecdh..ecdh..|..ecdh..fcdh..|..fcdg..ecdh..|.eacdh..eccce.|eccddg..fdccdh|fdddg....gdddg|ehhg......hhhh"],[{"a":"#fafafc","b":"#fafbf8","c":"#f8f8f6","d":"#e6ed5d","e":"#d6a01f","f":"#30302e","g":"#272826","h":"#1b1c19","i":"#1c191b"},"...fff..fff...|..fdei..fdeh..|..faeh..fbeh..|..fdeh..fdeh..|..fdei..fdeh..|..fdeh..fdei..|.fcdeh..fdddg.|fddeeh..feddei|feeeh....heeei|fhhh......hhih"]]};
-/* every pixel weapon in one list: ids 0-15 axes, 16-24 the second sheet, 25-49 the swords, 50-63 the upright swords, 64-68 the wood / stone / iron / diamond / gold swords */
-const SKIN=AXE_S.map(s=>[AXE_P,s]).concat(BLADES).concat(MCSW);
+/* every pixel weapon in one list: ids 0-15 axes, 16-24 the second sheet, 25-49 the swords, 50-63 the upright swords, 64-68 the wood / stone / iron / diamond / gold swords, 69-71 the diamond sword, diamond pickaxe and bow */
+/* three more weapons, pixelled from the diamond-tools sheet (ids 69-71): the diamond sword, the diamond pickaxe and the bow. Same format as MCSW */
+const MCX=[[{"a":"#06080c","b":"#41f8fb","c":"#1fc2c5","d":"#622f08","e":"#cd6006"},".............aaa|............abca|...........abcba|..........abcba.|.........abcba..|........abcba...|..aa...abcba....|..aca.abcba.....|...ababcba......|...abacba.......|....abaa........|...deabca.......|..ded.aaca......|aaed....aa......|aca.............|aaa............."],[{"a":"#06050b","b":"#40fbfb","c":"#1dc1c4","d":"#421e0a","e":"#ab470b"},"....aaaaa....|...abbccbade.|....aaaabbad.|........acba.|.......aeabba|......aea.aba|.....aea..aca|....aea...aca|...aea....aba|..aea......a.|.aea.........|aea..........|aa..........."],[{"a":"#06060a","b":"#4b6b74","c":"#af4301","d":"#371903","e":"#9caaaf","f":"#c9d8df"},"..........aaaa.|.......aaacddca|.....aacdcaaaa.|....aeaaaa..b..|...aefa....b...|..aefa....b....|..aaa....b.....|.aca....b......|.ada...b.......|.aca..b........|aca..b.........|ada.b..........|adab...........|aca............|.a............."]];
+const SKN={69:'Sword',70:'Pickaxe',71:'Bow'};   /* skins that carry their own noun (the rest take it from the weapon style) */
+const STAFFSK=[[{"a":"#6b5151","b":"#603529","c":"#413b45","d":"#372f39","e":"#562328","f":"#372326","g":"#2b2531","h":"#261d27","i":"#3c1920","j":"#2f1422","k":"#281621","l":"#1f1521","m":"#1b0c21","n":"#131120"},"........................jj|.......................caj|......................dcd.|.....................hagn.|....................ibg...|...................iai....|..................iai.....|.................gbe......|................naf.......|...............fbn........|..............fek.........|.............kfl..........|............kfl...........|...........kem............|..........fbk.............|.........kel..............|........hak...............|.......jeh................|......jbi.................|.....jbi..................|....mei...................|...gck....................|..ccd.....................|.gcd......................|.cc.......................|.j........................"],[{"a":"#a36a3f","b":"#985631","c":"#68646a","d":"#774834","e":"#534642","f":"#58362c","g":"#4d2c24","h":"#3a3542","i":"#312d39","j":"#422323","k":"#341f26","l":"#2b2631","m":"#221926","n":"#1a111c","o":"#160f25"},"........................j.|.......................faj|......................kdf.|.....................gbgk.|....................jbg...|...................kbg....|..................fcl.....|.................mef......|................hch.......|...............lci........|..............icl.........|.............ich..........|............lch...........|...........lci............|..........lch.............|.........lem..............|........ieo...............|.......gem................|......mdk.................|.....feo..................|....fbm...................|...faj....................|.lgfg.....................|.dbg......................|jbg.......................|.n........................"],[{"a":"#605f67","b":"#47444d","c":"#3e384a","d":"#333041","e":"#322c47","f":"#2d2c44","g":"#222433","h":"#232130","i":"#201c31","j":"#1e1929","k":"#181b2e","l":"#16182a","m":"#191626","n":"#131529","o":"#131226","p":"#120f22"},"........................m.|.......................dah|......................mbc.|......................dh..|....................mbd...|...................jbd....|..................jad.....|..................bb......|................gac.......|...............mad........|..............fdd.........|..............be..........|............nci...........|...........keg............|..........ifo.............|.........ofl..............|........kei...............|.......jek................|......ofk.................|......fl..................|.....fi...................|....gl....................|..hgn.....................|.bah......................|.bb.......................|op........................"],[{"a":"#686b74","b":"#5a575e","c":"#4c4952","d":"#4d3f47","e":"#413d48","f":"#3d3b44","g":"#393640","h":"#2e2a35","i":"#33232f","j":"#201d2d","k":"#421520","l":"#1d1a29","m":"#171524","n":"#141122","o":"#100e1e"},".......................l..|.......................eah|.....................mebbh|.....................nedn.|.....................gjl..|....................fg....|...................cd.....|..................be......|................ofg.......|...............leh........|...............gg.........|..............gh..........|.............bg...........|............kk............|..........jkk.............|.........cai..............|........lkel..............|.......jdi................|.......ci.................|.....jfl..................|....jel...................|...hem....................|..ffj.....................|.aaf......................|fac.......................|.m........................"],[{"a":"#92654b","b":"#6f6464","c":"#7d533c","d":"#6d4733","e":"#514240","f":"#5e3a29","g":"#4c3027","h":"#492a1f","i":"#37313a","j":"#38282a","k":"#342225","l":"#2e1c1e","m":"#241d29","n":"#1e151d","o":"#171324","p":"#16101c"},"......................je..|.....................kdcb.|.....................hpoak|...................jncclc.|...................ffffgh.|...................fgg....|..................hakhk...|.................hfn......|................gfn.......|...............fdp........|..............adl.........|.............mdh..........|............ebo...........|...........ib.............|..........ibm.............|.........ie...............|........ie................|.......mem................|......mi..................|.....gmo..................|....gcj...................|...fdk....................|.jdcl.....................|jacd......................|hckl......................|.l........................"],[{"a":"#927f71","b":"#715b50","c":"#614c43","d":"#5a3e37","e":"#473a36","f":"#48332f","g":"#402f2e","h":"#332b2c","i":"#352526","j":"#2b2327","k":"#2a1d22","l":"#221d23","m":"#1f151f","n":"#181520","o":"#150f1c","p":"#150d1b"},"........................g.|.......................cal|......................ngel|.....................lclp.|....................hah...|...................gah....|..................cad.....|.................gdfo.....|................gccl......|...............mig........|..............mgd.........|.............ogfm.........|.............bcn..........|............bc............|...........be.............|..........be..............|.........df...............|........di................|.......di.................|......di..................|.....fk...................|....hi....................|...hk.....................|..jj......................|.hk.......................|mh........................"],[{"a":"#836541","b":"#675238","c":"#45432d","d":"#373827","e":"#313426","f":"#2f3324","g":"#2d2f25","h":"#2e2924","i":"#212823","j":"#27201f","k":"#151d20","l":"#1e1a20","m":"#171a24","n":"#1c1420","o":"#11141b","p":"#0f0f1c","q":"#0c0d1a"},"........................n.|.......................haj|......................jag.|.....................ocej.|....................ndb...|...................nfi....|...................ab.....|..................fdl.....|.................bf.......|................eb........|...............fg.........|..............bc..........|............pgm...........|...........lch............|..........mcg.............|..........cf..............|........oci...............|.......mcf................|.......di.................|......dk..................|.....el...................|....ip....................|...kq.....................|..kq......................|hi........................|h........................."],[{"a":"#8b6c49","b":"#6a543a","c":"#5d4933","d":"#4f3d2c","e":"#3d3323","f":"#5a2428","g":"#3c2822","h":"#2c2724","i":"#281f22","j":"#3b1723","k":"#26111c","l":"#1a141c","m":"#1c0d1c"},"........................d.|.....................eecbh|....................heiic.|....................edcha.|....................eaecd.|...................bccdg..|.................icba.....|.................gbel.....|.................heh......|................bi........|...............ji.........|.............lfj..........|.............ae...........|............bc............|..........idd.............|.........kfd..............|........kfj...............|.......mfj................|......mfj.................|.....kfj..................|....mfj...................|....jk....................|...jk.....................|..jm......................|gdk.......................|.g........................"],[{"a":"#8a8f9a","b":"#696a71","c":"#8b4b36","d":"#564e52","e":"#874935","f":"#824533","g":"#6a3b36","h":"#62312c","i":"#5a3035","j":"#512f2d","k":"#49312e","l":"#4b282b","m":"#442426","n":"#3d262a","o":"#3a2029","p":"#331d26"},"..........................|.......................da.|......................aa..|.....................ndb..|....................pk....|....................k.....|...................i......|..................f.......|.................ej.......|................f.........|...............c..........|..............fl..........|.............c............|............c.............|...........e..............|..........e...............|.........f................|........e.................|......mf..................|......g...................|.....h....................|....h.....................|...h......................|..h.......................|.l........................|o........................."],[{"a":"#7f8289","b":"#6e6e75","c":"#5a555e","d":"#834635","e":"#784034","f":"#703a2e","g":"#66362f","h":"#3d3a47","i":"#592c2e","j":"#4c2633","k":"#412233","l":"#2b2129"},".........................|......................kb.|.....................hba.|....................chh..|....................hc...|...................b.....|..................ic.....|.................ef......|................ef.......|...............dd........|..............fd.........|.............gd..........|............ed...........|...........id............|..........ef.............|.........gd..............|........ge...............|.......gd................|......jf.................|......g..................|....ji...................|...ji....................|...i.....................|..j......................|.k.......................|l........................"],[{"a":"#83848c","b":"#756e71","c":"#874d38","d":"#56575d","e":"#824433","f":"#703d2e","g":"#514140","h":"#58382f","i":"#5d3231","j":"#5a2e2d","k":"#4e292d","l":"#47252a","m":"#3f2523","n":"#39212c"},".........................b|.......................aa.|......................bag.|.....................bag..|.....................bd...|....................b.....|...................cg.....|..................fh......|.................el.......|................e.........|...............ch.........|..............cj..........|.............c............|............ek............|...........c..............|..........c...............|.........c................|........e.................|.......c..................|......e...................|....mf....................|...li.....................|..lj......................|..i.......................|.j........................|n........................."],[{"a":"#9498a2","b":"#82868e","c":"#6b6b73","d":"#8a4c36","e":"#874836","f":"#743b32","g":"#5e352d","h":"#5d2c2f","i":"#562b2e","j":"#502c2b","k":"#55161b","l":"#43282d","m":"#3a1b23"},".........................b|........................c.|......................ccb.|.....................aba..|.....................ba...|....................h.....|...................a......|...............mkkki......|...............kkgk.......|................e.........|...............e..........|..............eg..........|.............d............|............e.............|...........e..............|..........dg..............|.........eg...............|........ej................|.......f..................|......d...................|.....f....................|....g.....................|...g......................|..g.......................|.h........................|l........................."],[{"a":"#aab1bb","b":"#90969e","c":"#81848f","d":"#676562","e":"#575557","f":"#894a36","g":"#824633","h":"#6f3a31","i":"#38384a","j":"#5b2f2d","k":"#56292e","l":"#3e222c"},".........................b|.......................ca.|......................ba..|.....................eab..|.....................bd...|...................ec.....|...................d......|..................i.......|.................e........|................d.........|...............i..........|..............h...........|.............f............|............g.............|...........f..............|..........g...............|.........f................|........g.................|.......g..................|......h...................|.....k....................|....j.....................|...j......................|..k.......................|.l........................|l........................."],[{"a":"#c5c5b3","b":"#95ac85","c":"#88816f","d":"#8b7855","e":"#896c52","f":"#776246","g":"#765d47","h":"#705a42","i":"#6f573c","j":"#6c5742","k":"#69523b","l":"#614b35","m":"#604a34","n":"#5e4833","o":"#574638","p":"#4f3f2b"},".....................kee..|.....................gnlkk|....................ki...e|....................ij...d|....................gg..ig|....................ho....|...................mn.....|...............jffhp......|..............jn..........|..............b...........|.............a............|............a.............|............c.............|...........k..............|..........d...............|.........d................|........h.................|......kg..................|.....mj...................|....m.....................|...h......................|.nn......................."]];   /* ids 72-79: the eight staffs from the staff sheet (drawn as icons); ids 80-84: five spears; id 85: the druid's gnarled staff. */
+const SKIN=AXE_S.map(s=>[AXE_P,s]).concat(BLADES).concat(MCSW).concat(MCX).concat(STAFFSK);
 const A_=i=>i,W_=i=>16+i,S_=i=>25+i,V_=i=>50+i;
 /* weapon skins by style and tier: tier 0 plain iron, 1 steel, 2 ornate, 3 magical. A weapon's tier is its rarity (3 = Very rare and up). */
 const SKT={
-  warrior:[[5,6,8,10,15,21,0].map(S_).concat([11,6,1].map(V_)),[1,7,12,16,20,23,24].map(S_).concat([3,4,10,5].map(V_)),[9,11,13,14,17,19,22].map(S_).concat([0,2,9,8,12].map(V_)),[1,2,4,5,6].map(W_).concat([7,13].map(V_))],
+  warrior:[[5,6,8,10,15,21,0].map(S_).concat([11,6,1].map(V_)),[1,7,12,16,20,23,24].map(S_).concat([3,4,10,5].map(V_)),[9,11,13,14,17,19,22].map(S_).concat([0,2,9,8,12].map(V_)),[1,2,4,5,6].map(W_).concat([7,13].map(V_)).concat([69,70])],
   great:[[3,18].map(S_),[0,2,7].map(A_).concat([3].map(V_)),[4,9,13].map(A_).concat([0,9].map(V_)),[8,11,12,14].map(A_)],
-  mage:[[2,12].map(S_),[7,13].map(S_),[0,8].map(W_),[7].map(W_)],
-  rogue:[[0,6].map(S_),[2,4].map(S_),[11,22].map(S_),[2,4].map(W_)],
+  spear:[[80,81],[82],[83],[84]],                                    /* the five spears (the same models as in the barrel) */
+  mage:[[72,73],[74,75],[76,77],[78,79,85]],                         /* the eight staffs from the staff sheet and the druid's gnarled staff */
+  rogue:[[0,6].map(S_),[2,4].map(S_),[11,22].map(S_).concat([71]),[2,4].map(W_).concat([71])],
   cleric:[[1].map(A_),[6].map(A_),[10].map(A_),[W_(3),A_(15)]]
 };
 function pickSkin(st,r){
@@ -1266,6 +1271,15 @@ function bustGrid(look,full,eq){
         R(21,21,8,1,gc);if(m>=3)R(22,22,6,1,M(gc,.7));
         R(25,22,1,6,BR);R(24,22,3,2,SK);R(24,25,3,2,SK);R(24,28,3,1,m>=4?GOLD:BR);
       },
+      spear:()=>{                                  /* two-handed spear: a long shaft, both hands on it, a leaf-shaped head that grows with the tier */
+        const B=BLADE[m],BL=M(B,1.25),WD='#7a5a2a',gc=m>=4?GOLD:MATS[Math.min(m,3)],y0=3-(m>=3?1:0);
+        R(26,y0+6,1,31-y0-6+4,WD);R(27,y0+6,1,31-y0-6+4,M(WD,.72));P(26,34,M(WD,1.3));
+        P(26,y0,BL);R(25,y0+1,3,3,B);R(26,y0+1,1,3,BL);R(26,y0+4,1,1,B);
+        if(m>=3){R(24,y0+2,1,2,B);R(28,y0+2,1,2,B)}
+        R(25,y0+5,3,1,gc);if(m>=2)P(26,y0+6,RED);
+        if(m>=5){R(26,y0+1,1,3,'#fff');P(23,y0,'rgba(255,240,150,.7)');P(29,y0+4,'rgba(255,240,150,.7)')}
+        R(25,22,3,2,SK);R(25,16,3,2,SK);                   /* both hands on the shaft */
+      },
       warrior:()=>{
         const B=BLADE[m],BL=M(B,1.25),len=11+m,y0=21-len,gc=m>=4?GOLD:MATS[Math.min(m,3)];
         /* sword */
@@ -1537,7 +1551,7 @@ function initCreator(){
 /* ---------- loot: random drops, you decide what to wear ---------- */
 const SLOTS=['helm','armor','legs','boots','weapon','trinket','offhand','companion'];
 const SLOTN={helm:'Helm',armor:'Armor',legs:'Legs',boots:'Boots',weapon:'Weapon',trinket:'Trinket',offhand:'Off-hand',companion:'Companion'};
-const NOUN={legs:{warrior:'Leggings'},boots:{warrior:'Boots'},helm:{warrior:'Helm',mage:'Hat',rogue:'Hood',cleric:'Circlet'},armor:{warrior:'Plate',mage:'Robes',rogue:'Leathers',cleric:'Vestments'},weapon:{warrior:'Sword',great:'Greatsword',mage:'Staff',rogue:'Daggers',cleric:'Mace'},offhand:{warrior:'Shield',mage:'Tome',rogue:'Dagger',cleric:'Lantern'}};
+const NOUN={legs:{warrior:'Leggings'},boots:{warrior:'Boots'},helm:{warrior:'Helm',mage:'Hat',rogue:'Hood',cleric:'Circlet'},armor:{warrior:'Plate',mage:'Robes',rogue:'Leathers',cleric:'Vestments'},weapon:{warrior:'Sword',great:'Greatsword',spear:'Spear',mage:'Staff',rogue:'Daggers',cleric:'Mace'},offhand:{warrior:'Shield',mage:'Tome',rogue:'Dagger',cleric:'Lantern'}};
 const MATN=['Plain','Iron','Steel','Tempered','Mythril','Golden','Dragon','Godforged'];
 /* metal gear (pixel sprites): rarity -> metal. Names use the real metal: Copper, Chainmail, Iron, Diamond, Golden (swords: Wooden, Stone, Iron, Diamond, Golden) */
 const MCN=['Copper','Chainmail','Iron','Diamond','Golden'],MCW=['Wooden','Stone','Iron','Diamond','Golden'],MCR=[0,1,2,2,3,4,4];
@@ -1561,7 +1575,7 @@ function eff(it,k){const v=it.b[k]||0;return it.slot==='companion'?Math.round(v*
 const PETQ=['Stray','Tame','Loyal','Clever','Noble','Fabled','Mythic','Spirit'];
 const TNAME=['Bone Charm','Copper Ring','Silver Ring','Jade Ring','Gold Ring','Mythril Ring','Dragon Eye','Eye of the Void'];
 const SUF={xp:'of Insight',gold:'of Fortune',dmg:'of Warding',hp:'of Vitality',bd:'of Slaying'};
-const ICON={legs:{warrior:'👖'},boots:{warrior:'👢'},helm:{warrior:'\u26d1\ufe0f',mage:'\ud83c\udfa9',rogue:'\ud83e\udd77',cleric:'\ud83d\udc51'},armor:{warrior:'\ud83d\udee1\ufe0f',mage:'\ud83e\udde5',rogue:'\ud83e\udd4b',cleric:'\ud83d\udc58'},weapon:{warrior:'\u2694\ufe0f',great:'\ud83d\udde1\ufe0f',mage:'\ud83e\ude84',rogue:'\ud83d\udd2a',cleric:'\ud83d\udd28'},offhand:{warrior:'🛡️',mage:'📖',rogue:'🗡️',cleric:'🏮'}};
+const ICON={legs:{warrior:'👖'},boots:{warrior:'👢'},helm:{warrior:'\u26d1\ufe0f',mage:'\ud83c\udfa9',rogue:'\ud83e\udd77',cleric:'\ud83d\udc51'},armor:{warrior:'\ud83d\udee1\ufe0f',mage:'\ud83e\udde5',rogue:'\ud83e\udd4b',cleric:'\ud83d\udc58'},weapon:{warrior:'\u2694\ufe0f',great:'\ud83d\udde1\ufe0f',spear:'\ud83d\udd31',mage:'\ud83e\ude84',rogue:'\ud83d\udd2a',cleric:'\ud83d\udd28'},offhand:{warrior:'🛡️',mage:'📖',rogue:'🗡️',cleric:'🏮'}};
 const RAR=['#8a7862','#58b368','#4a9ae0','#2fc7c0','#a56be0','#e8b93c','#ff7a4a','#ff4fd8'];   /* frame colour per rarity */
 const STAT_TXT={xp:v=>(v<0?'':'+')+v+'% XP',gold:v=>(v<0?'':'+')+v+'% coins',dmg:v=>v<0?'+'+(-v)+'% damage taken':'-'+v+'% damage taken',hp:v=>(v<0?'':'+')+v+' max HP',bd:v=>(v<0?'':'+')+v+'% boss damage'};
 /* Unique gear: hand-made named items, mostly weapons. Quirky rather than strong, some have trade-offs.
@@ -1589,7 +1603,7 @@ const bonusTxt=it=>Object.keys(it.b).map(k=>STAT_TXT[k](eff(it,k))).join(', ');
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 function itemName(it){
   const main=Object.keys(it.b)[0];
-  const base=it.slot==='trinket'?TNAME[it.r]:it.slot==='companion'?PETQ[it.r]+' '+(PETS[it.pet]||PETS.wolfpup).n:(it.ms!=null?(it.slot==='weapon'?MCW:MCN)[it.ms]:MATN[it.r])+' '+NOUN[it.slot][it.st];
+  const base=it.slot==='trinket'?TNAME[it.r]:it.slot==='companion'?PETQ[it.r]+' '+(PETS[it.pet]||PETS.wolfpup).n:(it.ms!=null?(it.slot==='weapon'?MCW:MCN)[it.ms]:MATN[it.r])+' '+((it.slot==='weapon'&&it.sk!=null&&SKN[it.sk])||NOUN[it.slot][it.st]);
   return base+(main?' '+SUF[main]:'');
 }
 /* old saves had gear tiers per slot: turn them into loot items so nothing is lost */
@@ -1619,7 +1633,8 @@ function migrate(s){
   return s;
 }
 const wornOf=(s,k)=>{const id=(s.worn||{})[k];return id?((s.inv||[]).find(i=>i.id===id)||null):null};
-const worn=k=>wornOf(S,k);
+const twoH=i=>!!i&&i.slot==='weapon'&&i.st==='spear';   /* a spear is two-handed */
+const worn=k=>{if(k==='offhand'&&twoH(wornOf(S,'weapon')))return null;return wornOf(S,k)};   /* a spear in hand: nothing is held in the off-hand */
 const hpOf=s=>SLOTS.reduce((a,k)=>{const i=wornOf(s,k);return a+(i?eff(i,'hp'):0)},0);
 let TRYIT=null,WFX=null;   /* TRYIT: item being tried on in the Hero tab (only set briefly while previewing stats). WFX: slot just worn, for the flash */
 function bsum(k){return SLOTS.reduce((a,s)=>{const i=TRYIT&&TRYIT.slot===s?TRYIT:worn(s);return a+(i?eff(i,k):0)},0)}
@@ -2212,8 +2227,8 @@ function buildGear(slot,r,st,pet){
   if(slot==='companion')it.pet=pet||pool[Math.floor(Math.random()*pool.length)];
   if(MCA[slot]&&(slot==='legs'||slot==='boots'||s0==='warrior'))it.ms=mi;   /* helm, chestplate, leggings, boots: a metal and its sprite */
   if(slot==='weapon'){
-    if(s0==='warrior'&&Math.random()<(st==null?1:.5)){it.ms=mi;it.sk=64+mi}   /* the wood / stone / iron / diamond / gold sword */
-    else it.sk=pickSkin(it.st,r);
+    if(s0==='warrior'&&Math.random()<(st==null?1:.5)){it.ms=mi;it.sk=mi===3?[67,69,70][Math.floor(Math.random()*3)]:64+mi}   /* the wood / stone / iron / diamond / gold sword; diamond is the sword, the sheet's sword or the pickaxe */
+    else{it.sk=pickSkin(it.st,r);if(it.sk===69||it.sk===70)it.ms=3}   /* the diamond sword and pickaxe are always named Diamond */
   }
   it.n=itemName(it);return it;
 }
@@ -2237,7 +2252,12 @@ function openChest(){
 function wear(id){
   const it=S.inv.find(i=>i.id===id);if(!it)return;
   S.worn=S.worn||{};
-  if(S.worn[it.slot]===id)delete S.worn[it.slot];else{S.worn[it.slot]=id;WFX=it.slot}
+  if(S.worn[it.slot]===id)delete S.worn[it.slot];
+  else{
+    if(it.slot==='offhand'&&twoH(wornOf(S,'weapon'))){toast('A spear needs both hands. Put it away to use an off-hand.');buzz(20);return}
+    if(twoH(it)&&S.worn.offhand){delete S.worn.offhand;toast('Two-handed: your off-hand item was put away')}
+    S.worn[it.slot]=id;WFX=it.slot
+  }
   TR=bsum('hp');save();render();
 }
 function sell(id){
@@ -3869,7 +3889,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
   const pick=a=>a[Math.floor(Math.random()*a.length)];
   const price=e=>e.cur==='g'?coinText(e.cost,2):e.cost+'\u{1F48E}';
   const stk=k=>k==='a'?S.sa.s:S.sp.s;
-  const stkAll=k=>k==='a'?S.sa.s.concat((S.sv&&S.sv.s)||[]):S.sp.s;   /* the armoury's four bays, then the three vault pieces (index 4-6) */
+  const stkAll=k=>k==='a'?S.sa.s.concat((S.sv&&S.sv.s)||[],(S.sc&&S.sc.s)||[]):S.sp.s;   /* the armoury's four bays, the three vault pieces (index 4-6), then the pieces standing in the scene (index 7+, each has a .pk key) */
 
   /* ---- stock ---- */
   const armCap=()=>{const l=levelOf(S.xp);return l>=22?3:l>=12?2:l>=5?1:0};   /* best rarity (and weapon skin tier) the shelves carry: Lv 1 plain, Lv 5 steel, Lv 12 ornate, Lv 22 rare */
@@ -3900,6 +3920,26 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       return {it,cur:cur[j],cost:cur[j]==='g'?VG(r):VM[r],sold:false,vault:true};
     });
   }
+  /* The pieces you can see in the Armoury scene are the wares: the hanging helm ('helm'), the hanging chestplate ('plate'), the diamond armour stand ('stand'),
+     every sword in the long rack ('sw0'..) and every staff or spear in the barrel ('sp0'..). Tap one to select it, then Buy on the plaque.
+     Rolled once a day (S.sc). The rack swords keep the exact sprite you see (its skin and tier); a sold piece disappears from the scene. */
+  function swTier(v){const id=50+v;for(const st of ['warrior','great'])for(let k=0;k<4;k++)if(SKT[st][k].indexOf(id)>-1)return [st,k];return ['warrior',0]}
+  /* what stands in the barrel today: four spears (models 8-12 are the five spear models) and four staffs (models 0-7 are the eight staffs of the sheet, 13 the gnarled druid staff), picked and arranged by the date. genScene() and aFill() both use it, so every model is also its own ware. */
+  function barrelSet(){
+    const sp=aShuffle(5).slice(0,4).map(k=>({c:8+k,k:'spear',sk:80+k})),st=aShuffle(9).slice(0,4).map(k=>k<8?{c:k,k:'staff',sk:72+k}:{c:13,k:'staff',sk:85});   /* model 13 / skin 85 = the gnarled druid staff */
+    const all=sp.concat(st);return aShuffle(8).map(i=>all[i]);
+  }
+  function genScene(){
+    const out=[],mk=(pk,it,r)=>{delete it.isNew;out.push({it,cur:'g',cost:ARM_COST[r],sold:false,pk})};
+    let r=armRarity();mk('helm',buildGear('helm',r,'warrior'),r);
+    r=armRarity();mk('plate',buildGear('armor',r,'warrior'),r);
+    /* the diamond armour stand is four wares: its helm ('sthelm'), chestplate ('stand'), leggings ('stlegs') and boots ('stboots'), each picked on its own */
+    [['sthelm','helm'],['stand','armor'],['stlegs','legs'],['stboots','boots']].forEach(([pk,sl])=>{const it=buildGear(sl,3,'warrior');it.ms=3;it.n=itemName(it);mk(pk,it,3)});
+    aRack().forEach((v,q)=>{const [st,k]=swTier(v),it=buildGear('weapon',k,st);delete it.ms;it.sk=50+v;it.n=itemName(it);mk('sw'+q,it,k)});
+    /* the barrel holds four spears and four staffs (see barrelSet); slot q shows model q of that set, and its ware is that exact model */
+    barrelSet().forEach((b,q)=>{r=armRarity();const it=buildGear('weapon',r,b.k==='spear'?'spear':'mage');it.sk=b.sk;it.n=itemName(it);mk('sp'+q,it,r)});
+    return out;
+  }
   function genPets(){
     const rs=[0,1,2,Math.random()<.25?4:3],seen=[];
     return rs.map(r=>{
@@ -3914,6 +3954,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const d=today();let ch=false;
     if(!S.sa||S.sa.d!==d||!Array.isArray(S.sa.s)||S.sa.s.length!==4||S.sa.g!==2){S.sa={d,g:2,s:genArm()};ch=true}
     if(!S.sv||S.sv.d!==d||!Array.isArray(S.sv.s)||S.sv.s.length!==3||S.sv.g!==2){S.sv={d,g:2,s:genVault()};ch=true}
+    if(!S.sc||S.sc.d!==d||!Array.isArray(S.sc.s)||S.sc.s.length!==24||S.sc.g!==6){S.sc={d,g:6,s:genScene()};ch=true}
     if(!S.sp||S.sp.d!==d||!Array.isArray(S.sp.s)||S.sp.s.length!==4){S.sp={d,s:genPets()};ch=true}
     if(ch)save();
   }
@@ -4014,13 +4055,20 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
   let zf=null,zfK='a',zfSel=null;
   const zfReduce=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
   const zfKey=e=>{if(e.key==='Escape')zfClose()};
-  /* like the main shop's stone floor: tapping empty wall (or the empty strip under the ware card) takes you back. Wares, the ware card and the purse are left alone. */
-  const zfTap=e=>{
+  /* leaving: tap one of the two wall torches (see zfBuild); tapping bare wall no longer takes you back */
+  /* The wall is drawn in 3D (perspective + a quarter turn), and browsers do not hit-test through that reliably: a tap on a piece lands on the room itself and nothing happens.
+     So when a tap lands on the bare room, the piece under the finger is found by its on-screen box and clicked for you. Taps the browser did route to the wall are left alone. */
+  const zfHit=e=>{
     if(!zf)return;
-    const room=document.getElementById('sfroom');if(!room||!room.classList.contains('done'))return;   /* only once the camera has arrived */
-    const t=e.target;if(!t||!t.closest)return;
-    if(t.closest('[data-i],[data-sm],.fz-c,.sfz-det,.sfz-chip,.sfz-plq'))return;
-    if(t.closest('#sfroom,.sfz-bot')||t===document.body||t===document.documentElement||t.tagName==='MAIN')zfClose();
+    const room=document.getElementById('sfroom');if(!room||!room.classList.contains('done'))return;
+    const t=e.target;if(!t||!t.closest||!room.contains(t)||t.closest('.sfz-hud,.sfz-bot,.modal,[data-pk],.sfa-v,.fz-c,.sfw-th'))return;   /* not on the HUD or a modal, and not already on a piece */
+    const x=e.clientX,y=e.clientY;let best=null,bd=1e9;
+    zf._wall.querySelectorAll('[data-pk]:not(.gone),.sfa-v,.fz-c,.sfw-th').forEach(n=>{
+      const r=n.getBoundingClientRect();if(!r.width||!r.height||x<r.left||x>r.right||y<r.top||y>r.bottom)return;
+      const d=((x-r.left-r.width/2)/r.width)**2+((y-r.top-r.height/2)/r.height)**2;   /* several boxes overlap (swords, spears): the one whose centre is nearest wins */
+      if(d<bd){bd=d;best=n}
+    });
+    if(best){e.stopPropagation();e.preventDefault();best.click()}
   };
   function zfSay(t){
     if(!zf)return;const b=zf.querySelector('.sfz-say');if(!b)return;
@@ -4054,13 +4102,13 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     +'<div class="sfa-rail"><i></i><b class="p l"></b><b class="p r"></b><div class="sfa-rowx"></div></div>'
     +'<div class="sfa-shelf"><i class="sfa-sbr l"></i><i class="sfa-sbr r"></i>'+'<div class="sfa-cr"><div class="ax"></div><i class="sfa-crf"></i></div>'.repeat(3)+'</div>'
     +'<div class="sfa-floor"><i class="sfa-run"></i></div>'
-    +'<div class="sfa-sd l"><i></i></div>'+RK('w')
+    +'<div class="sfa-sd l"><i><b class="sfa-sz zh"></b><b class="sfa-sz zc"></b><b class="sfa-sz zg"></b><b class="sfa-sz zb"></b><b class="sfa-sz zb2"></b></i></div>'+RK('w')
     +'<div class="sfa-sd r br"><i class="bk"></i><div class="it"></div><i class="fr"></i></div></div>';
   /* one sword standing in the long rack; extra = blade rows added so it can reach up toward the top beam */
   function rackSword(v,q,k,VF){
     VF=VF||[0,1,0,1,0,0,0,1,1,0,1,1,0,1];
     const e=wpnCv(34+v,k||.9);if(VF[v])e.style.transform='scaleY(-1)';const w=parseFloat(e.style.width);
-    e.dataset.v=v;e.dataset.q=q;e.dataset.rows=BLADES[34+v][1].split('|').length;
+    e.dataset.v=v;e.dataset.q=q;e.dataset.rows=BLADES[34+v][1].split('|').length;e.dataset.pk='sw'+q;e.onclick=()=>zfPickKey('sw'+q);   /* each sword is its own ware */
     e.style.setProperty('--ih',e.style.height||'60px');e.style.position='absolute';e.style.bottom='6px';e.style.left=(24.1+q*14.2-w/2).toFixed(1)+'px';   /* centres spread across the inner frame (rack is 176 wide) so the guards of the end swords stay inside the posts */
     return e;
   }
@@ -4086,13 +4134,17 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     /* the barrel on the right of the floor: the staffs and spears (red-banded pike, halberd, diamond staff, plain spear, orb staff), leaning out of it at different angles */
     const bi=sc.querySelector('.sfa-sd.br .it');
     /* the 24 spear models (drawn from the reference sheets): [height, butt x, lean, width] in css px; eight of them stand in the barrel today */
-    const SPR=[[138.7,16,0,32],[143.7,16,0,32],[136.0,16,0,32],[142.7,16,0,32],[135.7,16,0,32],[138.7,16,0,32],[143.3,16,0,32],[139.3,16,0,32],[142.3,16,0,32],[143.3,16,0,32],[143.3,16,0,32],[142.3,16,0,32],[141.7,16,0,32],[139.3,16,0,32],[142.3,16,0,32],[142.3,16,0,32],[142.7,16,0,32],[141.3,16,0,32],[142.0,16,0,32],[142.3,16,0,32],[144.0,16,0,32],[143.3,16,0,32],[141.3,16,0,32],[140.7,16,0,32]],SK=1;
+    const SPR=[[137.3,16.0,0,32.0],[137.0,16.0,0,32.0],[139.7,16.0,0,32.0],[138.0,16.0,0,32.0],[139.0,16.0,0,32.0],[139.3,16.0,0,32.0],[137.7,16.0,0,32.0],[140.0,16.0,0,32.0],[166.4,16,0,32],[172.4,16,0,32],[166.4,16,0,32],[170.8,16,0,32],[172.0,16,0,32],[140.0,24.67,0,49.3]],SK=1,SL=1;   /* the 8 staff and spear models: [height, butt x, lean, width] in css px (art is 3x) */   /* SL stretches the spears' length only (the art is smooth, so it stays clean) */
     const SLOT=[[12,-4,0],[18.5,-3,5],[25,-2,2],[31.5,-1,6],[38,1,3],[44.5,2,6],[51,3,1],[57.5,4,5]];   /* butt x in the barrel, fan angle, how far it is pushed up */
-    if(bi)aShuffle(24).slice(0,8).forEach((id,q)=>{
+    if(bi)barrelSet().forEach((bm,q)=>{const id=bm.c;
       const [h,xb,ang,sw]=SPR[id],[cx,rot,up]=SLOT[q],e=document.createElement('i');e.className='stf w'+id;
-      e.style.width=(sw*SK).toFixed(1)+'px';e.style.height=(h*SK).toFixed(1)+'px';e.style.backgroundSize='100% 100%';e.style.imageRendering='auto';   /* hi-res art: drawn smooth, not blocky */
+      e.style.width=(sw*SK).toFixed(1)+'px';e.style.height=(h*SK*SL).toFixed(1)+'px';e.style.backgroundSize='100% 100%';e.style.imageRendering='auto';   /* hi-res art: drawn smooth, not blocky */
       e.style.transformOrigin=(xb*SK).toFixed(1)+'px 100%';e.style.left=(cx-xb*SK).toFixed(1)+'px';e.style.bottom=(8+up)+'px';
       e.style.transform='rotate('+(ang+rot).toFixed(2)+'deg)';bi.appendChild(e);
+      /* the spears overlap, so each one gets a thin invisible strip down its shaft (one slot wide, same tilt) to tap */
+      const hw=6.5,ht=document.createElement('b');ht.className='stf-hit';ht.dataset.pk='sp'+q;ht._art=e;
+      ht.style.width=hw+'px';ht.style.height=e.style.height;ht.style.left=(cx-hw/2).toFixed(1)+'px';ht.style.bottom=(8+up)+'px';
+      ht.style.transformOrigin=(hw/2)+'px 100%';ht.style.transform='rotate('+(ang+rot).toFixed(2)+'deg)';ht.onclick=()=>zfPickKey('sp'+q);bi.appendChild(ht);
     });
   }
   const ZD={
@@ -4106,6 +4158,8 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     helm:['Heads are fragile. Helmets are not.','Dented in all the right places.'],
     weapon:['Sharp end away from you. Always.','That blade has opinions. Mostly about goblins.'],
     armor:['Fits better than it looks. Mostly.','Heavy. But so is regret.'],
+    legs:['Good greaves make a good stride.','Knees are the first to go. Protect them.'],
+    boots:['Walk softly. Wear heavy boots.','A hero is only as good as their boots.'],
     offhand:['Everyone looks braver behind a shield.','Hold it higher. Now you are a wall.'],
     vault:['Vault piece. Not for the faint of purse.','Above your station, for now. Save up.','Only the best steel hangs on the rail.'],
     gone:['That one is already gone. New stock every dawn.','Sold. Early heroes get the good plate.']
@@ -4140,7 +4194,21 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       +'<div class="sfw-in">'+(A?ADEC:'<svg class="sfw-decor up" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges" aria-hidden="true">'+ZD[k]+'</svg><svg class="sfw-decor lo" viewBox="0 100 100 70" preserveAspectRatio="xMidYMax meet" shape-rendering="crispEdges" aria-hidden="true">'+ZD[k]+'</svg>')
       +'<div class="sfw-sign fz-sign">'+(A?'Armoury':'Companions')+'</div>'
       +'<i class="sfw-torch l"></i><i class="sfw-torch r"></i><div class="sfw-slots"></div></div><div class="sfw-shade"></div>';
-    if(A)aFill(sc);
+    /* the two wall torches are the way back to the store (only once the camera has arrived) */
+    sc.querySelectorAll('.sfw-torch').forEach(n=>{
+      const go=()=>{const rm=document.getElementById('sfroom');if(rm&&rm.classList.contains('done'))zfClose()};
+      n.classList.add('tap');n.tabIndex=0;n.setAttribute('role','button');n.setAttribute('aria-label','Torch: back to the store');n.title='Back to the store';
+      n.appendChild(el('b','sfw-th'));n.onclick=go;n.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go()}};
+    });
+    if(A){aFill(sc);
+      /* the hanging helm and chestplate, and the four parts of the armour stand (helm, chestplate, leggings, boots) are each their own ware */
+      [['.sfa-ch.r','helm','helm'],['.sfa-ch.l','plate','chestplate'],['.sfa-sz.zh','sthelm','stand helm'],['.sfa-sz.zc','stand','stand chestplate'],['.sfa-sz.zg','stlegs','stand leggings'],['.sfa-sz.zb','stboots','stand boots']].forEach(([q,k,lb])=>{
+        const n=sc.querySelector(q);if(!n)return;
+        n.dataset.pk=k;n.tabIndex=0;n.setAttribute('role','button');n.setAttribute('aria-label','Inspect the '+lb);
+        if(k==='stboots')n._art=sc.querySelector('.sfa-sz.zb2');   /* the boots on the plinth glow / vanish with the boots ware */
+        n.onclick=()=>zfPickKey(k);n.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();zfPickKey(k)}};
+      });
+    }
     return sc;
   }
   /* ---- the Armoury's description plaque (oak, like the Guild Store's chest panel). Hidden until you pick a piece; tap the same piece again to put it away. ---- */
@@ -4161,6 +4229,24 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     r.appendChild(buyb);
     pl.replaceChildren(ic,t,r);
   }
+  /* tap a piece in the scene: select it (its plaque and Buy button appear), tap it again to put it back */
+  function zfPickKey(key){
+    if(!zf||zfK!=='a')return;
+    const all=stkAll('a'),i=all.findIndex(e=>e.pk===key);if(i<0||all[i].sold)return;
+    if(zfSel===i)zfSel=null;
+    else{zfSel=i;kind='a';zfSay(pick(ZSAY[all[i].it.slot]||LINES.a))}
+    zfRender();
+  }
+  /* glow the selected piece; hide the ones already bought */
+  function zfMark(){
+    if(!zf||!zf._wall)return;
+    const all=stkAll('a'),sel=zfSel!=null&&all[zfSel]?all[zfSel].pk:null;
+    const sdl=zf._wall.querySelector('.sfa-sd.l'),bo=all.find(x=>x.pk==='stboots');if(sdl)sdl.classList.toggle('nb',!!bo&&bo.sold);   /* bought boots leave the plinth too */
+    zf._wall.querySelectorAll('[data-pk]').forEach(n=>{
+      const e=all.find(x=>x.pk===n.dataset.pk),on=!!sel&&n.dataset.pk===sel,gone=!!e&&e.sold;
+      [n,n._art].forEach(m=>{if(m){m.classList.toggle('on',on);m.classList.toggle('gone',gone)}});
+    });
+  }
   function zfRender(){
     if(!zf)return;
     ensure();
@@ -4170,12 +4256,14 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const gem=el('span','sfz-chip cur gem');gem.title='Gems';gem.append(px('\u{1F48E}',16),el('b','',String(S.gems||0)));
     zf.querySelector('.sfz-wal').replaceChildren(purse,gem);
     const box=zf._wall.querySelector('.sfw-slots');
-    if(zfK==='a'){box.replaceChildren(...list.map((e,i)=>aBay(e,i)));const rl=zf._wall.querySelector('.sfa-rowx');if(rl)rl.replaceChildren(...S.sv.s.map((e,j)=>vBtn(e,4+j)))}
+    if(zfK==='a'){box.replaceChildren();   /* the four display bays (helm, weapon, armour, off-hand) are gone from the wall; only the vault rail is left */
+      const rl=zf._wall.querySelector('.sfa-rowx');if(rl)rl.replaceChildren(...S.sv.s.map((e,j)=>vBtn(e,4+j)))}
     else box.replaceChildren(...list.map((e,i)=>{
       const n=el('div','sfw-s s'+i+(zfSel===i?' sel':'')+(e.sold?' sold':'')),b=cell(zfK,i,e,()=>{zfSel=i;kind=zfK;if(!e.sold)zfSay(e.it.slot==='companion'?'A good one. Keep it fed.':pick(LINES.a));zfRender()});
       n.appendChild(b);return n;
     }));
-    if(zfK==='a'){zfDock();zfFit();return}
+    if(zfK==='a'){if(zfSel!=null){const se=stkAll('a')[zfSel];if(se&&se.pk&&se.sold)zfSel=null}   /* bought: the piece leaves the scene, so put its plaque away */
+      zfDock();zfMark();zfFit();return}
     const det=zf.querySelector('.sfz-det'),ft=zf.querySelector('.sfz-ft');det.replaceChildren();
     const e=zfSel!=null?stkAll(zfK)[zfSel]:null;
     det.hidden=!e;ft.hidden=!!e;
@@ -4234,22 +4322,24 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       const vis=Math.max(60,(Math.min(rc.bottom,vh)-yb)/ZS),base=Math.min(vis-20,150);   /* floor showing under the wall box (wall px) and where the feet of the racks go */
       /* everything is scaled evenly (never stretched). The racks' posts and the stands' poles get longer instead: --rh / --sh are their own heights. */
       const hr=base+34;   /* height a rack needs to reach the top of the shelf plank it leans on (shelf 22px up, plank 12px thick) */
-      const hs=hr+30;     /* the stands rise a little past that, so they are always the tallest */
+      const hs=Math.min((hr+30)*1.35,ah+base-6);     /* the stands rise well past that, so they are always the tallest: 1.35x lifts the helm up to the brick course above the shelf (never higher than the wall box itself) */
       /* the armour stand (40 wide) and the barrel of staffs (80 wide, its spears lean out ~27px to the right) are drawn bigger than the weapon rack (160 wide): the stands scale KS times the rack.
          All three are sized together so they exactly fit inside the wall; the stands tuck OV px behind the rack's ends, and nothing is pushed past the edge of the room. */
-      const M=4,KS=1.35,OV=2,LEAN=24;
+      const M=4,KS=1.35,OV=2,LEAN=24,BK=1.3;   /* BK: the barrel is drawn 1.3x bigger (taller and wider) than the other stands */
       /* the diamond set fills the armour stand: it is drawn as tall as the stand minus a short pole and the base, and the stand is exactly as wide as that armour (the art is 20x33 with 14px of armour in it). These are screen sizes; they are divided by ss below because the stand itself is scaled by ss. */
-      const hArm=Math.max(60,hs-13),wArm=hArm*14/33;
-      const sc=Math.max(.5,Math.min(1.2,(aw-2*M+2*OV-wArm)/(160+(80+LEAN)*KS))),ss=Math.min(1.8,sc*KS);
+      const hArm=Math.max(60,hs/(1+10/33)),wArm=hArm*14/33,us=hArm/33;   /* 10 art pixels are left under the armour for the diamond boots and the plinth; the slab is 1 pixel wider than the armour on each side (us) */
+      const sc=Math.max(.5,Math.min(1.2,(aw-2*M+2*OV-wArm-2*us)/(160+(80+LEAN)*KS*BK))),ss=Math.min(1.8,sc*KS),bs=Math.min(2.4,sc*KS*BK);
       const rh=Math.max(72,hr/sc);s.setProperty('--rs',sc.toFixed(3));s.setProperty('--rh',rh.toFixed(1)+'px');
       const csv=Math.max(1,Math.min(1.6,(rh-12)/66));s.setProperty('--cs',csv.toFixed(3));aRackFit(inn,rh,csv);   /* the weapons in the racks grow evenly with the taller frame (about their own feet) */
-      s.setProperty('--ss',ss.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--sw',(wArm/ss).toFixed(1)+'px');s.setProperty('--aah',(hArm/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-44).toFixed(1)+'px');
+      s.setProperty('--ss',ss.toFixed(3));s.setProperty('--bs',bs.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--sw',(wArm/ss).toFixed(1)+'px');s.setProperty('--aah',(hArm/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-44).toFixed(1)+'px');
       /* lay the three out left to right: armour stand (diamond set), the long weapon rack, barrel of staffs and spears */
-      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[wArm,160*sc,80*ss],gap=Math.max(-OV,(aw-2*M-ws.reduce((p,q)=>p+q,0)-LEAN*ss)/2);
-      let x=M;its.forEach((n,i)=>{n.style.left=x.toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});
+      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[wArm+2*us,160*sc,80*bs],gap=Math.max(-OV,(aw-2*M-ws.reduce((p,q)=>p+q,0)-LEAN*bs)/2);
+      let x=M;its.forEach((n,i)=>{n.style.left=(x+(i===0?us:0)).toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});
       /* nudge the barrel to the right (only the barrel: the rack and armour stand keep their size and spots), never past the right edge of the wall */
       const bn=its[2],rk=its[1];if(bn){const l0=parseFloat(bn.style.left)||0;let nl=l0+Math.max(0,Math.min(18,aw-M-(l0+ws[2])));const rr=(parseFloat(rk.style.left)||0)+176*sc+3;   /* the rack is 176 wide but laid out as 160, so it grows rightwards; keep the barrel clear of it */
-        bn.style.left=(Math.max(nl,rr)+5*ss).toFixed(1)+'px'}   /* the barrel sprite is 70 wide but keeps its 80-wide slot, so centre it in the slot */
+        bn.style.left=(Math.max(nl,rr)+5*bs).toFixed(1)+'px';
+        /* then slide the rack a little to the right, towards the barrel, using only the gap left between them (8px at most, 4px kept clear) */
+        const rl=parseFloat(rk.style.left)||0,bl=parseFloat(bn.style.left)||0,dx=Math.max(0,Math.min(8,bl-(rl+176*sc)-4));rk.style.left=(rl+dx).toFixed(1)+'px'}   /* the barrel sprite is 70 wide but keeps its 80-wide slot, so centre it in the slot */
       return;
     }
     const W=Math.max(100,Math.min(140,70*aw/(ah*.4)));
@@ -4258,7 +4348,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
   function zfClose(){
     if(!zf)return;
     const r=zf,room=document.getElementById('sfroom'),wall=r._wall;zf=null;zfSel=null;clearTimeout(r._h);
-    document.removeEventListener('keydown',zfKey);document.removeEventListener('click',zfTap);window.removeEventListener('resize',zfResize);
+    document.removeEventListener('keydown',zfKey);document.removeEventListener('click',zfHit,true);window.removeEventListener('resize',zfResize);
     document.body.classList.remove('sfz-open');
     r.classList.remove('in');r.classList.add('closing');
     /* the same camera move, played backwards: turn back to the counter, then pull out of the middle of the room */
@@ -4266,7 +4356,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     setTimeout(()=>{room.classList.remove('moving','back','turn-l','turn-r');if(room.firstChild)room.firstChild.style.paddingBottom='';if(wall)wall.classList.remove('on')},zfReduce()?30:1200);
     setTimeout(()=>r.remove(),zfReduce()?30:900);
   }
-  const zfResize=()=>{const room=document.getElementById('sfroom');if(room&&zf){zfDims(room);zfFrame(room,zf._wall);zfFit()}};
+  const zfResize=()=>{const room=document.getElementById('sfroom');if(room&&zf){zfDims(room);zfFrame(room,zf._wall);zfMark();zfFit()}};
   function zoomFloor(k,i){
     if(zf)return;if(sheet)closeSheet(true);
     const room=sfRoom();if(!room)return;
@@ -4285,7 +4375,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const hud=el('div','sfz-hud'),sayrow=el('div','sfz-sayrow'),sayEl2=el('div','sfz-say'),box=el('div','sf-say-box');
     box.appendChild(el('span','sf-say-in'));sayEl2.appendChild(box);sayrow.appendChild(sayEl2);
     hud.append(el('div','sfz-wal'),sayrow);
-    const bot=el('div','sfz-bot'),det=el('div','sfz-det'),ft=el('div','sfz-ft','Fresh stock every dawn. Tap a pen to see it. Tap the wall to leave.');
+    const bot=el('div','sfz-bot'),det=el('div','sfz-det'),ft=el('div','sfz-ft','Fresh stock every dawn. Tap a pen to see it. Tap a torch to leave.');
     det.hidden=true;
     if(k==='a'){const pq=el('div','sfz-plq');pq.hidden=true;bot.append(pq)}   /* Armoury: nothing under the wall until you pick a piece */
     else bot.append(det,ft);
@@ -4299,7 +4389,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     document.body.classList.add('sfz-open');
     root.classList.add('in');room.classList.add('go');
     /* once the camera has arrived (zoomed in, no pull-back), draw the wall flat and crisp at the same zoom */
-    setTimeout(()=>{if(zf===root){room.classList.add('done');zfFit();document.addEventListener('click',zfTap)}},zfReduce()?20:1420);
+    setTimeout(()=>{if(zf===root){room.classList.add('done');zfFit();document.addEventListener('click',zfHit,true)}},zfReduce()?20:1420);
     setTimeout(()=>zfSay(pick(LINES[k])),zfReduce()?60:1460);
   }
   function openSheet(k,i){zoomFloor(k,i)}
