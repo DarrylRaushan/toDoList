@@ -4348,8 +4348,8 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       const hArm=Math.max(60,hs/(1+10/33)),wArm=hArm*14/33,us=hArm/33;   /* 10 art pixels are left under the armour for the diamond boots and the plinth; the slab is 1 pixel wider than the armour on each side (us) */
       const BX=70,BO=10;   /* barrel sprite width and how far the spears lean past it (barrel px) */
       const sc=Math.max(.3,Math.min(1.2,(aw-2*M-8-wArm-2*us)/(176+(BX+BO)*KS*BK))),ss=Math.min(1.8,sc*KS),bs=Math.min(2.4,sc*KS*BK);
-      const SH=3,G=3,wst0=wArm+2*us,wb0=(BX+BO)*bs,d=Math.max(0,Math.min(.3,(aw-2*M+SH-wst0-176*sc-wb0-2*G)/176)),rsc=sc+d;   /* the armour stand slides SH px left, and the weapon rack takes that space (and any slack) so it grows, uniformly, wider and taller */
-      const rh=Math.max(72,hr/sc);s.setProperty('--rs',rsc.toFixed(3));s.setProperty('--rh',rh.toFixed(1)+'px');
+      const SH=9,G=3,wst0=wArm+2*us,wb0=(BX+BO)*bs,d=Math.max(0,Math.min(.3,(aw-2*M+SH-wst0-176*sc-wb0-2*G)/176)),rsc=sc+d;   /* the armour stand slides SH px left, and the weapon rack takes that space (and any slack) so it grows, uniformly, wider and taller */
+      const RHK=1.3,rh=Math.max(72,hr*RHK/sc);   /* RHK: the rack's posts and swords are 30% longer than the bare floor-to-shelf height */s.setProperty('--rs',rsc.toFixed(3));s.setProperty('--rh',rh.toFixed(1)+'px');
       const csv=Math.max(1,Math.min(1.6,(rh-12)/66));s.setProperty('--cs',csv.toFixed(3));aRackFit(inn,rh,csv);   /* the weapons in the racks grow evenly with the taller frame (about their own feet) */
       s.setProperty('--ss',ss.toFixed(3));s.setProperty('--bs',bs.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--sw',(wArm/ss).toFixed(1)+'px');s.setProperty('--aah',(hArm/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-56).toFixed(1)+'px');
       /* lay the three out left to right: armour stand (diamond set), the long weapon rack, barrel of staffs and spears */
