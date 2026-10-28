@@ -4230,6 +4230,42 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     return sc;
   }
   /* ---- the Armoury's description plaque (oak, like the Guild Store's chest panel). Hidden until you pick a piece; tap the same piece again to put it away. ---- */
+  /* ---- swipe the description plaque to flick through the same kind of piece: swords, spears, the armour stand's four parts, the vault rail, the hanging plate and helm. Sold pieces are skipped. ---- */
+  function zfGroup(all,e){
+    const pk=e.pk||'',at=all.indexOf(e);
+    const same=x=>{const k=x.pk||'',xi=all.indexOf(x);
+      if(/^sw\d+$/.test(pk))return /^sw\d+$/.test(k);
+      if(/^sp\d+$/.test(pk))return /^sp\d+$/.test(k);
+      if(!pk)return !k&&xi>=4&&at>=4;
+      if(/^st/.test(pk))return /^st/.test(k);
+      return k==='helm'||k==='plate'};
+    return all.map((x,i)=>i).filter(i=>same(all[i]));
+  }
+  function zfCycle(dir){
+    if(!zf||zfK!=='a'||zfSel==null)return false;
+    const all=stkAll('a'),e=all[zfSel];if(!e)return false;
+    const g=zfGroup(all,e),at=g.indexOf(zfSel);if(g.length<2)return false;
+    for(let n=1;n<g.length;n++){
+      const j=g[(at+dir*n+g.length*n)%g.length],t=all[j];
+      if(t&&!t.sold){zfSel=j;kind='a';zfSay(pick(ZSAY[t.it.slot]||LINES.a));zfRender();
+        const pl=zf.querySelector('.sfz-plq');
+        if(pl&&pl.animate&&!zfReduce())pl.animate([{transform:'translateX('+(dir*-28)+'px)',opacity:.25},{transform:'none',opacity:1}],{duration:170,easing:'ease-out'});
+        return true}
+    }
+    return false;
+  }
+  function zfSwipe(pl){
+    let x0=0,y0=0,id=null,moved=false;
+    pl.style.touchAction='pan-y';
+    pl.addEventListener('pointerdown',ev=>{if(ev.pointerType==='mouse'&&ev.button!==0)return;id=ev.pointerId;x0=ev.clientX;y0=ev.clientY;moved=false});
+    pl.addEventListener('pointerup',ev=>{
+      if(ev.pointerId!==id)return;id=null;
+      const dx=ev.clientX-x0,dy=ev.clientY-y0;
+      if(Math.abs(dx)>=36&&Math.abs(dx)>Math.abs(dy)*1.4){moved=true;zfCycle(dx<0?1:-1)}
+    });
+    pl.addEventListener('pointercancel',()=>{id=null});
+    pl.addEventListener('click',ev=>{if(moved){ev.preventDefault();ev.stopPropagation();moved=false}},true);   /* a swipe that started or ended on the Buy button must not buy */
+  }
   function zfDock(){
     const pl=zf.querySelector('.sfz-plq');if(!pl)return;
     const all=stkAll('a'),e=zfSel!=null?all[zfSel]:null,ic=el('span','sfz-di');
@@ -4245,6 +4281,8 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const r=el('div','sfz-pb');
     if(!e.sold)r.appendChild(el('span','sfz-pp'+(poor?' poor':''),price(e)));
     r.appendChild(buyb);
+    const gi=zfGroup(all,e);
+    if(gi.length>1)t.append(el('i','sfz-sw','\u2039  '+(gi.indexOf(zfSel)+1)+' / '+gi.length+'  \u203A  swipe'));
     pl.replaceChildren(ic,t,r);
   }
   /* tap a piece in the scene: select it (its plaque and Buy button appear), tap it again to put it back */
@@ -4392,7 +4430,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     hud.append(el('div','sfz-wal'),sayrow);
     const bot=el('div','sfz-bot'),det=el('div','sfz-det'),ft=el('div','sfz-ft','Fresh stock every dawn. Tap a pen to see it. Tap a torch to leave.');
     det.hidden=true;
-    if(k==='a'){const pq=el('div','sfz-plq');pq.hidden=true;bot.append(pq)}   /* Armoury: nothing under the wall until you pick a piece */
+    if(k==='a'){const pq=el('div','sfz-plq');pq.hidden=true;zfSwipe(pq);bot.append(pq)}   /* Armoury: nothing under the wall until you pick a piece */
     else bot.append(det,ft);
     root.append(hud,bot);
     document.addEventListener('keydown',zfKey);window.addEventListener('resize',zfResize);

@@ -3901,3 +3901,6 @@ body.sfz-open{background-color:#0d0a09!important}
 .sfa-floor{left:-80px;right:-80px}
 .sfa-floor::after{left:80px;right:80px}
 .sfa-shelf::after{left:-80px;right:-80px}
+
+/* Armoury plaque: small 'n / total' swipe hint */
+.sfz-sw{display:block;margin-top:2px;font:400 16px/1 var(--body);font-style:normal;letter-spacing:.5px;color:#b39f7f}
