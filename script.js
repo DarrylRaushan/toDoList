@@ -266,11 +266,12 @@ const A_=i=>i,W_=i=>16+i,S_=i=>25+i,V_=i=>50+i;
 /* weapon skins by style and tier: tier 0 plain iron, 1 steel, 2 ornate, 3 magical. A weapon's tier is its rarity (3 = Very rare and up). */
 const SKT={
   warrior:[[5,6,8,10,15,21,0].map(S_).concat([11,6,1].map(V_)),[1,7,12,16,20,23,24].map(S_).concat([3,4,10,5].map(V_)),[9,11,13,14,17,19,22].map(S_).concat([0,2,9,8,12].map(V_)),[1,2,4,5,6].map(W_).concat([7,13].map(V_)).concat([69,70])],
-  great:[[3,18].map(S_),[0,2,7].map(A_).concat([3].map(V_)),[4,9,13].map(A_).concat([0,9].map(V_)),[8,11,12,14].map(A_)],
+  great:[[3,18].map(S_),[3].map(V_),[0,9].map(V_),[]],                 /* greatswords only: the axe models now belong to the axe style */
+  axe:[[1,3,5].map(A_),[0,2,6,7].map(A_),[4,9,10,13].map(A_),[8,11,12,14,15].map(A_)],   /* the 16 axe models, and nothing else may carry one */
   spear:[[80,81],[82],[83],[84]],                                    /* the five spears (the same models as in the barrel) */
   mage:[[72,73],[74,75],[76,77],[78,79,85]],                         /* the eight staffs from the staff sheet and the druid's gnarled staff */
   rogue:[[0,6].map(S_),[2,4].map(S_),[11,22].map(S_).concat([71]),[2,4].map(W_).concat([71])],
-  cleric:[[1].map(A_),[6].map(A_),[10].map(A_),[W_(3),A_(15)]]
+  cleric:[[W_(3)],[W_(3)],[W_(3)],[W_(3)]]
 };
 function pickSkin(st,r){
   const t=SKT[st]||SKT.warrior;let k=Math.max(0,Math.min(3,r|0)),p=t[k];
@@ -287,12 +288,15 @@ function spIcon(sp,n){
   const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.imageSmoothingEnabled=false;
   x.drawImage(t,Math.round((n-dw)/2),Math.round((n-dh)/2),dw,dh);c.className='px';c.style.imageRendering='pixelated';return c;
 }
+/* two shield sprites: 0 = heraldic steel shield (blue lion on black, red lion on tan), 1 = plank shield with iron rim and rivets, 2 = round wooden shield with a steel rim and boss. An offhand shield with .shk set uses one as its icon ('shd:N'). */
+const SHD=[[{"a":"#333335","b":"#cac9c9","c":"#a28656","d":"#8e0101","e":"#010002","f":"#294d7e","g":"#9f9d9e","h":"#7c7a7b","i":"#560205","j":"#baa178","k":"#1a191c","l":"#273e5d","m":"#8b7041","n":"#6b0001","o":"#262628","p":"#212c3b","q":"#c2c1c2","r":"#aba9aa","s":"#3e3e40","t":"#848283","u":"#989698","v":"#937547","w":"#a68a5a","x":"#a7a5a6","y":"#9d814f","z":"#b69f78","A":"#b79e71","B":"#29292b","C":"#273d60","D":"#807e80"},"...................e...................|..................eqe..................|................eeqqbee................|..............eeqqxqxbbee..............|............eehxxxxqxxxxhee............|..........eehxhxxxxqxxxxhxhee..........|..eeeeeeeehxhxhhxxxqxxxhhxhxheeeeeeee..|.eqqqqqqxxhxhxhohxxqxxhyhxhxhxxbbbbbbe.|eqqxxxxhhxhxooooohxqxhyyyyyxhxhhxxxxbbe|eqxqxxxhhxkkoaaaaohxhyjjjjymmxhhxxxbxbe|eqxxqxxhekoaaaaaaaohyjjjjjAjymehxxbxxbe|eqxxxqxhoooooaaaaaahjjjjjjcyyyyhxbxxxbe|eqxxxxeeooooooaaaaahjjzjjyyyyyyeexxxxbe|eqxxxxkkooCfooaffaaxjjddjyydnyymmxxxxbe|exhhhhkkoCCCfolCBaaxjAwnnydnnnymmhhhhxe|exhheekkoCCCooBBaaaxjjjwcyynnnymmeehhxe|.exxkkkkopCCooaaCfaqjdnjjyynniymmmmxxe.|.ehhkkfkoppCfoaaClaqjnnjjydniiymdmmhhe.|.exxkkpfoopCCfpCpBaqjcinidnnimydimmxxe.|.ehhkkkCooCCCClpBaaqjAcinnnnnyynmmmhhe.|.exxkkCkooCCppCoaaaqjjAcniinnyymnmmxxe.|.ehhkCCkoCCCoopCaaaqjjjnimmnnnymnnmhhe.|.exxkpCkCCCCfoopCfaqjdniyydnnnnmnimxxe.|.ehhkkpCpCCplfaopCaqjniyjdninninimmhhe.|.exxkkkkkCCkpCaaaoaxjcyjjnimnnmmmmmxxe.|..ehhkkkCpkoppCfaaaxjjjdniiyminmmmhhe..|..exxkkkpCookkooaaxxxjjccmmyynimmmxxe..|..ehhkkkklooooaaaaxxxjjzjyyyynmmmmhhe..|..exxkkkoppCooaaaaxqxjjjjyyniimmmmxxe..|..eqhkkkokkkooaaaxxqxxjjjyymmmymmmhbe..|..eqxxxkooooooaaaxqhqxjjjyyyyyymxxxbe..|...eqxxqooooooaaaahhhwjjjyyyyyybxxbe...|...eqxqxxoooooaxqaahcjqxjyyyyyxxbxbe...|....eqxxxhooooxhhqxqxqhhxyyyyhxxxbe....|.....eqxxhoooxhaaxxqxxcchxyyyhxxbe.....|......eqxhoooxxaaaxxxcwAxxyyyhxbe......|.......eqhqoooahaaaxvwjhcmyybhbe.......|........eqqhooaaaaqrqjjycyyhbbe........|.........eqhqoaaashqhjjjjybhbe.........|..........ehqhqaaxqqqxzjbhbhe..........|...........eqhqDggxqxuxhbhbe...........|............eeqhhtuxgthhbee............|..............eehhtxDhhee..............|................eehhhee................|..................eee.................."],[{"a":"#655234","b":"#90939a","c":"#76706a","d":"#533e24","e":"#715c3d","f":"#59452a","g":"#5f4b31","h":"#6c5739","i":"#624f31","j":"#574327","k":"#7a736d","l":"#5e4a2f"},"bbbbbbbbbbbb|beahaeahahab|bhiaghiagalb|becjgagalkfb|bedfgagalfdb|belagaiagelb|bhlegaiagelb|bhlegaiagalb|bhcigaiagkdb|bhdigagagjdb|bhlegagagalb|bhlegagagalb|bhlagagagalb|bhcfgaiagklb|bhdfgaiagjlb|bhlagaiagalb|bhlagagagalb|bhgagagagalb|bhcfgalaikfb|bhdjialaijfb|bhlilgliggib|bbbbbbbbbbbb"],[{"o": "#1a0f1c", "a": "#e6ebf3", "b": "#b4bfd2", "c": "#7d89a3", "d": "#4a5268", "1": "#b8693f", "2": "#9a5233", "3": "#7a3f28", "4": "#5a2d20", "5": "#3d1e18", "e": "#c9d3e4", "f": "#98a5bd", "g": "#5b6580", "h": "#242a3c"}, "..............oooo..............|..........ooooaaaboooo..........|........ooaaaaaabbbbbboo........|.......oaaaaaaoooobbbbbbo.......|.....ooaaaaoo511113oobbbboo.....|....ooaaaoo1151115222oobbcoo....|....oaaao51115112523112occco....|...oaaao1511151222222112occco...|..oaaao115111512152225112occco..|..oaao11151315111522252215occo..|.oaaao111222251oo522221212occco.|.oaao11151125ooeeoo25111532occo.|.oaao1115133oeeeeefo5111532occo.|.oaa5111522oeeaeefffo1113222cco.|oaao5111522oeaeeffffo1115123occo|oaao111152oeeeeffffggo125333ocdo|oabo511153oeeefffffggo125243oddo|obbo5121522oeffffhfgo1115443oddo|.obb1211522offffffggo1125343ddo.|.obbo1115233offggggo5122534oddo.|.obbo31253215ooggoo25332533oddo.|.obbbo123225113oo225223344odddo.|..obbo15222511152235222533oddo..|..obbbo532251113322532253odddo..|...obbco3325111533353235odddo...|....occco32111153335232odddo....|....oocccoo5111534352oodddoo....|.....ooccccoo225344ooddddoo.....|.......occccccooooddddddo.......|........ooccccccddddddoo........|..........oooocdddoooo..........|..............oooo.............."]];
+(function(){const st=document.createElement('style');st.textContent='.sfa-vr .sfa-ax[data-pk]{pointer-events:auto;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}.sfa-vr .sfa-ax[data-pk]:hover{filter:brightness(1.2) drop-shadow(2px 3px 0 rgba(0,0,0,.5))}.sfa-vr .sfa-ax[data-pk].on{filter:brightness(1.25) drop-shadow(0 0 4px #ffd75a) drop-shadow(0 0 8px rgba(255,200,90,.8))}.sfa-vr .sfa-ax[data-pk]:focus-visible{outline:2px dashed #ffd75a;outline-offset:2px}.sfa-vr .sfa-ax[data-pk].gone{visibility:hidden;pointer-events:none}';document.head.appendChild(st)})();   /* tappable wall axes */
 function sprIcon(sp,n){
   const t=document.createElement('canvas');t.width=t.height=16;const tx=t.getContext('2d');
   sp.r.forEach((row,y)=>{for(let x=0;x<16;x++){const c=sp.p[row[x]];if(c){tx.fillStyle=c;tx.fillRect(x,y,1,1)}}});
   const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(t,0,0,n,n);c.className='px';c.style.imageRendering='pixelated';return c;
 }
-function px(e,n){if(typeof e==='string'&&e.slice(0,4)==='wpn:')return skIcon(+e.slice(4),n);if(typeof e==='string'&&e.slice(0,3)==='mc:'){const q=e.split(':');return mcIcon(q[1],+q[2],n)}if(SHOP_SPR[e])return sprIcon(SHOP_SPR[e],n);if(typeof e==='string'&&e.slice(0,4)==='pet:')return petIcon(e.slice(4),n);if(typeof e==='string'&&e.slice(0,5)==='coin:')return coinIcon(e.slice(5));const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.font=Math.round(n*.78)+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,n/2,n/2+1);c.className='px';return c}
+function px(e,n){if(typeof e==='string'&&e.slice(0,4)==='shd:'&&SHD[+e.slice(4)])return spIcon(SHD[+e.slice(4)],n);if(typeof e==='string'&&e.slice(0,4)==='wpn:')return skIcon(+e.slice(4),n);if(typeof e==='string'&&e.slice(0,3)==='mc:'){const q=e.split(':');return mcIcon(q[1],+q[2],n)}if(SHOP_SPR[e])return sprIcon(SHOP_SPR[e],n);if(typeof e==='string'&&e.slice(0,4)==='pet:')return petIcon(e.slice(4),n);if(typeof e==='string'&&e.slice(0,5)==='coin:')return coinIcon(e.slice(5));if(typeof e==='string'&&e.slice(0,4)==='trk:')return trkIcon(+e.slice(4),n);const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.font=Math.round(n*.78)+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,n/2,n/2+1);c.className='px';return c}
 /* ---------- currency: bronze, silver and gold ----------
    One number is saved (S.gold = the BRONZE count, so old saves keep working). 1 silver = 10 bronze, 1 gold = 100 bronze.
    Everything you see is just that number written as coins: 125 -> '1g 2s 5b'. */
@@ -302,6 +306,13 @@ const COINS={
   s:{o:'#2c3340',d:'#7a869c',m:'#b4bfd0',l:'#e2e9f4',h:'#ffffff'},
   g:{o:'#4a2f06',d:'#b07a10',m:'#e8b93c',l:'#f8d870',h:'#fff6c8'}
 };
+function trkIcon(r,n){   /* 12x12 pendant: a chain and a gem in the rarity's colour */
+  const c=document.createElement('canvas');c.width=c.height=12;const x=c.getContext('2d'),g=(col,l)=>{x.fillStyle=col;l.forEach(([a,b,w,h])=>x.fillRect(a,b,w||1,h||1))};
+  const col=RAR[r%RAR.length]||RAR[0],ink='#1a0f06';
+  g(ink,[[0,0],[1,1],[2,2],[3,3],[4,4],[11,0],[10,1],[9,2],[8,3],[7,4]]);g('#d9c38c',[[1,0],[2,1],[3,2],[4,3],[5,4,2],[10,0],[9,1],[8,2],[7,3]]);
+  g(ink,[[3,5,6,1],[2,6,8,4],[3,10,6,1],[4,11,4,1]]);
+  g(col,[[4,6,4,1],[3,7,6,3],[4,10,4,1]]);g(hexMul(col,1.45),[[4,6,2,1],[3,7,2,1],[3,8,1,1]]);g(hexMul(col,.65),[[7,9,2,1],[8,8,1,1],[5,10,3,1]]);
+  c.className='px';c.style.width=c.style.height=n+'px';return c}
 function coinIcon(k){   /* 10x10 pixel coin; CSS scales it up unsmoothed */
   const C=COINS[k]||COINS.g,S=10,c=document.createElement('canvas');c.width=c.height=S;c.className='px coin';
   const x=c.getContext('2d');
@@ -1272,6 +1283,15 @@ function bustGrid(look,full,eq){
         R(21,21,8,1,gc);if(m>=3)R(22,22,6,1,M(gc,.7));
         R(25,22,1,6,BR);R(24,22,3,2,SK);R(24,25,3,2,SK);R(24,28,3,1,m>=4?GOLD:BR);
       },
+      axe:()=>{                                    /* one-handed axe: a short haft with a broad head that grows with the tier */
+        const B=BLADE[m],BL=M(B,1.25),WD='#7a5a2a',gc=m>=4?GOLD:MATS[Math.min(m,3)],hy=10-(m>=3?1:0),hh=6+(m>=3?1:0);
+        R(25,hy-1,1,26,WD);R(26,hy-1,1,26,M(WD,.72));P(25,34,M(WD,1.3));
+        R(21,hy,5,hh,B);R(19,hy+1,2,hh-2,B);R(19,hy+1,1,hh-2,BL);R(21,hy,5,1,BL);
+        R(25,hy,2,hh,gc);P(25,hy-2,BL);P(26,hy-2,B);
+        if(m>=2)R(22,hy+2,3,1,M(B,.7));
+        if(m>=5){R(21,hy+1,3,hh-2,'#fff');P(18,hy+1,'rgba(255,240,150,.7)');P(28,hy+hh,'rgba(255,240,150,.7)')}
+        R(25,22,3,2,SK);
+      },
       spear:()=>{                                  /* two-handed spear: a long shaft, both hands on it, a leaf-shaped head that grows with the tier */
         const B=BLADE[m],BL=M(B,1.25),WD='#7a5a2a',gc=m>=4?GOLD:MATS[Math.min(m,3)],y0=3-(m>=3?1:0);
         R(26,y0+6,1,31-y0-6+4,WD);R(27,y0+6,1,31-y0-6+4,M(WD,.72));P(26,34,M(WD,1.3));
@@ -1552,7 +1572,7 @@ function initCreator(){
 /* ---------- loot: random drops, you decide what to wear ---------- */
 const SLOTS=['helm','armor','legs','boots','weapon','trinket','offhand','companion'];
 const SLOTN={helm:'Helm',armor:'Armor',legs:'Legs',boots:'Boots',weapon:'Weapon',trinket:'Trinket',offhand:'Off-hand',companion:'Companion'};
-const NOUN={legs:{warrior:'Leggings'},boots:{warrior:'Boots'},helm:{warrior:'Helm',mage:'Hat',rogue:'Hood',cleric:'Circlet'},armor:{warrior:'Plate',mage:'Robes',rogue:'Leathers',cleric:'Vestments'},weapon:{warrior:'Sword',great:'Greatsword',spear:'Spear',mage:'Staff',rogue:'Daggers',cleric:'Mace'},offhand:{warrior:'Shield',mage:'Tome',rogue:'Dagger',cleric:'Lantern'}};
+const NOUN={legs:{warrior:'Leggings'},boots:{warrior:'Boots'},helm:{warrior:'Helm',mage:'Hat',rogue:'Hood',cleric:'Circlet'},armor:{warrior:'Plate',mage:'Robes',rogue:'Leathers',cleric:'Vestments'},weapon:{warrior:'Sword',great:'Greatsword',axe:'Axe',spear:'Spear',mage:'Staff',rogue:'Daggers',cleric:'Mace'},offhand:{warrior:'Shield',mage:'Tome',rogue:'Dagger',cleric:'Lantern'}};
 const MATN=['Plain','Iron','Steel','Tempered','Mythril','Golden','Dragon','Godforged'];
 /* metal gear (pixel sprites): rarity -> metal. Names use the real metal: Copper, Chainmail, Iron, Diamond, Golden (swords: Wooden, Stone, Iron, Diamond, Golden) */
 const MCN=['Copper','Chainmail','Iron','Diamond','Golden'],MCW=['Wooden','Stone','Iron','Diamond','Golden'],MCR=[0,1,2,2,3,4,4];
@@ -1576,7 +1596,7 @@ function eff(it,k){const v=it.b[k]||0;return it.slot==='companion'?Math.round(v*
 const PETQ=['Stray','Tame','Loyal','Clever','Noble','Fabled','Mythic','Spirit'];
 const TNAME=['Bone Charm','Copper Ring','Silver Ring','Jade Ring','Gold Ring','Mythril Ring','Dragon Eye','Eye of the Void'];
 const SUF={xp:'of Insight',gold:'of Fortune',dmg:'of Warding',hp:'of Vitality',bd:'of Slaying'};
-const ICON={legs:{warrior:'👖'},boots:{warrior:'👢'},helm:{warrior:'\u26d1\ufe0f',mage:'\ud83c\udfa9',rogue:'\ud83e\udd77',cleric:'\ud83d\udc51'},armor:{warrior:'\ud83d\udee1\ufe0f',mage:'\ud83e\udde5',rogue:'\ud83e\udd4b',cleric:'\ud83d\udc58'},weapon:{warrior:'\u2694\ufe0f',great:'\ud83d\udde1\ufe0f',spear:'\ud83d\udd31',mage:'\ud83e\ude84',rogue:'\ud83d\udd2a',cleric:'\ud83d\udd28'},offhand:{warrior:'🛡️',mage:'📖',rogue:'🗡️',cleric:'🏮'}};
+const ICON={legs:{warrior:'👖'},boots:{warrior:'👢'},helm:{warrior:'\u26d1\ufe0f',mage:'\ud83c\udfa9',rogue:'\ud83e\udd77',cleric:'\ud83d\udc51'},armor:{warrior:'\ud83d\udee1\ufe0f',mage:'\ud83e\udde5',rogue:'\ud83e\udd4b',cleric:'\ud83d\udc58'},weapon:{warrior:'\u2694\ufe0f',great:'\ud83d\udde1\ufe0f',axe:'\ud83e\ude93',spear:'\ud83d\udd31',mage:'\ud83e\ude84',rogue:'\ud83d\udd2a',cleric:'\ud83d\udd28'},offhand:{warrior:'🛡️',mage:'📖',rogue:'🗡️',cleric:'🏮'}};
 const RAR=['#8a7862','#58b368','#4a9ae0','#2fc7c0','#a56be0','#e8b93c','#ff7a4a','#ff4fd8'];   /* frame colour per rarity */
 const STAT_TXT={xp:v=>(v<0?'':'+')+v+'% XP',gold:v=>(v<0?'':'+')+v+'% coins',dmg:v=>v<0?'+'+(-v)+'% damage taken':'-'+v+'% damage taken',hp:v=>(v<0?'':'+')+v+' max HP',bd:v=>(v<0?'':'+')+v+'% boss damage'};
 /* Unique gear: hand-made named items, mostly weapons. Quirky rather than strong, some have trade-offs.
@@ -1612,6 +1632,7 @@ const OLDCLS={cleric:'druid',monk:'bard'};   /* classes that were renamed: old s
 function migrate(s){
   if(OLDCLS[s.cls])s.cls=OLDCLS[s.cls];
   (s.inv||[]).forEach(i=>{if(i.slot==='companion'&&PETMAP[i.pet]){i.pet=PETMAP[i.pet];i.n=i.u&&UNIQ[i.u]?UNIQ[i.u].n:itemName(i)}});
+  (s.inv||[]).forEach(i=>{if(i.slot==='weapon'&&!i.u&&i.sk!=null&&i.sk>=0&&i.sk<=15&&i.st!=='axe'){i.st='axe';i.n=itemName(i)}});   /* axe models only live on axes now */
   (s.inv||[]).forEach(i=>{if(i.n&&i.n.indexOf('Sword & Shield')>-1)i.n=i.n.replace('Sword & Shield','Sword')});
   (s.inv||[]).forEach(i=>{if(i.slot==='companion'&&i.n&&i.n.indexOf('Wolf Pup')>-1)i.n=i.n.replace('Wolf Pup','Fire Wolf Cub')});
   if(s.inv){
@@ -2231,9 +2252,10 @@ function buildGear(slot,r,st,pet){
     if(s0==='warrior'&&Math.random()<(st==null?1:.5)){it.ms=mi;it.sk=mi===3?[67,69,70][Math.floor(Math.random()*3)]:64+mi}   /* the wood / stone / iron / diamond / gold sword; diamond is the sword, the sheet's sword or the pickaxe */
     else{it.sk=pickSkin(it.st,r);if(it.sk===69||it.sk===70)it.ms=3}   /* the diamond sword and pickaxe are always named Diamond */
   }
+  if(slot==='offhand'&&s0==='warrior')it.shk=Math.floor(Math.random()*SHD.length);   /* a shield gets the heraldic shield or the plank shield */
   it.n=itemName(it);return it;
 }
-const iicon=it=>it.slot==='trinket'?'\ud83d\udcff':it.slot==='companion'?(PETS[it.pet]||PETS.wolfpup).e:(it.slot==='weapon'&&it.sk!=null&&SKIN[it.sk])?'wpn:'+it.sk:(it.ms!=null&&MCA[it.slot])?'mc:'+it.slot+':'+it.ms:ICON[it.slot][it.st];
+const iicon=it=>(it.slot==='offhand'&&it.shk!=null)?'shd:'+(it.shk%SHD.length):it.slot==='trinket'?'trk:'+it.r:it.slot==='companion'?(PETS[it.pet]||PETS.wolfpup).e:(it.slot==='weapon'&&it.sk!=null&&SKIN[it.sk])?'wpn:'+it.sk:(it.ms!=null&&MCA[it.slot])?'mc:'+it.slot+':'+it.ms:ICON[it.slot][it.st];
 const dicon=k=>k==='trinket'?'\ud83d\udcff':k==='companion'?'🐾':ICON[k][S.cls&&NOUN[k][S.cls]?S.cls:'warrior'];
 const sellVal=it=>it.u?120:10*(it.r+1)*(it.r+1);
 function openChest(){
@@ -3930,6 +3952,8 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const sp=aShuffle(5).slice(0,4).map(k=>({c:8+k,k:'spear',sk:80+k})),st=aShuffle(9).slice(0,4).map(k=>k<8?{c:k,k:'staff',sk:72+k}:{c:13,k:'staff',sk:85});   /* model 13 / skin 85 = the gnarled druid staff */
     const all=sp.concat(st);return aShuffle(8).map(i=>all[i]);
   }
+  /* the wall axes (skins 0-15): the weapon style and rarity tier each one belongs to in SKT, so an axe is sold as the exact model you see */
+  function axTier(id){for(let k=0;k<4;k++)if(SKT.axe[k].indexOf(id)>-1)return ['axe',k];return ['axe',Math.min(1,armCap())]}
   function genScene(){
     const out=[],mk=(pk,it,r)=>{delete it.isNew;out.push({it,cur:'g',cost:ARM_COST[r],sold:false,pk})};
     let r=armRarity();mk('helm',buildGear('helm',r,'warrior'),r);
@@ -3939,6 +3963,12 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     aRack().forEach((v,q)=>{const [st,k]=swTier(v),it=buildGear('weapon',k,st);delete it.ms;it.sk=50+v;it.n=itemName(it);mk('sw'+q,it,k)});
     /* the barrel holds four spears and four staffs (see barrelSet); slot q shows model q of that set, and its ware is that exact model */
     barrelSet().forEach((b,q)=>{r=armRarity();const it=buildGear('weapon',r,b.k==='spear'?'spear':'mage');it.sk=b.sk;it.n=itemName(it);mk('sp'+q,it,r)});
+    /* the six axes on the two wall rails ('ax<skin>'): aAxR() hangs aShuffle(16)'s first six, so those are exactly the wares */
+    aShuffle(16).slice(0,6).forEach(id=>{const [st,k]=axTier(id),it=buildGear('weapon',k,st);delete it.ms;it.sk=id;it.n=itemName(it);mk('ax'+id,it,k)});
+    /* the three shields on the wall rail under the beam ('sh0'..'sh2') */
+    [0,1,2].forEach(i=>{r=armRarity();const sh=buildGear('offhand',r,'warrior');sh.shk=i%SHD.length;mk('sh'+i,sh,r)});
+    /* the two crates on the shelf hold four trinkets each ('cr0'..'cr3' in the left crate, 'cr4'..'cr7' in the right one) */
+    for(let c=0;c<8;c++){r=armRarity();const it=buildGear('trinket',r,null);mk('cr'+c,it,r)}
     return out;
   }
   function genPets(){
@@ -3955,7 +3985,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const d=today();let ch=false;
     if(!S.sa||S.sa.d!==d||!Array.isArray(S.sa.s)||S.sa.s.length!==4||S.sa.g!==2){S.sa={d,g:2,s:genArm()};ch=true}
     if(!S.sv||S.sv.d!==d||!Array.isArray(S.sv.s)||S.sv.s.length!==3||S.sv.g!==2){S.sv={d,g:2,s:genVault()};ch=true}
-    if(!S.sc||S.sc.d!==d||!Array.isArray(S.sc.s)||S.sc.s.length!==24||S.sc.g!==6){S.sc={d,g:6,s:genScene()};ch=true}
+    if(!S.sc||S.sc.d!==d||!Array.isArray(S.sc.s)||S.sc.s.length!==41||S.sc.g!==9){S.sc={d,g:9,s:genScene()};ch=true}
     if(!S.sp||S.sp.d!==d||!Array.isArray(S.sp.s)||S.sp.s.length!==4){S.sp={d,s:genPets()};ch=true}
     if(ch)save();
   }
@@ -4055,16 +4085,16 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
      (Armoury) or right (Companions). The real stock stands in four niches; tap one to see its card and buy it. "Turn back" (or Esc) swings you round again. */
   let zf=null,zfK='a',zfSel=null;
   const zfReduce=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
-  const zfKey=e=>{if(e.key==='Escape')zfClose()};
+  const zfKey=e=>{if(e.key==='Escape'){if(zf&&zf.querySelector('.sfz-cm'))zfCmClose();else zfClose()}};
   /* leaving: tap one of the two wall torches (see zfBuild); tapping bare wall no longer takes you back */
   /* The wall is drawn in 3D (perspective + a quarter turn), and browsers do not hit-test through that reliably: a tap on a piece lands on the room itself and nothing happens.
      So when a tap lands on the bare room, the piece under the finger is found by its on-screen box and clicked for you. Taps the browser did route to the wall are left alone. */
   const zfHit=e=>{
     if(!zf)return;
     const room=document.getElementById('sfroom');if(!room||!room.classList.contains('done'))return;
-    const t=e.target;if(!t||!t.closest||!room.contains(t)||t.closest('.sfz-hud,.sfz-bot,.modal,[data-pk],.sfa-v,.fz-c,.sfw-th'))return;   /* not on the HUD or a modal, and not already on a piece */
+    const t=e.target;if(!t||!t.closest||!room.contains(t)||t.closest('.sfz-hud,.sfz-bot,.sfz-cm,.sfz-cmb,.modal,[data-pk],.sfa-cr[data-cr],.sfa-v,.fz-c,.sfw-th'))return;   /* not on the HUD or a modal, and not already on a piece */
     const x=e.clientX,y=e.clientY;let best=null,bd=1e9;
-    zf._wall.querySelectorAll('[data-pk]:not(.gone),.sfa-v,.fz-c,.sfw-th').forEach(n=>{
+    zf._wall.querySelectorAll('[data-pk]:not(.gone),.sfa-cr[data-cr],.sfa-v,.fz-c,.sfw-th').forEach(n=>{
       const r=n.getBoundingClientRect();if(!r.width||!r.height||x<r.left||x>r.right||y<r.top||y>r.bottom)return;
       const d=((x-r.left-r.width/2)/r.width)**2+((y-r.top-r.height/2)/r.height)**2;   /* several boxes overlap (swords, spears): the one whose centre is nearest wins */
       if(d<bd){bd=d;best=n}
@@ -4077,8 +4107,8 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     zf._h=setTimeout(()=>b.classList.remove('on'),2400+t.length*30);
   }
   /* pixel-art decor for the companion pens (viewBox 100 x 170, drawn flat like the rest of the shop). The Armoury has none: it is an HTML wall of displays. */
-    function aShuffle(n){
-    let h=2166136261;for(const ch of today()){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}
+    function aShuffle(n,salt){
+    let h=2166136261;for(const ch of today()+(salt||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}
     let s=h>>>0;const rnd=()=>{s=(s+0x6D2B79F5)>>>0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
     const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a;
   }
@@ -4101,7 +4131,11 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     +'<i class="sfa-beam"></i>'
     +'<div class="sfa-ch l"><i class="sfa-cu"></i></div><div class="sfa-ch c"><i class="sfa-cs"></i></div><div class="sfa-ch r"><i class="sfa-hm"></i></div>'
     +'<div class="sfa-rail"><i></i><b class="p l"></b><b class="p r"></b><div class="sfa-rowx"></div></div>'
-    +'<div class="sfa-shelf"><i class="sfa-sbr l"></i><i class="sfa-sbr r"></i>'+'<div class="sfa-cr"><div class="ax"></div><i class="sfa-crf"></i></div>'.repeat(3)+'</div>'
+    +'<div class="sfa-axr"><i class="rl"></i><i class="pk p1"></i><i class="pk p2"></i><i class="pk p3"></i><div class="sh">'+[0,1,2].map(i=>'<div class="sd"><b class="sfa-w" data-pk="sh'+i+'"></b></div>').join('')+'</div></div>'
+    +'<div class="sfa-vr l"><i class="rl"></i><div class="ax"></div></div><div class="sfa-vr r"><i class="rl"></i><div class="ax"></div></div>'
+
+    +'<div class="sfa-shelf"><i class="sfa-sbr l"></i><i class="sfa-sbr r"></i>'+'<div class="sfa-cr"><div class="ax"></div><i class="sfa-crf"></i></div>'.repeat(2)+'</div>'
+    +'<div class="sfa-dgr"><div class="gr g1"><i class="rl"></i><div class="ax"></div></div><div class="gr g2"><i class="rl"></i><div class="ax"></div></div></div>'
     +'<div class="sfa-floor"><i class="sfa-run"></i></div>'
     +'<div class="sfa-sd l"><i><b class="sfa-sz zh"></b><b class="sfa-sz zc"></b><b class="sfa-sz zg"></b><b class="sfa-sz zb"></b><b class="sfa-sz zb2"></b></i></div>'+RK('w')
     +'<div class="sfa-sd r br"><i class="bk"></i><div class="it"></div><i class="fr"></i></div></div>';
@@ -4140,10 +4174,41 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       };im.src=m[1];
     });
   }
+  /* the axes hang on two upright wall rails, one in each free column under the torches (they used to stand in the crates): three to a rail, each hung from an iron peg.
+     The axes are drawn as big as the shorter rail allows (never more than 0.9x), the same size on both sides, and may overlap a little like real hung tools. */
+  function aAxR(sc){
+    const rs=[...sc.querySelectorAll('.sfa-vr')];if(!rs.length)return;
+    if(rs.some(r=>!r.clientWidth||r.clientHeight<40))return;
+    const N=3,k=Math.max(.5,Math.min(.9,Math.min(...rs.map(r=>((r.clientHeight-12)/N+8)/40))));
+    const o=aShuffle(16);let p=0;
+    rs.forEach(r=>{
+      const h=r.querySelector('.ax'),W=r.clientWidth,H=r.clientHeight,key=W+'x'+H+'x'+k.toFixed(3);if(!h)return;
+      if(r._k===key){p+=N;return}
+      r._k=key;h.replaceChildren();r.querySelectorAll('.pk').forEach(x=>x.remove());
+      const sz=40*k,step=(H-12)/N;
+      for(let q=0;q<N;q++){
+        const aid=o[p++],cv=axeCv(aid,k),t=6+q*step+(step-sz)/2;
+        cv.dataset.pk='ax'+aid;cv.tabIndex=0;cv.setAttribute('role','button');cv.setAttribute('aria-label','Inspect the wall axe');cv.onclick=()=>zfPickKey('ax'+aid);cv.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();zfPickKey('ax'+aid)}};
+        if((q+p)%2)cv.style.transform='scaleX(-1)';
+        cv.style.left=((W-sz)/2).toFixed(1)+'px';cv.style.top=t.toFixed(1)+'px';h.appendChild(cv);
+        const pk=document.createElement('i');pk.className='pk';pk.style.top=(t+sz*.25).toFixed(1)+'px';r.appendChild(pk);
+      }
+    });
+    zfMark();   /* the freshly hung axes pick up their glow / sold state */
+  }
   function aFill(sc){
     aHQ(sc);
-    const o=aShuffle(16);
-    sc.querySelectorAll('.sfa-cr .ax').forEach((h,c)=>[0,1,2,3].forEach(q=>{const cv=axeCv(o[c*4+q],1);cv.style.left=q*12+'px';cv.style.bottom='5px';h.appendChild(cv)}));
+    /* two rods over the crates, three hooks each; a dagger hangs from every hook by its pommel, point down. The dagger art is drawn blade up-left / hilt down-right, so it is turned 225deg (hilt up, blade down; the angle is worked out from each sprite's own diagonal so every dagger hangs straight; sprites 2 and 4 are drawn the other way round, hilt down-left) inside a square box as wide as its diagonal. */
+    {const hd=aShuffle(8).slice(0,6).map(i=>[9,15,11,13,20,31,2,4][i]),HX=[[16,50,84],[16,50,84]];let hn=0;
+      sc.querySelectorAll('.sfa-dgr .gr').forEach((r,ri)=>{const ax=r.querySelector('.ax');
+        HX[ri].forEach(px=>{
+          const id=hd[hn++],rows=BLADES[id][1].split('|'),bw=Math.max(...rows.map(q=>q.length)),bh=rows.length,k=1.3,cv=wpnCv(id,k),D=Math.ceil(Math.hypot(bw,bh)*k)+2;
+          const d=document.createElement('i');d.className='dg';d.style.width=d.style.height=D+'px';d.style.left='calc('+px+'% - '+(D/2).toFixed(1)+'px)';
+          cv.style.left='50%';cv.style.top='50%';cv.style.marginLeft=(-bw*k/2).toFixed(1)+'px';cv.style.marginTop=(-bh*k/2).toFixed(1)+'px';cv.style.transform='rotate('+(-90-Math.atan2(bh,id===2||id===4?-bw:bw)*180/Math.PI).toFixed(1)+'deg)';
+          d.appendChild(cv);ax.appendChild(d);
+          const pg=document.createElement('i');pg.className='pg';pg.style.left=px+'%';ax.appendChild(pg);
+        });
+      });}
     const vs=aRack();
     /* ONE long rack: eight swords, every one pommel up and point down in the trough. VSW sprites 1,3,7,8,10,11,13 are drawn blade-up, so those are flipped; the rest are already drawn pommel-up. */
     const VF=[0,1,0,1,0,0,0,1,1,0,1,1,0,1];
@@ -4206,6 +4271,62 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     b.onclick=()=>{if(zfSel===i){zfSel=null;zfRender();return}zfSel=i;kind='a';zfSay(e.sold?pick(ZSAY.gone):pick(ZSAY.vault));zfRender()};
     return b;
   }
+  /* put today's real item on each shield (called on every render, so a new day or a purchase is always shown) */
+  /* a shield icon cropped to its own pixels (no empty border), drawn at the same pixel scale as px() and shown k times that size, so its top edge sits right at the beam */
+  function shCrop(sp,k){
+    const P=sp[0],rows=sp[1].split('|'),h=rows.length,w=Math.max(...rows.map(r=>r.length));
+    let x0=w,y0=h,x1=-1,y1=-1;rows.forEach((r,y)=>{for(let j=0;j<r.length;j++)if(P[r[j]]){if(j<x0)x0=j;if(j>x1)x1=j;if(y<y0)y0=y;if(y>y1)y1=y}});
+    if(x1<0)return null;
+    const bw=x1-x0+1,bh=y1-y0+1,sc=64/Math.max(bw,bh),t=document.createElement('canvas'),tx=t.getContext('2d');
+    t.width=bw;t.height=bh;rows.forEach((r,y)=>{for(let j=0;j<r.length;j++){const col=P[r[j]];if(col&&j>=x0&&j<=x1&&y>=y0&&y<=y1){tx.fillStyle=col;tx.fillRect(j-x0,y-y0,1,1)}}});
+    const dw=Math.max(1,Math.round(bw*sc)),dh=Math.max(1,Math.round(bh*sc)),c=document.createElement('canvas');c.width=dw;c.height=dh;
+    const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(t,0,0,dw,dh);
+    c.className='px';c.style.imageRendering='pixelated';c.style.width=(dw/64*k*100).toFixed(1)+'%';c.style.height='auto';return c;
+  }
+  function aWares(sc){
+    const all=stkAll('a');
+    sc.querySelectorAll('.sfa-w[data-pk]').forEach(n=>{
+      const e=all.find(x=>x.pk===n.dataset.pk);if(!e)return;
+      n.style.setProperty('--rar',RAR[e.it.r]);
+      const ic=iicon(e.it),shc=(typeof ic==='string'&&ic.slice(0,4)==='shd:'&&SHD[+ic.slice(4)])?shCrop(SHD[+ic.slice(4)],1.3):null;   /* every shield is scaled so its longest side matches the round wooden shield */
+      n.replaceChildren(...(e.sold?[]:[shc||px(ic,64)]));
+      n.setAttribute('aria-label','Inspect the '+e.it.n);
+    });
+  }
+  /* the crates on the shelf: each holds four trinkets (wares 'cr0'..'cr7'); a bought one leaves the crate. Tap a crate for the menu. */
+  function aCrates(sc){
+    const all=stkAll('a');
+    sc.querySelectorAll('.sfa-cr').forEach((cr,c)=>{
+      if(!cr.dataset.cr){cr.dataset.cr=c;cr.tabIndex=0;cr.setAttribute('role','button');cr.onclick=()=>zfCrateMenu(c);cr.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();zfCrateMenu(c)}}}
+      const left=[0,1,2,3].filter(q=>{const e=all.find(x=>x.pk==='cr'+(c*4+q));return e&&!e.sold});
+      cr.setAttribute('aria-label','Crate of trinkets, '+left.length+' left');cr.classList.toggle('empty',!left.length);
+      const h=cr.querySelector('.ax');if(!h)return;h.replaceChildren();
+      [0,1,2,3].forEach(q=>{const e=all.find(x=>x.pk==='cr'+(c*4+q));if(!e||e.sold)return;const ic=px(iicon(e.it),20);ic.classList.add('ti');ic.style.left=(5+q*16)+'px';ic.style.bottom=(23+(q%2)*3)+'px';h.appendChild(ic)});
+    });
+  }
+  /* the small menu a crate opens: its trinkets, one row each; pick one and its plaque (with Buy) comes up like any other piece */
+  function zfCrateMenu(c){
+    if(!zf||zfK!=='a')return;
+    const open=zf.querySelector('.sfz-cm'),same=open&&+open.dataset.c===c;
+    zfCmClose();if(same)return;
+    const all=stkAll('a'),bd=el('div','sfz-cmb'),m=el('div','sfz-cm');m.dataset.c=c;m.setAttribute('role','dialog');m.setAttribute('aria-label','Trinkets in the crate');
+    bd.onclick=zfCmClose;
+    const hd=el('div','sfz-cmh'),x=el('button','sfz-cmx','\u00D7');x.type='button';x.setAttribute('aria-label','Close');x.onclick=zfCmClose;
+    hd.append(el('b','','Crate '+(c+1)+' \u00B7 Trinkets'),x);m.appendChild(hd);
+    [0,1,2,3].forEach(q=>{
+      const pk='cr'+(c*4+q),e=all.find(v=>v.pk===pk);if(!e)return;
+      const b=el('button','sfz-cmr'+(e.sold?' sold':'')+(zfSel!=null&&all[zfSel]&&all[zfSel].pk===pk?' on':''));b.type='button';b.disabled=e.sold;
+      b.style.setProperty('--rar',RAR[e.it.r]);
+      const ic=el('span','sfz-cmi');if(!e.sold)ic.appendChild(px(iicon(e.it),28));
+      const t=el('span','sfz-cmt');t.append(el('b','',e.sold?'Sold out':e.it.n),el('small','',e.sold?'New stock every dawn.':RNAME[e.it.r]+' \u00B7 '+bonusTxt(e.it)));
+      b.append(ic,t,el('span','sfz-cmp',e.sold?'':price(e)));
+      b.onclick=()=>{zfCmClose();if(zfSel==null||!all[zfSel]||all[zfSel].pk!==pk)zfPickKey(pk)};
+      m.appendChild(b);
+    });
+    zf.append(bd,m);
+    const f=m.querySelector('.sfz-cmr:not(:disabled)')||x;f.focus();
+  }
+  function zfCmClose(){if(!zf)return;zf.querySelectorAll('.sfz-cm,.sfz-cmb').forEach(n=>n.remove())}
   function zfBuild(k){
     const sc=el('div','sfw-scene sfw-'+k),A=k==='a';
     sc.innerHTML='<div class="sfw-wall"></div><div class="sfw-ceil"></div><i class="sfw-post l"></i><i class="sfw-post r"></i>'
@@ -4219,6 +4340,8 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       n.appendChild(el('b','sfw-th'));n.onclick=go;n.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go()}};
     });
     if(A){aFill(sc);
+      sc.querySelectorAll('.sfa-w[data-pk]').forEach(n=>{const k2=n.dataset.pk;n.tabIndex=0;n.setAttribute('role','button');n.onclick=()=>zfPickKey(k2);n.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();zfPickKey(k2)}}});
+      aWares(sc);aCrates(sc);
       /* the hanging helm and chestplate, and the four parts of the armour stand (helm, chestplate, leggings, boots) are each their own ware */
       [['.sfa-ch.r','helm','helm'],['.sfa-ch.l','plate','chestplate'],['.sfa-sz.zh','sthelm','stand helm'],['.sfa-sz.zc','stand','stand chestplate'],['.sfa-sz.zg','stlegs','stand leggings'],['.sfa-sz.zb','stboots','stand boots']].forEach(([q,k,lb])=>{
         const n=sc.querySelector(q);if(!n)return;
@@ -4236,6 +4359,9 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const same=x=>{const k=x.pk||'',xi=all.indexOf(x);
       if(/^sw\d+$/.test(pk))return /^sw\d+$/.test(k);
       if(/^sp\d+$/.test(pk))return /^sp\d+$/.test(k);
+      if(/^sh\d$/.test(pk))return /^sh\d$/.test(k);
+      if(/^ax\d+$/.test(pk))return /^ax\d+$/.test(k);
+      if(/^cr\d+$/.test(pk))return /^cr\d+$/.test(k);
       if(!pk)return !k&&xi>=4&&at>=4;
       if(/^st/.test(pk))return /^st/.test(k);
       return k==='helm'||k==='plate'};
@@ -4298,6 +4424,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     if(!zf||!zf._wall)return;
     const all=stkAll('a'),sel=zfSel!=null&&all[zfSel]?all[zfSel].pk:null;
     const sdl=zf._wall.querySelector('.sfa-sd.l'),bo=all.find(x=>x.pk==='stboots');if(sdl)sdl.classList.toggle('nb',!!bo&&bo.sold);   /* bought boots leave the plinth too */
+    zf._wall.querySelectorAll('.sfa-cr[data-cr]').forEach(n=>n.classList.toggle('on',!!sel&&/^cr\d+$/.test(sel)&&Math.floor(+sel.slice(2)/4)===+n.dataset.cr));   /* the crate the picked trinket is in glows */
     zf._wall.querySelectorAll('[data-pk]').forEach(n=>{
       const e=all.find(x=>x.pk===n.dataset.pk),on=!!sel&&n.dataset.pk===sel,gone=!!e&&e.sold;
       [n,n._art].forEach(m=>{if(m){m.classList.toggle('on',on);m.classList.toggle('gone',gone)}});
@@ -4313,7 +4440,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     zf.querySelector('.sfz-wal').replaceChildren(purse,gem);
     const box=zf._wall.querySelector('.sfw-slots');
     if(zfK==='a'){box.replaceChildren();   /* the four display bays (helm, weapon, armour, off-hand) are gone from the wall; only the vault rail is left */
-      const rl=zf._wall.querySelector('.sfa-rowx');if(rl)rl.replaceChildren(...S.sv.s.map((e,j)=>vBtn(e,4+j)))}
+      const rl=zf._wall.querySelector('.sfa-rowx');if(rl)rl.replaceChildren(...S.sv.s.map((e,j)=>vBtn(e,4+j)));aWares(zf._wall);aCrates(zf._wall)}
     else box.replaceChildren(...list.map((e,i)=>{
       const n=el('div','sfw-s s'+i+(zfSel===i?' sel':'')+(e.sold?' sold':'')),b=cell(zfK,i,e,()=>{zfSel=i;kind=zfK;if(!e.sold)zfSay(e.it.slot==='companion'?'A good one. Keep it fed.':pick(LINES.a));zfRender()});
       n.appendChild(b);return n;
@@ -4338,7 +4465,8 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
   /* the four stands are drawn for a 70px-wide cell; scale them to the niche so they fill it on any phone */
   function zfFit(){
     if(!zf||!zf._wall)return;
-    if(zfK==='a')aPack(zf._wall);
+    if(zfK==='a'){aPack(zf._wall);aAxR(zf._wall)}
+
     const n=zf._wall.querySelector('.sfw-s');if(!n||!n.clientWidth)return;
     const z=Math.max(.8,Math.min(2.5,(n.clientWidth-10)/70,(n.clientHeight-8)/68));
     zf._wall.style.setProperty('--zf',z.toFixed(3));
@@ -4392,7 +4520,11 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       s.setProperty('--ss',ss.toFixed(3));s.setProperty('--bs',bs.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--sw',(wArm/ss).toFixed(1)+'px');s.setProperty('--aah',(hArm/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-56).toFixed(1)+'px');
       /* lay the three out left to right: armour stand (diamond set), the long weapon rack, barrel of staffs and spears */
       const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[wArm+2*us,176*rsc,(BX+BO)*bs],gap=Math.max(-OV,(aw-2*M+SH-ws.reduce((p,q)=>p+q,0))/2);
-      let x=M-SH;its.forEach((n,i)=>{n.style.left=(x+(i===0?us:0)).toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});   /* real widths (rack 176, barrel 70 + lean), so the right-hand barrel and its spears always end inside the wall */
+      const NS=5;   /* NS: nudge the armour stand this many wall px to the right */
+      const xs=[];let x=M-SH;its.forEach((n,i)=>{xs.push(x);n.style.left=(x+(i===0?us+NS:0)).toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});
+      /* the shelf's two crates stand in the gap between the armour stand and the barrel (the plank itself still runs the full width): pad the shelf to that gap, and shrink the crates if it is narrow */
+      const shf=inn.querySelector('.sfa-shelf');
+      if(shf){const gl=Math.max(0,xs[0]+ws[0]+us+NS),gr=Math.max(gl,xs[2]-4);shf.style.paddingLeft=gl.toFixed(1)+'px';shf.style.paddingRight=Math.max(0,aw-gr).toFixed(1)+'px';inn.style.setProperty('--crs',Math.max(.55,Math.min(1,(gr-gl)/176)).toFixed(3));inn.style.setProperty('--dgx',((gl+gr)/2).toFixed(1)+'px')}   /* real widths (rack 176, barrel 70 + lean), so the right-hand barrel and its spears always end inside the wall */
       return;
     }
     const W=Math.max(100,Math.min(140,70*aw/(ah*.4)));

@@ -3904,3 +3904,74 @@ body.sfz-open{background-color:#0d0a09!important}
 
 /* Armoury plaque: small 'n / total' swipe hint */
 .sfz-sw{display:block;margin-top:2px;font:400 16px/1 var(--body);font-style:normal;letter-spacing:.5px;color:#b39f7f}
+
+/* Armoury wall: cleared down to the beam and the two torches (the ARMOURY sign, the hanging chestplates and helm, and the vault rail are hidden) to leave the brick open for new weapon displays */
+.sfw-a .sfw-sign,.sfw-a .sfa-ch,.sfw-a .sfa-rail{display:none!important}
+
+
+
+
+/* ---- Armoury: three shields hang from a rail under the beam (each is a ware); the axes hang on an upright rail in each free column under the torches; the shelf keeps two crates (full of daggers) in the gap between the armour stand and the barrel ---- */
+.sfa-axr{position:absolute;left:52px;right:52px;top:34px;height:96px;z-index:2;pointer-events:none}
+.sfa-axr .rl{position:absolute;left:0;right:0;top:0;height:10px;z-index:1;background:linear-gradient(#a07040,#6b4423 45%,#4a2e16);border:2px solid #1a0f06;box-shadow:inset 0 2px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.45)}
+.sfa-axr .rl::before,.sfa-axr .rl::after{content:'';position:absolute;top:-5px;width:8px;height:18px;background:linear-gradient(90deg,#b9c2d0,#4a5266);border:2px solid #1a0f06}
+.sfa-axr .rl::before{left:-8px}.sfa-axr .rl::after{right:-8px}
+.sfa-axr .pk{position:absolute;top:-1px;z-index:3;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:#b9c2d0;border:2px solid #1a0f06}
+.sfa-axr .pk.p1{left:16.667%}.sfa-axr .pk.p2{left:50%}.sfa-axr .pk.p3{left:83.333%}
+/* the three shields are bolted straight onto the beam: equal columns, so equal spacing, each held by an iron strap that wraps the beam */
+.sfa-axr .sh{position:absolute;left:0;right:0;top:5px;display:grid;grid-template-columns:repeat(3,1fr);justify-items:center}
+.sfa-axr .sd{position:relative;width:100%;aspect-ratio:4/5}
+.sfa-axr .sd::after{content:'';position:absolute;left:50%;top:-9px;z-index:1;width:54px;height:22px;margin-left:-27px;box-sizing:border-box;border:2px solid #1a0f06;background:radial-gradient(circle,#1a0f06 0 1.4px,#e8eef7 1.9px 3px,transparent 3.5px) 1px center/8px 8px no-repeat,radial-gradient(circle,#1a0f06 0 1.4px,#e8eef7 1.9px 3px,transparent 3.5px) right 1px center/8px 8px no-repeat,linear-gradient(#d3dae6,#7c869a 55%,#4a5266);box-shadow:inset 0 2px 0 rgba(255,255,255,.35),2px 3px 0 rgba(0,0,0,.5);pointer-events:none}
+.sfa-axr .pk{display:none}   /* the old pegs are not needed any more */
+.sfa-w{position:absolute;inset:-9px 0 0 0;display:grid;place-items:start center;z-index:2;pointer-events:auto;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}
+.sfa-w .px{height:auto;max-width:none;image-rendering:pixelated;filter:drop-shadow(4px 6px 0 rgba(0,0,0,.55))}
+.sfa-w:hover{filter:brightness(1.2)}
+.sfa-w.on{filter:brightness(1.25) drop-shadow(0 0 4px #ffd75a) drop-shadow(0 0 8px rgba(255,200,90,.8))}
+.sfa-w:focus-visible{outline:2px dashed var(--act);outline-offset:3px}
+.sfa-w.gone{visibility:hidden;pointer-events:none}
+.sfa-vr{position:absolute;top:84px;width:46px;z-index:2;pointer-events:none}
+.sfa-vr{bottom:38%}.sfa-vr.l{left:4px}.sfa-vr.r{right:4px}   /* both rails are exactly the same height */
+.sfa-vr .rl{position:absolute;left:50%;top:0;bottom:0;width:10px;margin-left:-5px;background:linear-gradient(90deg,#6b4423,#a07040 50%,#6b4423);border:2px solid #1a0f06;box-shadow:inset 0 2px 0 rgba(255,255,255,.12),3px 0 0 rgba(0,0,0,.4)}
+.sfa-vr .rl::before,.sfa-vr .rl::after{content:'';position:absolute;left:50%;width:20px;height:7px;margin-left:-12px;background:linear-gradient(#b9c2d0,#4a5266);border:2px solid #1a0f06}
+.sfa-vr .rl::before{top:-4px}.sfa-vr .rl::after{bottom:-4px}
+.sfa-vr .ax{position:absolute;inset:0;z-index:2}
+.sfa-vr .pk{position:absolute;left:50%;margin-left:-4px;z-index:3;width:6px;height:6px;border-radius:50%;background:#b9c2d0;border:2px solid #1a0f06}
+.sfa-shelf{justify-content:space-evenly}
+.sfa-cr{margin:0 calc(-3px + (var(--crs,1) - 1)*38px);transform:scale(var(--crs,1));transform-origin:50% 100%}
+
+/* ---- Armoury: two wooden rods above the dagger crates, three iron hooks on each, a dagger hanging from every hook. Drawn 176px wide (the crates' span) and scaled with them by --crs; --dgx (set by script.js zfFrame) is the middle of the gap between the armour stand and the barrel ---- */
+.sfa-dgr{position:absolute;left:var(--dgx,50%);width:176px;height:114px;margin-left:-88px;bottom:calc(34px + 46px*var(--crs,1));z-index:2;pointer-events:none;transform:scale(var(--crs,1));transform-origin:50% 100%}
+.sfa-dgr .gr{position:absolute;height:8px}
+.sfa-dgr .g1{left:0;right:0;top:0}
+.sfa-dgr .g2{left:24%;right:24%;top:58px}
+.sfa-dgr .rl{position:absolute;left:0;right:0;top:0;height:8px;z-index:1;background:linear-gradient(#a07040,#6b4423 45%,#4a2e16);border:2px solid #1a0f06;box-sizing:border-box;box-shadow:inset 0 2px 0 rgba(255,255,255,.18),0 3px 0 rgba(0,0,0,.45)}
+.sfa-dgr .rl::before,.sfa-dgr .rl::after{content:'';position:absolute;top:-4px;width:6px;height:14px;background:linear-gradient(90deg,#b9c2d0,#4a5266);border:2px solid #1a0f06;box-sizing:border-box}
+.sfa-dgr .rl::before{left:-6px}.sfa-dgr .rl::after{right:-6px}
+.sfa-dgr .ax{position:absolute;left:0;right:0;top:0;height:0}
+.sfa-dgr .pg{position:absolute;top:6px;z-index:3;width:5px;height:11px;margin-left:-2.5px;box-sizing:border-box;border:2px solid #1a0f06;border-radius:0 0 3px 3px;background:linear-gradient(90deg,#d6dde8,#6a7384)}
+.sfa-dgr .dg{position:absolute;top:8px;z-index:2;display:block;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
+.sfa-dgr .dg>canvas{position:absolute;display:block;image-rendering:auto}
+
+/* ---- Armoury: the two shelf crates hold trinkets; tap one for a small menu of what is inside ---- */
+.sfa-cr[data-cr]{pointer-events:auto;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}
+.sfa-cr[data-cr]:hover{filter:brightness(1.15)}
+.sfa-cr[data-cr].on{filter:brightness(1.2) drop-shadow(0 0 4px #ffd75a) drop-shadow(0 0 8px rgba(255,200,90,.8))}
+.sfa-cr[data-cr]:focus-visible{outline:2px dashed var(--act);outline-offset:3px}
+.sfa-cr .ax .ti{position:absolute;width:20px;height:20px;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.55))}
+.sfz-cmb{position:fixed;inset:0;z-index:6;pointer-events:auto;background:rgba(8,4,2,.45)}
+.sfz-cm{position:fixed;left:50%;top:50%;z-index:7;width:min(340px,calc(100vw - 32px));max-height:calc(100vh - 160px);overflow:auto;transform:translate(-50%,-50%);box-sizing:border-box;padding:10px;pointer-events:auto;color:#f0e2c0;
+  background:radial-gradient(ellipse at 22% 20%,rgba(255,200,120,.16),transparent 62%),repeating-linear-gradient(90deg,transparent 0 30px,rgba(0,0,0,.3) 30px 32px),linear-gradient(#4a2e16,#2e1c0e);
+  border:3px solid #1a0f06;box-shadow:inset 0 3px 0 rgba(255,220,160,.2),inset 0 0 0 3px #6b4423,3px 5px 0 rgba(0,0,0,.5)}
+.sfz-cmh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px;padding:2px 2px 6px;border-bottom:2px solid rgba(0,0,0,.4)}
+.sfz-cmh b{font:400 11px/1.2 var(--head);letter-spacing:1px;text-transform:uppercase;color:var(--gold);text-shadow:2px 2px 0 #000}
+.sfz-cmx{width:28px;height:28px;padding:0;font:400 20px/1 var(--body);color:#f0e2c0;background:#2e1c0e;border:2px solid #1a0f06;box-shadow:inset 0 2px 0 rgba(255,255,255,.1);cursor:pointer}
+.sfz-cmr{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:8px;width:100%;margin:0 0 6px;padding:6px 8px 6px 6px;text-align:left;color:#f0e2c0;font:inherit;cursor:pointer;background:linear-gradient(#3a2412,#26180c);border:2px solid #1a0f06;border-left:5px solid var(--rar,#8a7862);box-shadow:inset 0 2px 0 rgba(255,220,160,.12),2px 3px 0 rgba(0,0,0,.4)}
+.sfz-cmr:hover:not(:disabled),.sfz-cmr:focus-visible{filter:brightness(1.2);outline:none}
+.sfz-cmr.on{box-shadow:inset 0 0 0 2px var(--gold),2px 3px 0 rgba(0,0,0,.4)}
+.sfz-cmr:disabled{opacity:.5;cursor:default}
+.sfz-cmi{display:grid;place-items:center;width:36px;height:36px;background:rgba(0,0,0,.35);border:2px solid #1a0f06}
+.sfz-cmi .px{width:28px;height:28px}
+.sfz-cmt{display:grid;gap:2px;min-width:0}
+.sfz-cmt b{font:400 10px/1.3 var(--head);color:#f0e2c0;text-shadow:1px 1px 0 #000}
+.sfz-cmt small{font:400 17px/1 var(--body);color:#b39f7f}
+.sfz-cmp{font:400 16px/1 var(--body);color:var(--gold);white-space:nowrap}
