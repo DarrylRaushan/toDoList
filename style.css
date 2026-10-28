@@ -3890,3 +3890,9 @@ body.sfz-open{background-color:#0d0a09!important}
 .sfa-sz.zb2.on{filter:brightness(1.25) drop-shadow(0 0 4px #ffd75a) drop-shadow(0 0 8px rgba(255,200,90,.8))}
 .sfa-sz.zb2.gone{visibility:hidden}
 .sfa-sd.l.nb::before{-webkit-mask:linear-gradient(#000 45%,transparent 45% 75%,#000 75%);mask:linear-gradient(#000 45%,transparent 45% 75%,#000 75%)}
+
+
+
+
+/* Armoury / pens: while the camera is in the room the wall is not cut off at the room box, so it fills the whole screen (sides, and up under the status bar) instead of sitting in a bordered frame */
+.sf-room.moving,.sf-room.moving.done{overflow:visible}

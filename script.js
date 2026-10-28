@@ -4326,7 +4326,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const rc=room.getBoundingClientRect();if(!rc.width||!rc.height)return;
     const cx=rc.width/2,cy=rc.height/2,vw=window.innerWidth,vh=window.innerHeight;
     const toX=x=>cx+(x-rc.left-cx)/ZS,toY=y=>cy+(y-rc.top-cy)/ZS;
-    const x0=Math.max(0,toX(Math.max(rc.left,10))),x1=Math.min(rc.width,toX(Math.min(rc.right,vw-10)));
+    const x0=Math.max(0,toX(8)),x1=Math.min(rc.width,toX(vw-8));   /* the wall now fills the whole screen width (the room box no longer clips it), 8px in from each edge */
     /* the wall box ends 140-176px above the screen bottom (taller screens get more): the floor, the weapon racks and the armour stand are drawn below the box, so they need that strip to be seen.
        The description plaque floats over that strip only while a piece is picked. */
     const yb=zfK==='a'?Math.min(rc.bottom,vh)-Math.max(140,Math.min(176,Math.round(vh*.205))):vh-165;   /* the strip grows with the screen height, so short phones keep room for the four wall bays */
