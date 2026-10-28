@@ -4537,8 +4537,19 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const inn=wall&&wall.querySelector('.sfw-in');if(!inn||!room)return;
     const rc=room.getBoundingClientRect();if(!rc.width||!rc.height)return;
     const cx=rc.width/2,cy=rc.height/2,vw=window.innerWidth,vh=window.innerHeight;
-    const toX=x=>cx+(x-rc.left-cx)/ZS,toY=y=>cy+(y-rc.top-cy)/ZS;
-    const x0=Math.max(0,toX(2)),x1=Math.min(rc.width,toX(vw-8));   /* the wall now fills the whole screen width (the room box no longer clips it), 8px in from each edge */
+    const toY=y=>cy+(y-rc.top-cy)/ZS;
+    /* HORIZONTAL: measure where the wall really ends up on screen (the camera's final pose: zoomed in, facing the wall) instead of assuming a 1.5x zoom about the room's centre.
+       The wall is narrower than the room and the real zoom is a bit more than ZS, so the old maths left the whole scene ~10px right of centre and clipped the right-hand rack. */
+    let sxz=ZS,wcx=cx,Xc=rc.left+cx,wwid=rc.width;
+    {
+      const cl=room.classList,tc=zfK==='a'?'turn-l':'turn-r',add=['moving','done',tc].filter(c=>!cl.contains(c)),wasOn=wall.classList.contains('on');
+      add.forEach(c=>cl.add(c));wall.classList.add('on');
+      const q=wall.getBoundingClientRect(),ow=wall.offsetWidth;
+      if(ow>0&&q.width>0){sxz=q.width/ow;wcx=ow/2;Xc=(q.left+q.right)/2;wwid=ow}
+      add.forEach(c=>cl.remove(c));if(!wasOn)wall.classList.remove('on');
+    }
+    const toX=x=>wcx+(x-Xc)/sxz;
+    const x0=Math.max(0,toX(5)),x1=Math.min(wwid,toX(vw-5));   /* the wall fills the whole screen width, 5px in from each edge (the same on both sides, so the scene is centred) */
     /* the wall box ends 140-176px above the screen bottom (taller screens get more): the floor, the weapon racks and the armour stand are drawn below the box, so they need that strip to be seen.
        The description plaque floats over that strip only while a piece is picked. */
     const yb=zfK==='a'?Math.min(rc.bottom,vh)-Math.max(140,Math.min(176,Math.round(vh*.205))):vh-165;   /* the strip grows with the screen height, so short phones keep room for the four wall bays */
@@ -4567,7 +4578,8 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       /* lay the three out left to right: armour stand (diamond set), the long weapon rack, barrel of staffs and spears */
       const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[wArm+2*us,176*rsc,(BX+BO)*bs],gap=Math.max(-OV,(aw-2*M+SH-ws.reduce((p,q)=>p+q,0))/2);
       const NS=5;   /* NS: nudge the armour stand this many wall px to the right */
-      const xs=[];let x=M-SH;its.forEach((n,i)=>{xs.push(x);n.style.left=(x+(i===0?us+NS:0)).toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});
+      const CX=3;   /* CX: shift the whole armour stand / rack / barrel group this many wall px to the right so it sits centred under the wall */
+      const xs=[];let x=M-SH+CX;its.forEach((n,i)=>{xs.push(x);n.style.left=(x+(i===0?us+NS:0)).toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});
       /* the shelf's two crates stand in the gap between the armour stand and the barrel (the plank itself still runs the full width): pad the shelf to that gap, and shrink the crates if it is narrow */
       const shf=inn.querySelector('.sfa-shelf');
       if(shf){const gl=Math.max(0,xs[0]+ws[0]+us+NS),gr=Math.max(gl,xs[2]-4);shf.style.paddingLeft=gl.toFixed(1)+'px';shf.style.paddingRight=Math.max(0,aw-gr).toFixed(1)+'px';inn.style.setProperty('--crs',Math.max(.55,Math.min(1,(gr-gl)/176)).toFixed(3));inn.style.setProperty('--dgx',((gl+gr)/2).toFixed(1)+'px');
