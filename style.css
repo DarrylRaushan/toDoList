@@ -3896,3 +3896,8 @@ body.sfz-open{background-color:#0d0a09!important}
 
 /* Armoury / pens: while the camera is in the room the wall is not cut off at the room box, so it fills the whole screen (sides, and up under the status bar) instead of sitting in a bordered frame */
 .sf-room.moving,.sf-room.moving.done{overflow:visible}
+
+/* Armoury: the floor and the shelf plank run past both screen edges (they used to stop 12px short, leaving a dark strip down each side); the side shading stays where it was */
+.sfa-floor{left:-80px;right:-80px}
+.sfa-floor::after{left:80px;right:80px}
+.sfa-shelf::after{left:-80px;right:-80px}
