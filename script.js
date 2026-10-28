@@ -4326,7 +4326,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     const rc=room.getBoundingClientRect();if(!rc.width||!rc.height)return;
     const cx=rc.width/2,cy=rc.height/2,vw=window.innerWidth,vh=window.innerHeight;
     const toX=x=>cx+(x-rc.left-cx)/ZS,toY=y=>cy+(y-rc.top-cy)/ZS;
-    const x0=Math.max(0,toX(8)),x1=Math.min(rc.width,toX(vw-8));   /* the wall now fills the whole screen width (the room box no longer clips it), 8px in from each edge */
+    const x0=Math.max(0,toX(2)),x1=Math.min(rc.width,toX(vw-8));   /* the wall now fills the whole screen width (the room box no longer clips it), 8px in from each edge */
     /* the wall box ends 140-176px above the screen bottom (taller screens get more): the floor, the weapon racks and the armour stand are drawn below the box, so they need that strip to be seen.
        The description plaque floats over that strip only while a piece is picked. */
     const yb=zfK==='a'?Math.min(rc.bottom,vh)-Math.max(140,Math.min(176,Math.round(vh*.205))):vh-165;   /* the strip grows with the screen height, so short phones keep room for the four wall bays */
@@ -4348,12 +4348,13 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       const hArm=Math.max(60,hs/(1+10/33)),wArm=hArm*14/33,us=hArm/33;   /* 10 art pixels are left under the armour for the diamond boots and the plinth; the slab is 1 pixel wider than the armour on each side (us) */
       const BX=70,BO=10;   /* barrel sprite width and how far the spears lean past it (barrel px) */
       const sc=Math.max(.3,Math.min(1.2,(aw-2*M-8-wArm-2*us)/(176+(BX+BO)*KS*BK))),ss=Math.min(1.8,sc*KS),bs=Math.min(2.4,sc*KS*BK);
-      const rh=Math.max(72,hr/sc);s.setProperty('--rs',sc.toFixed(3));s.setProperty('--rh',rh.toFixed(1)+'px');
+      const SH=3,G=3,wst0=wArm+2*us,wb0=(BX+BO)*bs,d=Math.max(0,Math.min(.3,(aw-2*M+SH-wst0-176*sc-wb0-2*G)/176)),rsc=sc+d;   /* the armour stand slides SH px left, and the weapon rack takes that space (and any slack) so it grows, uniformly, wider and taller */
+      const rh=Math.max(72,hr/sc);s.setProperty('--rs',rsc.toFixed(3));s.setProperty('--rh',rh.toFixed(1)+'px');
       const csv=Math.max(1,Math.min(1.6,(rh-12)/66));s.setProperty('--cs',csv.toFixed(3));aRackFit(inn,rh,csv);   /* the weapons in the racks grow evenly with the taller frame (about their own feet) */
       s.setProperty('--ss',ss.toFixed(3));s.setProperty('--bs',bs.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--sw',(wArm/ss).toFixed(1)+'px');s.setProperty('--aah',(hArm/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-56).toFixed(1)+'px');
       /* lay the three out left to right: armour stand (diamond set), the long weapon rack, barrel of staffs and spears */
-      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[wArm+2*us,176*sc,(BX+BO)*bs],gap=Math.max(-OV,(aw-2*M-ws.reduce((p,q)=>p+q,0))/2);
-      let x=M;its.forEach((n,i)=>{n.style.left=(x+(i===0?us:0)).toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});   /* real widths (rack 176, barrel 70 + lean), so the right-hand barrel and its spears always end inside the wall */
+      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[wArm+2*us,176*rsc,(BX+BO)*bs],gap=Math.max(-OV,(aw-2*M+SH-ws.reduce((p,q)=>p+q,0))/2);
+      let x=M-SH;its.forEach((n,i)=>{n.style.left=(x+(i===0?us:0)).toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});   /* real widths (rack 176, barrel 70 + lean), so the right-hand barrel and its spears always end inside the wall */
       return;
     }
     const W=Math.max(100,Math.min(140,70*aw/(ah*.4)));
