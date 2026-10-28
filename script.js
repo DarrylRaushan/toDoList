@@ -4061,7 +4061,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     VF=VF||[0,1,0,1,0,0,0,1,1,0,1,1,0,1];
     const e=wpnCv(34+v,k||.9);if(VF[v])e.style.transform='scaleY(-1)';const w=parseFloat(e.style.width);
     e.dataset.v=v;e.dataset.q=q;e.dataset.rows=BLADES[34+v][1].split('|').length;
-    e.style.setProperty('--ih',e.style.height||'60px');e.style.position='absolute';e.style.bottom='6px';e.style.left=(28+q*14.86-w/2).toFixed(1)+'px';   /* centres spread across the inner frame so the guards of the end swords stay inside the posts */
+    e.style.setProperty('--ih',e.style.height||'60px');e.style.position='absolute';e.style.bottom='6px';e.style.left=(24.1+q*14.2-w/2).toFixed(1)+'px';   /* centres spread across the inner frame (rack is 176 wide) so the guards of the end swords stay inside the posts */
     return e;
   }
   /* zfFrame() calls this with the rack's height: the tallest sword is stretched (by adding blade rows, never by squashing pixels) until its pommel sits just under the top beam; the others keep their natural differences in length */
@@ -4074,7 +4074,7 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     it.dataset.xr=key;
     cvs.forEach((c,i)=>c.replaceWith(rackSword(+c.dataset.v,+c.dataset.q,ks[i])));
   }
-  const aRack=()=>aShuffle(14).slice(0,8);   /* the eight upright swords standing in the racks today (four a rack, swords only; never repeated on the boards) */
+  const aRack=()=>aShuffle(14).slice(0,10);   /* the eight upright swords standing in the racks today (four a rack, swords only; never repeated on the boards) */
   function aFill(sc){
     const o=aShuffle(16);
     sc.querySelectorAll('.sfa-cr .ax').forEach((h,c)=>[0,1,2,3].forEach(q=>{const cv=axeCv(o[c*4+q],1);cv.style.left=q*12+'px';cv.style.bottom='5px';h.appendChild(cv)}));
@@ -4085,9 +4085,14 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     if(it)vs.forEach((v,q)=>it.appendChild(rackSword(v,q,0,VF)));
     /* the barrel on the right of the floor: the staffs and spears (red-banded pike, halberd, diamond staff, plain spear, orb staff), leaning out of it at different angles */
     const bi=sc.querySelector('.sfa-sd.br .it');
-    if(bi)[['p',11,-3,0],['h',16,-2,5],['m',21,1,1],['s',27,6,6],['ostaff',32,10,2]].forEach(([kd,cx,rot,up])=>{
-      const e=document.createElement('i');e.className='stf '+kd;
-      e.style.left=(cx-8)+'px';e.style.bottom=(34+up)+'px';e.style.transform='rotate('+rot+'deg)';bi.appendChild(e);
+    /* the 24 spear models (drawn from the reference sheets): [height, butt x, lean, width] in css px; eight of them stand in the barrel today */
+    const SPR=[[138.7,16,0,32],[143.7,16,0,32],[136.0,16,0,32],[142.7,16,0,32],[135.7,16,0,32],[138.7,16,0,32],[143.3,16,0,32],[139.3,16,0,32],[142.3,16,0,32],[143.3,16,0,32],[143.3,16,0,32],[142.3,16,0,32],[141.7,16,0,32],[139.3,16,0,32],[142.3,16,0,32],[142.3,16,0,32],[142.7,16,0,32],[141.3,16,0,32],[142.0,16,0,32],[142.3,16,0,32],[144.0,16,0,32],[143.3,16,0,32],[141.3,16,0,32],[140.7,16,0,32]],SK=1;
+    const SLOT=[[12,-4,0],[18.5,-3,5],[25,-2,2],[31.5,-1,6],[38,1,3],[44.5,2,6],[51,3,1],[57.5,4,5]];   /* butt x in the barrel, fan angle, how far it is pushed up */
+    if(bi)aShuffle(24).slice(0,8).forEach((id,q)=>{
+      const [h,xb,ang,sw]=SPR[id],[cx,rot,up]=SLOT[q],e=document.createElement('i');e.className='stf w'+id;
+      e.style.width=(sw*SK).toFixed(1)+'px';e.style.height=(h*SK).toFixed(1)+'px';e.style.backgroundSize='100% 100%';e.style.imageRendering='auto';   /* hi-res art: drawn smooth, not blocky */
+      e.style.transformOrigin=(xb*SK).toFixed(1)+'px 100%';e.style.left=(cx-xb*SK).toFixed(1)+'px';e.style.bottom=(8+up)+'px';
+      e.style.transform='rotate('+(ang+rot).toFixed(2)+'deg)';bi.appendChild(e);
     });
   }
   const ZD={
@@ -4230,18 +4235,21 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       /* everything is scaled evenly (never stretched). The racks' posts and the stands' poles get longer instead: --rh / --sh are their own heights. */
       const hr=base+34;   /* height a rack needs to reach the top of the shelf plank it leans on (shelf 22px up, plank 12px thick) */
       const hs=hr+30;     /* the stands rise a little past that, so they are always the tallest */
-      /* the armour stand (40 wide) and the barrel of staffs (40 wide, its spears lean out ~27px to the right) are drawn bigger than the weapon rack (160 wide): the stands scale KS times the rack.
+      /* the armour stand (40 wide) and the barrel of staffs (80 wide, its spears lean out ~27px to the right) are drawn bigger than the weapon rack (160 wide): the stands scale KS times the rack.
          All three are sized together so they exactly fit inside the wall; the stands tuck OV px behind the rack's ends, and nothing is pushed past the edge of the room. */
       const M=4,KS=1.35,OV=2,LEAN=24;
       /* the diamond set fills the armour stand: it is drawn as tall as the stand minus a short pole and the base, and the stand is exactly as wide as that armour (the art is 20x33 with 14px of armour in it). These are screen sizes; they are divided by ss below because the stand itself is scaled by ss. */
       const hArm=Math.max(60,hs-13),wArm=hArm*14/33;
-      const sc=Math.max(.5,Math.min(1.2,(aw-2*M+2*OV-wArm)/(160+(40+LEAN)*KS))),ss=Math.min(1.8,sc*KS);
+      const sc=Math.max(.5,Math.min(1.2,(aw-2*M+2*OV-wArm)/(160+(80+LEAN)*KS))),ss=Math.min(1.8,sc*KS);
       const rh=Math.max(72,hr/sc);s.setProperty('--rs',sc.toFixed(3));s.setProperty('--rh',rh.toFixed(1)+'px');
       const csv=Math.max(1,Math.min(1.6,(rh-12)/66));s.setProperty('--cs',csv.toFixed(3));aRackFit(inn,rh,csv);   /* the weapons in the racks grow evenly with the taller frame (about their own feet) */
       s.setProperty('--ss',ss.toFixed(3));s.setProperty('--sh',Math.max(80,hs/ss).toFixed(1)+'px');s.setProperty('--sw',(wArm/ss).toFixed(1)+'px');s.setProperty('--aah',(hArm/ss).toFixed(1)+'px');s.setProperty('--rdy',(base-44).toFixed(1)+'px');
       /* lay the three out left to right: armour stand (diamond set), the long weapon rack, barrel of staffs and spears */
-      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[wArm,160*sc,40*ss],gap=Math.max(-OV,(aw-2*M-ws.reduce((p,q)=>p+q,0)-LEAN*ss)/2);
+      const its=[...inn.querySelectorAll('.sfa-sd.l,.sfa-rk.w,.sfa-sd.r')],ws=[wArm,160*sc,80*ss],gap=Math.max(-OV,(aw-2*M-ws.reduce((p,q)=>p+q,0)-LEAN*ss)/2);
       let x=M;its.forEach((n,i)=>{n.style.left=x.toFixed(1)+'px';n.style.right='auto';n.style.marginLeft='0';x+=ws[i]+gap});
+      /* nudge the barrel to the right (only the barrel: the rack and armour stand keep their size and spots), never past the right edge of the wall */
+      const bn=its[2],rk=its[1];if(bn){const l0=parseFloat(bn.style.left)||0;let nl=l0+Math.max(0,Math.min(18,aw-M-(l0+ws[2])));const rr=(parseFloat(rk.style.left)||0)+176*sc+3;   /* the rack is 176 wide but laid out as 160, so it grows rightwards; keep the barrel clear of it */
+        bn.style.left=(Math.max(nl,rr)+5*ss).toFixed(1)+'px'}   /* the barrel sprite is 70 wide but keeps its 80-wide slot, so centre it in the slot */
       return;
     }
     const W=Math.max(100,Math.min(140,70*aw/(ah*.4)));
