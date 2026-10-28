@@ -4214,12 +4214,12 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     c.className='sfa-ax';c.style.imageRendering='auto';c.style.width=c.style.height=40*k+'px';return c;
   }
   /* the weapons hang on two upright wall rails, one in each free column under the torches: six hooks to a rail, an axe, a mace, an axe, a mace, an axe, a mace (three of each per side),
-     each hung from an iron peg. They are drawn as big as the shorter rail allows (never more than 1.05x), the same size on both sides, and may overlap a little like real hung tools.
+     each hung from an iron peg. They are drawn as big as the shorter rail allows (never more than 1.7x, so neighbours overlap a little), the same size on both sides, and may overlap a little like real hung tools.
      Only the axes are wares (the maces are wall decoration, so they have no tap target). */
   function aAxR(sc){
     const rs=[...sc.querySelectorAll('.sfa-vr')];if(!rs.length)return;
     if(rs.some(r=>!r.clientWidth||r.clientHeight<40))return;
-    const N=3,M=6,k=Math.max(.5,Math.min(1.05,Math.min(...rs.map(r=>((r.clientHeight-12)/M+8)/40))));
+    const N=3,M=6,k=Math.max(.5,Math.min(1.7,Math.min(...rs.map(r=>((r.clientHeight-12)/M)*1.65/40))));
     const o=aShuffle(16);let p=0;
     rs.forEach((r,ri)=>{
       const h=r.querySelector('.ax'),W=r.clientWidth,H=r.clientHeight,key='m'+W+'x'+H+'x'+k.toFixed(3);if(!h)return;
