@@ -3930,7 +3930,7 @@ body.sfz-open{background-color:#0d0a09!important}
 .sfa-w:focus-visible{outline:2px dashed var(--act);outline-offset:3px}
 .sfa-w.gone{visibility:hidden;pointer-events:none}
 .sfa-vr{position:absolute;top:72px;width:92px;z-index:2;pointer-events:none}   /* wider rails: the axes and maces fill the side columns */
-.sfa-vr{bottom:38%}.sfa-vr.l{left:-12px}.sfa-vr.r{right:-12px}   /* the rail line sits near the screen edge (the box is wider than the line, so it is pulled outwards) */   /* both rails are exactly the same height */
+.sfa-vr{bottom:30%}.sfa-vr.l{left:-12px}.sfa-vr.r{right:-12px}   /* the rail line sits near the screen edge (the box is wider than the line, so it is pulled outwards) */   /* both rails are exactly the same height */
 .sfa-vr .rl{position:absolute;left:50%;top:0;bottom:0;width:10px;margin-left:-5px;background:linear-gradient(90deg,#6b4423,#a07040 50%,#6b4423);border:2px solid #1a0f06;box-shadow:inset 0 2px 0 rgba(255,255,255,.12),3px 0 0 rgba(0,0,0,.4)}
 .sfa-vr .rl::before,.sfa-vr .rl::after{content:'';position:absolute;left:50%;width:20px;height:7px;margin-left:-12px;background:linear-gradient(#b9c2d0,#4a5266);border:2px solid #1a0f06}
 .sfa-vr .rl::before{top:-4px}.sfa-vr .rl::after{bottom:-4px}
@@ -3982,6 +3982,7 @@ body.sfz-open{background-color:#0d0a09!important}
 .sfz-cmp{font:400 16px/1 var(--body);color:var(--gold);white-space:nowrap}
 
 /* ---- Armoury: greatswords and bows on the brick above the dagger rods (script.js aFill fills .ax). Rides inside .sfa-dgr, so it scales and centres with the rods. ---- */
-.sfa-dgr .sfa-gbr{position:absolute;left:-8px;right:-8px;top:-56px;height:48px;z-index:2;pointer-events:none}
+.sfa-dgr .sfa-gbr{position:absolute;left:-10px;right:-10px;top:auto;bottom:calc(100% + 8px);height:var(--gbh,48px);z-index:2;pointer-events:none}   /* sits on the brick just above the dagger rods and grows upward into all the free wall (--gbh is set in script.js zfFrame) */
+.sfa-gbr .ax>canvas{filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5))}
 .sfa-dgr .sfa-gbr .ax{position:absolute;left:0;right:0;top:0;bottom:0;height:auto}
 .sfa-gbr .pk{position:absolute;z-index:3;display:block;width:6px;height:6px;margin:-3px 0 0 -3px;box-sizing:border-box;border-radius:50%;background:radial-gradient(circle at 35% 30%,#eef2f8,#8f9aae 60%,#4a5266);border:2px solid #1a0f06;box-shadow:1px 2px 0 rgba(0,0,0,.5)}

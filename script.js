@@ -4266,6 +4266,41 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
     });
     zfMark();   /* the freshly hung axes pick up their glow / sold state */
   }
+  /* The brick above the dagger rods: two big weapons (a greatsword or a war hammer each) and two bows, re-rolled at every dawn. Decoration only.
+     H is the free height (in the dagger board's own px) between the shield rail and the top dagger rod, worked out in zfFrame. When there is plenty of room the four pieces stand upright in four columns
+     (big | bow | bow | big), each scaled up to fill the space and pinned to the wall; on a very short wall they fall back to the old low strip, lying down. */
+  function aGBR(sc,H){
+    const g=sc.querySelector('.sfa-gbr .ax');if(!g)return;
+    const W=224,key=W+'x'+Math.round(H);if(g._k===key)return;g._k=key;g.replaceChildren();
+    const gk=aShuffle(6,'gbr'),gs=aShuffle(2,'gbg'),hs=aShuffle(5,'gbh'),bs=aShuffle(7,'gbb'),BW=BOWSK.concat(BOWN),
+      big=[0,1,2].map(j=>gk[j]%2?{h:1,sp:HAMSK[hs[j]]}:{h:0,id:[34,43][(gs[j%2]+j)%2]}),
+      bow=j=>({sp:BW[bs[j]]});
+    const peg=(x,y)=>{const pk=document.createElement('i');pk.className='pk';pk.style.left=x.toFixed(1)+'px';pk.style.top=y.toFixed(1)+'px';g.appendChild(pk)};
+    if(H<96){   /* short wall: the old strip, everything lying down in one row */
+      const bo=j=>{const q=bs[j];return q<2?{sp:BOWSK[q],k:q?2.6:1.6}:{sp:BW[q],k:.44}};
+      [[big[0],12.5],[bo(0),37.5,0],[big[1],62.5],[bo(1),87.5,1]].forEach(([o,pct,flip])=>{
+        const isB=!!o.k,cv=o.h?skCv(o.sp,.5):isB?skCv(o.sp,o.k):wpnCv(o.id,o.id===34?.78:.72),w=parseFloat(cv.style.width),h=parseFloat(cv.style.height);
+        cv.setAttribute('aria-hidden','true');cv.style.left='calc('+pct+'% - '+(w/2).toFixed(1)+'px)';cv.style.top=(H/2-h/2).toFixed(1)+'px';
+        if(!isB)cv.style.transform=o.h?'rotate(90deg)':'rotate(-90deg)';else if(flip)cv.style.transform='scaleX(-1)';
+        g.appendChild(cv);
+        if(!isB)[-.27,.27].forEach(f=>peg(W*pct/100+h*f,H/2+w/2));
+      });
+      return;
+    }
+    /* tall wall: two rows of three. Top row: three bows. Bottom row: three big weapons (greatswords point-down as drawn, war hammers head-up as drawn). Each piece is scaled evenly to fill its cell. */
+    const cw=W/3,rows=[{y:H*.25,h:H*.44,list:[bow(0),bow(1),bow(2)]},{y:H*.73,h:H*.5,list:big}];
+    rows.forEach((row,ri)=>row.list.forEach((o,i)=>{
+      const cx=cw*(i+.5),isB=!o.h&&o.id==null,cv=o.h||isB?skCv(o.sp,1):wpnCv(o.id,1),w0=parseFloat(cv.style.width),h0=parseFloat(cv.style.height);
+      let f=Math.min((cw-6)/w0,row.h/h0);
+      if(isB&&w0/h0>.6)f=Math.min(f*1.1,(cw-2)/w0,row.h*.9/h0);   /* the two small squarish bows would look lost: let them grow a little */
+      const w=w0*f,h=h0*f,y=row.y-h/2;
+      cv.style.width=w.toFixed(1)+'px';cv.style.height=h.toFixed(1)+'px';cv.style.left=(cx-w/2).toFixed(1)+'px';cv.style.top=y.toFixed(1)+'px';cv.setAttribute('aria-hidden','true');
+      if(isB&&i===2)cv.style.transform='scaleX(-1)';   /* the right-hand bow is mirrored so the row is symmetrical */
+      g.appendChild(cv);
+      if(isB)peg(i===2?cx+w*.2:cx-w*.2,row.y);         /* one iron pin through the grip */
+      else[.3,.7].forEach(p=>peg(cx,y+h*p));            /* two pins hold a sword or hammer to the brick */
+    }));
+  }
   function aFill(sc){
     aHQ(sc);
     /* two rods over the crates, three hooks each; a dagger hangs from every hook by its pommel, point down. The dagger art is drawn blade up-left / hilt down-right, so it is turned 225deg (hilt up, blade down; the angle is worked out from each sprite's own diagonal so every dagger hangs straight; sprites 2 and 4 are drawn the other way round, hilt down-left) inside a square box as wide as its diagonal. */
@@ -4279,19 +4314,8 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
           const pg=document.createElement('i');pg.className='pg';pg.style.left=px+'%';ax.appendChild(pg);
         });
       });}
-    /* the brick above the dagger rods: two greatswords (lying pommel-left, point-right, each on two iron pegs) and two bows, alternating. Decoration only. */
-    /* the brick above the dagger rods: two big-weapon slots (lying pommel-left, point-right, each on two iron pegs) and two bows, alternating. Each big slot holds a greatsword or a war hammer and each bow slot one of the seven bows, re-rolled at every dawn. Decoration only. */
-    {const g=sc.querySelector('.sfa-gbr .ax');if(g){g.replaceChildren();
-      const gk=aShuffle(4,'gbr'),gs=aShuffle(2,'gbg'),hs=aShuffle(5,'gbh'),bs=aShuffle(7,'gbb'),BW=BOWSK.concat(BOWN),
-        big=[0,1].map(j=>gk[j]%2?{h:1,sp:HAMSK[hs[j]]}:{h:0,id:[34,43][gs[j]]}),
-        bow=j=>{const q=bs[j];return q<2?{sp:BOWSK[q],k:q?2.6:1.6}:{sp:BW[q],k:.44}};   /* the two old bows keep their size; the five tall ones are drawn smaller */
-      [[big[0],12.5],[bow(0),37.5,0],[big[1],62.5],[bow(1),87.5,1]].forEach(([o,pct,flip])=>{
-        const isB=!!o.k,cv=o.h?skCv(o.sp,.5):isB?skCv(o.sp,o.k):wpnCv(o.id,o.id===34?.78:.72),w=parseFloat(cv.style.width),h=parseFloat(cv.style.height);
-        cv.setAttribute('aria-hidden','true');cv.style.left='calc('+pct+'% - '+(w/2).toFixed(1)+'px)';cv.style.top=(24-h/2).toFixed(1)+'px';
-        if(!isB)cv.style.transform=o.h?'rotate(90deg)':'rotate(-90deg)';else if(flip)cv.style.transform='scaleX(-1)';   /* swords are drawn pommel-up (a quarter turn left lays them point-right); hammers are drawn head-up (a quarter turn right lays them head-right) */
-        g.appendChild(cv);
-        if(!isB)[-.27,.27].forEach(f=>{const pk=document.createElement('i');pk.className='pk';pk.style.left='calc('+pct+'% + '+(h*f).toFixed(1)+'px)';pk.style.top=(24+w/2).toFixed(1)+'px';g.appendChild(pk)});
-      });}}
+    /* the brick above the dagger rods (greatswords, war hammers, bows) is laid out by aGBR once zfFrame knows how much wall is free */
+    {const gb=sc.querySelector('.sfa-gbr');if(gb&&gb.dataset.h)aGBR(sc,+gb.dataset.h)}
     const vs=aRack();
     /* ONE long rack: eight swords, every one pommel up and point down in the trough. VSW sprites 1,3,7,8,10,11,13 are drawn blade-up, so those are flipped; the rest are already drawn pommel-up. */
     const VF=[0,1,0,1,0,0,0,1,1,0,1,1,0,1];
@@ -4622,7 +4646,10 @@ addEventListener('resize',sfFit);addEventListener('orientationchange',sfFit);sfF
       if(shf){const gl=Math.max(0,xs[0]+ws[0]+us+NS),gr=Math.max(gl,xs[2]-4);shf.style.paddingLeft=gl.toFixed(1)+'px';shf.style.paddingRight=Math.max(0,aw-gr).toFixed(1)+'px';inn.style.setProperty('--crs',Math.max(.55,Math.min(1,(gr-gl)/176)).toFixed(3));inn.style.setProperty('--dgx',((gl+gr)/2).toFixed(1)+'px');
         /* the dagger display has its own scale (it may grow a little past the crates) and takes all the brick height that is free above the crates, so the two rows get room */
         const dcs=Math.max(.55,Math.min(1,(gr-gl)/176)),dgs=Math.max(.6,Math.min(1.12,(gr-gl+10)/204)),dgb=44+46*dcs,dgh=Math.max(120,Math.min(176,(ah-dgb-62)/dgs));
-        inn.style.setProperty('--dgs',dgs.toFixed(3));inn.style.setProperty('--dgh',dgh.toFixed(1)+'px')}   /* real widths (rack 176, barrel 70 + lean), so the right-hand barrel and its spears always end inside the wall */
+        inn.style.setProperty('--dgs',dgs.toFixed(3));inn.style.setProperty('--dgh',dgh.toFixed(1)+'px')
+        /* the free brick between the shield rail and the top dagger rod: from just under the shields down to the top of the (scaled) dagger board. The big weapons and bows fill it. */
+        {const sdw=(aw-104)/3,gTop=34+5+sdw*1.25+8,gBot=ah-dgb-dgh*dgs-8*dgs-2,gH=Math.max(48,Math.min(300,(gBot-gTop)/dgs)),gb=inn.querySelector('.sfa-gbr');
+        inn.style.setProperty('--gbh',gH.toFixed(1)+'px');if(gb){gb.dataset.h=gH.toFixed(1);aGBR(inn,gH)}}}   /* real widths (rack 176, barrel 70 + lean), so the right-hand barrel and its spears always end inside the wall */
       return;
     }
     const W=Math.max(100,Math.min(140,70*aw/(ah*.4)));
